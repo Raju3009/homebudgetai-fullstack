@@ -1,0 +1,129 @@
+<h1>Expenses</h1>
+
+<div class="min-h-screen bg-gray-100 p-6">
+
+  <div class="max-w-3xl mx-auto">
+<div class="min-h-screen bg-gray-100 p-6">
+
+  <div class="max-w-4xl mx-auto">
+
+    <!-- TITLE -->
+    <h1 class="text-3xl font-bold text-center text-indigo-600 mb-6">
+      💰 Expense Tracker
+    </h1>
+
+    <!-- ADD FORM -->
+    <div class="bg-white p-4 rounded-xl shadow mb-6 flex gap-2">
+
+      <input [(ngModel)]="newExpense.title"
+             class="border p-2 rounded w-full"
+             placeholder="Title" />
+
+      <input [(ngModel)]="newExpense.amount"
+             type="number"
+             class="border p-2 rounded w-full"
+             placeholder="Amount" />
+
+      <input [(ngModel)]="newExpense.category"
+             class="border p-2 rounded w-full"
+             placeholder="Category" />
+
+      <button (click)="addExpense()"
+              class="bg-indigo-600 text-white px-4 rounded hover:bg-indigo-700">
+        Add
+      </button>
+    </div>
+
+    <!-- SUMMARY + CHART -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg mb-6">
+
+      <!-- HEADER -->
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-700">
+          📊 Expense Analytics
+        </h2>
+        <span class="text-sm text-gray-400">Summary</span>
+      </div>
+
+      <!-- TOTAL -->
+      <div class="text-center mb-4">
+        <p class="text-gray-500 text-sm">Total Spend</p>
+        <h3 class="text-2xl font-bold text-indigo-600">
+          ₹{{ expenses.reduce((sum, e) => sum + e.amount, 0) }}
+        </h3>
+      </div>
+
+      <!-- CHART -->
+      <div class="flex justify-center">
+        <div class="w-72 h-72">
+          <canvas id="expenseChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TOTAL ITEMS -->
+    <div class="mb-4 text-lg font-semibold">
+      Total Items:
+      <span class="bg-green-500 text-white px-2 py-1 rounded">
+        {{ expenses.length }}
+      </span>
+    </div>
+
+    <!-- LIST -->
+    <div class="space-y-3">
+
+      <div *ngFor="let e of expenses"
+           class="bg-white p-4 rounded-xl shadow flex justify-between items-center">
+
+        <!-- VIEW MODE -->
+        <div *ngIf="editId !== e.id">
+          <p class="font-bold text-lg">{{ e.title }}</p>
+          <p class="text-gray-600">₹{{ e.amount }}</p>
+          <span class="text-sm bg-gray-200 px-2 py-1 rounded">
+            {{ e.category }}
+          </span>
+        </div>
+
+        <!-- EDIT MODE -->
+        <div *ngIf="editId === e.id" class="flex gap-2">
+          <input [(ngModel)]="editExpense.title" class="border p-1 rounded" />
+          <input [(ngModel)]="editExpense.amount" type="number" class="border p-1 rounded" />
+          <input [(ngModel)]="editExpense.category" class="border p-1 rounded" />
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="flex gap-2">
+
+          <button *ngIf="editId !== e.id"
+                  (click)="startEdit(e)"
+                  class="bg-yellow-400 px-3 py-1 rounded">
+            Edit
+          </button>
+
+          <button *ngIf="editId === e.id"
+                  (click)="updateExpense()"
+                  class="bg-green-500 text-white px-3 py-1 rounded">
+            Save
+          </button>
+
+          <button *ngIf="editId === e.id"
+                  (click)="cancelEdit()"
+                  class="bg-gray-400 px-3 py-1 rounded">
+            Cancel
+          </button>
+
+          <button (click)="deleteExpense(e.id)"
+                  class="bg-red-500 text-white px-3 py-1 rounded">
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
