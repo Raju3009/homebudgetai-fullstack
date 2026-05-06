@@ -1,0 +1,39 @@
+<div class="min-h-screen bg-gray-100 p-6">
+
+  <div class="max-w-5xl mx-auto">
+
+    <h1 class="text-3xl font-bold text-indigo-600 mb-6">
+      📊 Dashboard
+    </h1>
+
+    <!-- SUMMARY CARDS -->
+    <div class="grid grid-cols-3 gap-4 mb-6">
+
+      <div class="bg-white p-4 rounded-xl shadow">
+        <p class="text-gray-500">Total</p>
+        <h2 class="text-xl font-bold text-indigo-600">₹{{ total }}</h2>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow">
+        <p class="text-gray-500">Income</p>
+        <h2 class="text-xl font-bold text-green-600">₹{{ income }}</h2>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow">
+        <p class="text-gray-500">Expense</p>
+        <h2 class="text-xl font-bold text-red-600">₹{{ expense }}</h2>
+      </div>
+
+    </div>
+
+    <!-- BAR CHART -->
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h2 class="text-lg font-semibold mb-4">Monthly Overview</h2>
+      <div class="h-80">
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+</div>
