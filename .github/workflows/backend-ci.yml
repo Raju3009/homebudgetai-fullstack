@@ -1,0 +1,36 @@
+﻿name: Backend CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'HomeBudgetAPI/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'HomeBudgetAPI/**'
+      - '.github/workflows/backend-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore HomeBudgetAPI/HomeBudgetAPI.csproj
+
+      - name: Build
+        run: dotnet build HomeBudgetAPI/HomeBudgetAPI.csproj -c Release --no-restore
+
+      - name: Docker build
+        working-directory: HomeBudgetAPI
+        run: docker build -t homebudgetai-api:ci .

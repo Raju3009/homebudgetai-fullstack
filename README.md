@@ -121,6 +121,26 @@ The API creates the schema and seed user on first startup with `EnsureCreated`.
 
 Angular routing is supported by `homebudget-ui/public/_redirects` and `netlify.toml`.
 
+
+### Frontend on GitHub Pages
+
+A GitHub Actions workflow is included at `.github/workflows/frontend-pages.yml`.
+
+1. In GitHub, open repository Settings -> Pages.
+2. Set Source to `GitHub Actions`.
+3. Push to `main` or run the workflow manually.
+4. The frontend will publish to:
+
+```text
+https://raju3009.github.io/homebudgetai-fullstack/
+```
+
+For a fully working production login, deploy the backend first and set `homebudget-ui/src/environments/environment.prod.ts` to the live API URL before publishing.
+
+### Backend CI / Docker
+
+`.github/workflows/backend-ci.yml` restores, builds, and Docker-builds the .NET API on every backend change. Use the generated Docker image flow as the base for Render, Railway, Azure, or Fly.io deployment.
+
 ## API Documentation
 
 Swagger is available at:
@@ -159,3 +179,4 @@ Key endpoints:
 - Angular production build passes.
 - ASP.NET Core Release build passes.
 - Deployment configs generated for Netlify and Render.
+
