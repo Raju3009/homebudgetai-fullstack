@@ -1,21 +1,15 @@
-# Base image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
 
-# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-
-# Copy project file first (faster builds)
-COPY *.csproj ./
-RUN dotnet restore
-
-# Copy everything else
+COPY ["HomeBudgetAPI.csproj", "./"]
+RUN dotnet restore "HomeBudgetAPI.csproj"
 COPY . .
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish "HomeBudgetAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# Final stage
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .

@@ -1,0 +1,22 @@
+﻿services:
+  - type: web
+    name: homebudgetai-api
+    runtime: docker
+    rootDir: HomeBudgetAPI
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: DatabaseProvider
+        value: PostgreSQL
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        generateValue: true
+      - key: Jwt__Issuer
+        value: HomeBudgetAI
+      - key: Jwt__Audience
+        value: HomeBudgetAI.Users
+      - key: Cors__AllowedOrigins__0
+        sync: false

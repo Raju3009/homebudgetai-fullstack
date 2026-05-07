@@ -1,112 +1,17 @@
+﻿import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../../services/api.service';
 import Chart from 'chart.js/auto';
-import { CommonModule } from '@angular/common';
+import { ApiService, DashboardSummary } from '../../services/api.service';
 
-@Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './dashboard.component.html'
-})
+@Component({ selector: 'app-dashboard', standalone: true, imports: [CommonModule], templateUrl: './dashboard.component.html' })
 export class DashboardComponent implements OnInit {
-
-  expenses: any[] = [];
-  chart: any;
-
-  total = 0;
-  income = 0;
-  expense = 0;
-
+  summary?: DashboardSummary; loading = true; chart?: Chart;
   constructor(private api: ApiService) {}
-
-  ngOnInit() {
-    this.loadData();
-  }
-
-  // ============================
-  // LOAD DATA
-  // ============================
-  loadData() {
-    this.api.getExpenses().subscribe((res: any) => {
-      this.expenses = res;
-
-      this.calculateSummary();
-
-      // wait for DOM
-      requestAnimationFrame(() => this.createChart());
-    });
-  }
-
-  // ============================
-  // SUMMARY CALCULATION (FIXED)
-  // ============================
-  calculateSummary() {
-    this.total = 0;
-    this.income = 0;
-    this.expense = 0;
-
-    this.expenses.forEach(e => {
-      const amount = Number(e.amount);
-
-      this.total += amount;
-
-      // ✅ USE ONE LOGIC ONLY (recommended: category-based)
-      if (e.category?.toLowerCase() === 'income') {
-        this.income += amount;
-      } else {
-        this.expense += amount;
-      }
-    });
-  }
-
-  // ============================
-  // CHART
-  // ============================
-  createChart() {
-    const canvas = document.getElementById('barChart') as HTMLCanvasElement;
-    if (!canvas) return;
-
-    if (this.chart) {
-      this.chart.destroy();
-    }
-
-    const monthly: any = {};
-
-    this.expenses.forEach(e => {
-      const date = new Date(e.date);
-      const month = date.toLocaleString('default', { month: 'short' });
-
-      monthly[month] = (monthly[month] || 0) + Number(e.amount);
-    });
-
-    this.chart = new Chart(canvas, {
-      type: 'bar',
-
-      data: {
-        labels: Object.keys(monthly),
-        datasets: [
-          {
-            label: 'Monthly Expenses',
-            data: Object.values(monthly),
-            backgroundColor: '#6366F1' // 🔥 premium color
-          }
-        ]
-      },
-
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            display: true
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
+  ngOnInit() { this.api.dashboard().subscribe(res => { this.summary = res; this.loading = false; requestAnimationFrame(() => this.draw()); }); }
+  draw() {
+    const canvas = document.getElementById('monthlyChart') as HTMLCanvasElement | null;
+    if (!canvas || !this.summary) return;
+    this.chart?.destroy();
+    this.chart = new Chart(canvas, { type: 'bar', data: { labels: this.summary.monthlyTotals.map(x => x.month), datasets: [{ label: 'Income', data: this.summary.monthlyTotals.map(x => x.income), backgroundColor: '#0f9f6e' }, { label: 'Expenses', data: this.summary.monthlyTotals.map(x => x.expenses), backgroundColor: '#dc2626' }] }, options: { responsive: true, maintainAspectRatio: false } });
   }
 }

@@ -1,8 +1,5 @@
-namespace HomeBudgetAPI.Models
-{
-    public class LoginModel
-    {
-        public string Email { get; set; } = "";
-        public string Password { get; set; } = "";
-    }
-}
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace HomeBudgetAPI.Models;
+
+public record LoginModel([Required, EmailAddress] string Email, [Required] string Password);

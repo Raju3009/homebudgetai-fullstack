@@ -1,39 +1,9 @@
-<div class="min-h-screen bg-gray-100 p-6">
-
-  <div class="max-w-5xl mx-auto">
-
-    <h1 class="text-3xl font-bold text-indigo-600 mb-6">
-      📊 Dashboard
-    </h1>
-
-    <!-- SUMMARY CARDS -->
-    <div class="grid grid-cols-3 gap-4 mb-6">
-
-      <div class="bg-white p-4 rounded-xl shadow">
-        <p class="text-gray-500">Total</p>
-        <h2 class="text-xl font-bold text-indigo-600">₹{{ total }}</h2>
-      </div>
-
-      <div class="bg-white p-4 rounded-xl shadow">
-        <p class="text-gray-500">Income</p>
-        <h2 class="text-xl font-bold text-green-600">₹{{ income }}</h2>
-      </div>
-
-      <div class="bg-white p-4 rounded-xl shadow">
-        <p class="text-gray-500">Expense</p>
-        <h2 class="text-xl font-bold text-red-600">₹{{ expense }}</h2>
-      </div>
-
-    </div>
-
-    <!-- BAR CHART -->
-    <div class="bg-white p-6 rounded-xl shadow">
-      <h2 class="text-lg font-semibold mb-4">Monthly Overview</h2>
-      <div class="h-80">
-        <canvas id="barChart"></canvas>
-      </div>
-    </div>
-
-  </div>
-
-</div>
+﻿<section class="page-grid" *ngIf="!loading && summary; else wait">
+  <article class="metric"><span>Income</span><strong>{{ summary.income | currency }}</strong></article>
+  <article class="metric"><span>Expenses</span><strong>{{ summary.expenses | currency }}</strong></article>
+  <article class="metric accent"><span>Remaining</span><strong>{{ summary.balance | currency }}</strong></article>
+  <section class="panel wide"><div class="section-head"><h2>Monthly Flow</h2><p>Income and expense trend</p></div><div class="chart-box"><canvas id="monthlyChart"></canvas></div></section>
+  <section class="panel"><div class="section-head"><h2>Top Categories</h2><p>Expense concentration</p></div><div class="category-row" *ngFor="let item of summary.categoryTotals"><span>{{ item.category }}</span><strong>{{ item.total | currency }}</strong></div></section>
+  <section class="panel"><div class="section-head"><h2>AI Suggestions</h2><p>Generated from your budget behavior</p></div><div class="suggestion" *ngFor="let item of summary.suggestions">{{ item }}</div></section>
+</section>
+<ng-template #wait><div class="loading">Loading dashboard...</div></ng-template>

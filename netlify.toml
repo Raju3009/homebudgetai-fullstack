@@ -1,0 +1,9 @@
+﻿[build]
+  base = "homebudget-ui"
+  command = "npm ci && npm run build -- --configuration production"
+  publish = "dist/homebudget-ui/browser"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
