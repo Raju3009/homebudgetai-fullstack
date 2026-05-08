@@ -19,8 +19,10 @@ public record DashboardSummary(
     decimal Income,
     decimal Expenses,
     decimal Balance,
+    decimal SavingsRate,
     IReadOnlyList<CategoryTotal> CategoryTotals,
     IReadOnlyList<MonthlyTotal> MonthlyTotals,
+    IReadOnlyList<TransactionResponse> RecentTransactions,
     IReadOnlyList<string> Suggestions);
 
 public record CategoryTotal(string Category, decimal Total);

@@ -7,7 +7,7 @@ namespace HomeBudgetAPI.Repositories;
 
 public interface ITransactionRepository
 {
-    Task<PagedResponse<TransactionResponse>> SearchAsync(int userId, string? query, string? category, TransactionType? type, int page, int pageSize);
+    Task<PagedResponse<TransactionResponse>> SearchAsync(int userId, string? query, string? category, TransactionType? type, DateTime? from, DateTime? to, int page, int pageSize);
     Task<List<BudgetTransaction>> ListForDashboardAsync(int userId);
     Task<BudgetTransaction?> GetAsync(int userId, int id);
     Task<BudgetTransaction> AddAsync(BudgetTransaction transaction);
@@ -21,7 +21,7 @@ public class TransactionRepository : ITransactionRepository
 
     public TransactionRepository(AppDbContext db) => _db = db;
 
-    public async Task<PagedResponse<TransactionResponse>> SearchAsync(int userId, string? query, string? category, TransactionType? type, int page, int pageSize)
+    public async Task<PagedResponse<TransactionResponse>> SearchAsync(int userId, string? query, string? category, TransactionType? type, DateTime? from, DateTime? to, int page, int pageSize)
     {
         page = Math.Max(page, 1);
         pageSize = Math.Clamp(pageSize, 5, 100);
@@ -35,6 +35,8 @@ public class TransactionRepository : ITransactionRepository
 
         if (!string.IsNullOrWhiteSpace(category)) items = items.Where(x => x.Category == category);
         if (type.HasValue) items = items.Where(x => x.Type == type.Value);
+        if (from.HasValue) items = items.Where(x => x.Date >= DateTime.SpecifyKind(from.Value.Date, DateTimeKind.Utc));
+        if (to.HasValue) items = items.Where(x => x.Date < DateTime.SpecifyKind(to.Value.Date.AddDays(1), DateTimeKind.Utc));
 
         var total = await items.CountAsync();
         var data = await items.OrderByDescending(x => x.Date).ThenByDescending(x => x.Id)

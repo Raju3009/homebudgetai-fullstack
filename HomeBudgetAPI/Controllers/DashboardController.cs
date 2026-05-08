@@ -37,6 +37,8 @@ public class DashboardController : ControllerBase
             .OrderBy(x => x.Key)
             .Select(x => new MonthlyTotal(x.Key.ToString("MMM yyyy"), x.Where(v => v.Type == TransactionType.Income).Sum(v => v.Amount), x.Where(v => v.Type == TransactionType.Expense).Sum(v => v.Amount)))
             .ToList();
-        return new DashboardSummary(income, expenses, income - expenses, categories, monthly, _insights.CreateSuggestions(income, expenses, categories.ToDictionary(x => x.Category, x => x.Total)));
+        var recent = data.Take(6).Select(x => new TransactionResponse(x.Id, x.Title, x.Category, x.Amount, x.Type, x.Date, x.Notes)).ToList();
+        var savingsRate = income <= 0 ? 0 : Math.Round(((income - expenses) / income) * 100, 1);
+        return new DashboardSummary(income, expenses, income - expenses, savingsRate, categories, monthly, recent, _insights.CreateSuggestions(income, expenses, categories.ToDictionary(x => x.Category, x => x.Total)));
     }
 }

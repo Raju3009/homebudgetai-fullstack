@@ -2,8 +2,14 @@
   <article class="metric"><span>Income</span><strong>{{ summary.income | currency }}</strong></article>
   <article class="metric"><span>Expenses</span><strong>{{ summary.expenses | currency }}</strong></article>
   <article class="metric accent"><span>Remaining</span><strong>{{ summary.balance | currency }}</strong></article>
+
   <section class="panel wide"><div class="section-head"><h2>Monthly Flow</h2><p>Income and expense trend</p></div><div class="chart-box"><canvas id="monthlyChart"></canvas></div></section>
-  <section class="panel"><div class="section-head"><h2>Top Categories</h2><p>Expense concentration</p></div><div class="category-row" *ngFor="let item of summary.categoryTotals"><span>{{ item.category }}</span><strong>{{ item.total | currency }}</strong></div></section>
+  <section class="panel"><div class="section-head"><h2>Category Mix</h2><p>Expense concentration</p></div><div class="chart-box compact"><canvas id="categoryChart"></canvas></div></section>
+
+  <section class="panel"><div class="section-head"><h2>Savings Tracker</h2><p>{{ summary.savingsRate | number:'1.0-1' }}% savings rate</p></div><div class="progress-line"><span [style.width.%]="summary.savingsRate < 0 ? 0 : (summary.savingsRate > 100 ? 100 : summary.savingsRate)"></span></div><strong>{{ summary.balance | currency }}</strong><small>Projected monthly surplus</small></section>
+  <section class="panel"><div class="section-head"><h2>Top Categories</h2><p>Where spending is going</p></div><div class="category-row" *ngFor="let item of summary.categoryTotals"><span>{{ item.category }}</span><strong>{{ item.total | currency }}</strong></div><div class="empty-state" *ngIf="summary.categoryTotals.length === 0">No expense categories yet.</div></section>
   <section class="panel"><div class="section-head"><h2>AI Suggestions</h2><p>Generated from your budget behavior</p></div><div class="suggestion" *ngFor="let item of summary.suggestions">{{ item }}</div></section>
+
+  <section class="panel wide"><div class="section-head"><h2>Recent Transactions</h2><p>Latest account activity</p></div><div class="category-row" *ngFor="let item of summary.recentTransactions"><span>{{ item.title }} <small>{{ item.category }}</small></span><strong [class.success]="item.type === 'Income'">{{ item.amount | currency }}</strong></div><div class="empty-state" *ngIf="summary.recentTransactions.length === 0">Add your first transaction to activate insights.</div></section>
 </section>
-<ng-template #wait><div class="loading">Loading dashboard...</div></ng-template>
+<ng-template #wait><section class="page-grid"><article class="metric skeleton"></article><article class="metric skeleton"></article><article class="metric skeleton"></article><section class="panel wide skeleton tall"></section><section class="panel skeleton tall"></section></section></ng-template>

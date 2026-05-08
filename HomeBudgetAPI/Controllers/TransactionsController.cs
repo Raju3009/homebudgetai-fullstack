@@ -18,12 +18,14 @@ public class TransactionsController : ControllerBase
     public TransactionsController(ITransactionRepository transactions) => _transactions = transactions;
 
     [HttpGet]
-    public Task<PagedResponse<TransactionResponse>> Search([FromQuery] string? q, [FromQuery] string? category, [FromQuery] TransactionType? type, [FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
-        _transactions.SearchAsync(UserId, q, category, type, page, pageSize);
+    public Task<PagedResponse<TransactionResponse>> Search([FromQuery] string? q, [FromQuery] string? category, [FromQuery] TransactionType? type, [FromQuery] DateTime? from, [FromQuery] DateTime? to, [FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+        _transactions.SearchAsync(UserId, q, category, type, from, to, page, pageSize);
 
     [HttpPost]
     public async Task<ActionResult<TransactionResponse>> Add(TransactionRequest request)
     {
+        if (string.IsNullOrWhiteSpace(request.Title)) return BadRequest(new { message = "Title is required." });
+        if (string.IsNullOrWhiteSpace(request.Category)) return BadRequest(new { message = "Category is required." });
         if (request.Amount <= 0) return BadRequest(new { message = "Amount must be greater than zero." });
         var item = await _transactions.AddAsync(new BudgetTransaction
         {
@@ -41,6 +43,9 @@ public class TransactionsController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult<TransactionResponse>> Update(int id, TransactionRequest request)
     {
+        if (string.IsNullOrWhiteSpace(request.Title)) return BadRequest(new { message = "Title is required." });
+        if (string.IsNullOrWhiteSpace(request.Category)) return BadRequest(new { message = "Category is required." });
+        if (request.Amount <= 0) return BadRequest(new { message = "Amount must be greater than zero." });
         var item = await _transactions.GetAsync(UserId, id);
         if (item is null) return NotFound();
         item.Title = request.Title.Trim();
@@ -64,9 +69,9 @@ public class TransactionsController : ControllerBase
     }
 
     [HttpGet("export")]
-    public async Task<FileContentResult> Export()
+    public async Task<FileContentResult> Export([FromQuery] string? q, [FromQuery] string? category, [FromQuery] TransactionType? type, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
     {
-        var data = await _transactions.SearchAsync(UserId, null, null, null, 1, 100);
+        var data = await _transactions.SearchAsync(UserId, q, category, type, from, to, 1, 100);
         var csv = new StringBuilder("Date,Type,Category,Title,Amount,Notes\n");
         foreach (var item in data.Items)
         {
