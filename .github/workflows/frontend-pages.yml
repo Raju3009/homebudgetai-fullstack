@@ -31,6 +31,9 @@ jobs:
           cache: npm
           cache-dependency-path: homebudget-ui/package-lock.json
 
+      - name: Use pinned npm
+        run: npm install -g npm@11.6.0
+
       - name: Install dependencies
         working-directory: homebudget-ui
         run: npm ci
