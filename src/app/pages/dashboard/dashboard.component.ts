@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ChangeDetectorRef } from '@angular/core';
-
+import { RouterLink } from '@angular/router';
 import Chart from 'chart.js/auto';
 
 import { ApiService } from '../../services/api.service';
@@ -10,33 +9,17 @@ import { ApiService } from '../../services/api.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './dashboard.component.html'
 })
 export class DashboardComponent implements OnInit {
-
-  // =========================================
-  // DATA
-  // =========================================
   expenses: any[] = [];
-
-  chart: any;
-
-  pieChart: any;
-
+  chart: Chart | null = null;
+  pieChart: Chart | null = null;
   total = 0;
-
   income = 0;
-
   expense = 0;
-
-  darkMode = false;
-
-  // =========================================
-  // EDIT MODAL
-  // =========================================
   selectedExpense: any = null;
-
   isEditModalOpen = false;
 
   constructor(
@@ -44,399 +27,180 @@ export class DashboardComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
-  // =========================================
-  // INIT
-  // =========================================
   ngOnInit(): void {
-
     this.loadData();
   }
 
-  // =========================================
-  // LOAD DATA
-  // =========================================
   loadData(): void {
-
     this.api.getExpenses().subscribe({
-
       next: (res: any) => {
-
-        console.log('API RESPONSE 👉', res);
-
-        // .NET sometimes returns $values
-        this.expenses = res?.$values
-          ? res.$values
-          : res;
-
-        // calculate totals
+        this.expenses = res?.$values ? res.$values : res;
         this.calculateSummary();
-
-        // refresh DOM
         this.cdr.detectChanges();
 
-        // wait for canvas render
         setTimeout(() => {
-
           this.createBarChart();
-
           this.createPieChart();
-
-        }, 300);
+        }, 150);
       },
-
       error: (err) => {
-
-        console.log(err);
+        console.error('Unable to load transactions', err);
+        this.expenses = [];
+        this.calculateSummary();
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.createBarChart();
+          this.createPieChart();
+        }, 150);
       }
     });
   }
 
-  // =========================================
-  // SUMMARY
-  // =========================================
   calculateSummary(): void {
-
     this.income = 0;
-
     this.expense = 0;
 
-    this.expenses.forEach(e => {
-
-      const amount = Number(e.amount || 0);
-
-      const type =
-        (e.type || 'Expense')
-        .toLowerCase()
-        .trim();
+    this.expenses.forEach((entry) => {
+      const amount = Number(entry.amount || 0);
+      const type = (entry.type || 'Expense').toLowerCase().trim();
 
       if (type === 'income') {
-
         this.income += amount;
-
       } else {
-
         this.expense += amount;
       }
     });
 
-    this.total =
-      this.income - this.expense;
+    this.total = this.income - this.expense;
   }
 
-  // =========================================
-  // BAR CHART
-  // =========================================
   createBarChart(): void {
+    const canvas = document.getElementById('barChart') as HTMLCanvasElement;
+    if (!canvas) return;
 
-    const canvas =
-      document.getElementById(
-        'barChart'
-      ) as HTMLCanvasElement;
+    this.chart?.destroy();
 
-    if (!canvas) {
+    const monthly: Record<string, number> = {};
+    this.expenses
+      .filter((entry) => (entry.type || 'Expense').toLowerCase().trim() !== 'income')
+      .forEach((entry) => {
+        const date = new Date(entry.date);
+        const month = Number.isNaN(date.getTime())
+          ? 'No date'
+          : date.toLocaleString('default', { month: 'short' });
 
-      console.log('Bar chart canvas missing');
-
-      return;
-    }
-
-    // destroy old chart
-    if (this.chart) {
-      this.chart.destroy();
-    }
-
-    const monthly: any = {};
-
-    // only expenses
-    const expenseData =
-      this.expenses.filter(e => {
-
-        const type =
-          (e.type || 'Expense')
-          .toLowerCase()
-          .trim();
-
-        return type !== 'income';
+        monthly[month] = (monthly[month] || 0) + Number(entry.amount || 0);
       });
 
-    // group by month
-    expenseData.forEach(e => {
-
-      const amount =
-        Number(e.amount || 0);
-
-      const date =
-        new Date(e.date);
-
-      const month =
-        date.toLocaleString(
-          'default',
-          {
-            month: 'short'
-          }
-        );
-
-      if (!monthly[month]) {
-
-        monthly[month] = 0;
-      }
-
-      monthly[month] += amount;
-    });
-
-    let labels =
-      Object.keys(monthly);
-
-    let data =
-      Object.values(monthly);
-
-    // fallback
-    if (labels.length === 0) {
-
-      labels = ['No Data'];
-
-      data = [0];
-    }
+    const labels = Object.keys(monthly);
+    const data = Object.values(monthly);
 
     this.chart = new Chart(canvas, {
-
       type: 'bar',
-
       data: {
-
-        labels: labels,
-
+        labels: labels.length ? labels : ['No data'],
         datasets: [
           {
-            label: 'Monthly Expenses',
-
-            data: data,
-
-            backgroundColor: [
-              '#6366F1',
-              '#8B5CF6',
-              '#EC4899',
-              '#10B981',
-              '#F59E0B',
-              '#06B6D4'
-            ],
-
-            borderRadius: 10
+            label: 'Monthly expenses',
+            data: data.length ? data : [0],
+            backgroundColor: ['#4F46E5', '#14B8A6', '#EC4899', '#F97316', '#22C55E', '#06B6D4'],
+            borderRadius: 14,
+            borderSkipped: false
           }
         ]
       },
-
       options: {
-
         responsive: true,
-
         maintainAspectRatio: false,
-
         plugins: {
-
-          legend: {
-            display: true
-          }
+          legend: { display: false }
         },
-
         scales: {
-
           y: {
-            beginAtZero: true
+            beginAtZero: true,
+            grid: { color: 'rgba(148, 163, 184, 0.18)' }
+          },
+          x: {
+            grid: { display: false }
           }
         }
       }
     });
   }
 
-  // =========================================
-  // PIE CHART
-  // =========================================
   createPieChart(): void {
+    const canvas = document.getElementById('pieChart') as HTMLCanvasElement;
+    if (!canvas) return;
 
-    const canvas =
-      document.getElementById(
-        'pieChart'
-      ) as HTMLCanvasElement;
+    this.pieChart?.destroy();
 
-    if (!canvas) {
-
-      console.log('Pie chart canvas missing');
-
-      return;
-    }
-
-    // destroy old pie chart
-    if (this.pieChart) {
-      this.pieChart.destroy();
-    }
-
-    const categories: any = {};
-
-    // only expenses
-    const expenseData =
-      this.expenses.filter(e => {
-
-        const type =
-          (e.type || 'Expense')
-          .toLowerCase()
-          .trim();
-
-        return type !== 'income';
+    const categories: Record<string, number> = {};
+    this.expenses
+      .filter((entry) => (entry.type || 'Expense').toLowerCase().trim() !== 'income')
+      .forEach((entry) => {
+        const category = entry.category || 'Other';
+        categories[category] = (categories[category] || 0) + Number(entry.amount || 0);
       });
 
-    // group by category
-    expenseData.forEach(e => {
-
-      const category =
-        e.category || 'Other';
-
-      const amount =
-        Number(e.amount || 0);
-
-      if (!categories[category]) {
-
-        categories[category] = 0;
-      }
-
-      categories[category] += amount;
-    });
-
-    let labels =
-      Object.keys(categories);
-
-    let data =
-      Object.values(categories);
-
-    // fallback
-    if (labels.length === 0) {
-
-      labels = ['No Data'];
-
-      data = [1];
-    }
+    const labels = Object.keys(categories);
+    const data = Object.values(categories);
 
     this.pieChart = new Chart(canvas, {
-
-      type: 'pie',
-
+      type: 'doughnut',
       data: {
-
-        labels: labels,
-
+        labels: labels.length ? labels : ['No data'],
         datasets: [
           {
-            data: data,
-
-            backgroundColor: [
-              '#6366F1',
-              '#EC4899',
-              '#10B981',
-              '#F59E0B',
-              '#06B6D4',
-              '#8B5CF6'
-            ]
+            data: data.length ? data : [1],
+            backgroundColor: ['#4F46E5', '#EC4899', '#14B8A6', '#F97316', '#06B6D4', '#A855F7'],
+            borderColor: '#ffffff',
+            borderWidth: 3
           }
         ]
       },
-
       options: {
-
         responsive: true,
-
+        maintainAspectRatio: false,
+        cutout: '58%',
         plugins: {
-
-          legend: {
-            position: 'bottom'
-          }
+          legend: { position: 'bottom' }
         }
       }
     });
   }
 
-  // =========================================
-  // DELETE
-  // =========================================
   deleteExpense(id: number): void {
+    if (!confirm('Delete this transaction?')) return;
 
-    const confirmDelete =
-      confirm(
-        'Delete this transaction?'
-      );
-
-    if (!confirmDelete) return;
-
-    this.api.deleteExpense(id)
-      .subscribe({
-
-        next: () => {
-
-          this.expenses =
-            this.expenses.filter(
-              e => e.id !== id
-            );
-
-          this.calculateSummary();
-
-          this.createBarChart();
-
-          this.createPieChart();
-        },
-
-        error: (err) => {
-
-          console.log(err);
-        }
-      });
+    this.api.deleteExpense(id).subscribe({
+      next: () => {
+        this.expenses = this.expenses.filter((entry) => entry.id !== id);
+        this.calculateSummary();
+        this.createBarChart();
+        this.createPieChart();
+      },
+      error: (err) => console.error('Unable to delete transaction', err)
+    });
   }
 
-  // =========================================
-  // OPEN EDIT
-  // =========================================
   openEdit(expense: any): void {
-
-    this.selectedExpense = {
-      ...expense
-    };
-
+    this.selectedExpense = { ...expense };
     this.isEditModalOpen = true;
   }
 
-  // =========================================
-  // CLOSE MODAL
-  // =========================================
   closeModal(): void {
-
     this.isEditModalOpen = false;
   }
 
-  // =========================================
-  // UPDATE
-  // =========================================
   updateExpense(): void {
+    if (!this.selectedExpense) return;
 
-    if (!this.selectedExpense)
-      return;
-
-    this.api.updateExpense(
-
-      this.selectedExpense.id,
-
-      this.selectedExpense
-
-    ).subscribe({
-
+    this.api.updateExpense(this.selectedExpense.id, this.selectedExpense).subscribe({
       next: () => {
-
         this.loadData();
-
         this.isEditModalOpen = false;
       },
-
-      error: (err) => {
-
-        console.log(err);
-      }
+      error: (err) => console.error('Unable to update transaction', err)
     });
   }
 }

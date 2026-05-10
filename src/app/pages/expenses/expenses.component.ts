@@ -1,20 +1,21 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ApiService } from '../../services/api.service';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import Chart from 'chart.js/auto';
+
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-expenses',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './expenses.component.html',
   styleUrls: ['./expenses.component.css']
 })
 export class ExpensesComponent implements OnInit {
-
   expenses: any[] = [];
-  chart: any;
+  chart: Chart | null = null;
 
   newExpense = {
     title: '',
@@ -24,7 +25,6 @@ export class ExpensesComponent implements OnInit {
   };
 
   editId: number | null = null;
-
   editExpense: any = {
     id: 0,
     title: '',
@@ -33,40 +33,34 @@ export class ExpensesComponent implements OnInit {
     type: 'Expense'
   };
 
-  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private api: ApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-  // ============================
-  // INIT
-  // ============================
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadExpenses();
   }
 
-  // ============================
-  // 📥 LOAD DATA (FIXED)
-  // ============================
-  loadExpenses() {
+  loadExpenses(): void {
     this.api.getExpenses().subscribe({
       next: (res: any) => {
-
-        console.log("API DATA 👉", res); // 🔥 DEBUG
-
-        // ✅ HANDLE .NET RESPONSE ($values)
         this.expenses = res?.$values ? res.$values : res;
-
-        console.log("FINAL DATA 👉", this.expenses);
-
         this.cdr.detectChanges();
         this.createChart();
       },
-      error: (err) => console.error("API ERROR ❌", err)
+      error: (err) => {
+        console.error('Unable to load transactions', err);
+        this.expenses = [];
+        this.cdr.detectChanges();
+        this.createChart();
+      }
     });
   }
 
-  // ============================
-  // ➕ ADD
-  // ============================
-  addExpense() {
+  addExpense(): void {
+    if (!this.newExpense.title || !this.newExpense.amount) return;
+
     this.api.addExpense(this.newExpense).subscribe({
       next: () => {
         this.newExpense = {
@@ -77,110 +71,78 @@ export class ExpensesComponent implements OnInit {
         };
         this.loadExpenses();
       },
-      error: (err) => console.error(err)
+      error: (err) => console.error('Unable to add transaction', err)
     });
   }
 
-  // ============================
-  // ❌ DELETE
-  // ============================
-  deleteExpense(id: number) {
+  deleteExpense(id: number): void {
     this.api.deleteExpense(id).subscribe({
       next: () => this.loadExpenses(),
-      error: (err) => console.error(err)
+      error: (err) => console.error('Unable to delete transaction', err)
     });
   }
 
-  // ============================
-  // ✏️ EDIT
-  // ============================
-  startEdit(e: any) {
-    this.editId = e.id;
-    this.editExpense = { ...e };
+  startEdit(expense: any): void {
+    this.editId = expense.id;
+    this.editExpense = { ...expense };
   }
 
-  cancelEdit() {
+  cancelEdit(): void {
     this.editId = null;
   }
 
-  updateExpense() {
+  updateExpense(): void {
     this.api.updateExpense(this.editExpense.id, this.editExpense).subscribe({
       next: () => {
         this.editId = null;
         this.loadExpenses();
       },
-      error: (err) => console.error(err)
+      error: (err) => console.error('Unable to update transaction', err)
     });
   }
 
-  // ============================
-  // 📊 SUMMARY (FIXED CASE ISSUE)
-  // ============================
-  getIncome() {
+  getIncome(): number {
     return this.expenses
-      .filter(x => (x.type || '').toLowerCase() === 'income')
-      .reduce((sum, x) => sum + Number(x.amount), 0);
+      .filter((entry) => (entry.type || '').toLowerCase() === 'income')
+      .reduce((sum, entry) => sum + Number(entry.amount), 0);
   }
 
-  getExpense() {
+  getExpense(): number {
     return this.expenses
-      .filter(x => (x.type || '').toLowerCase() === 'expense')
-      .reduce((sum, x) => sum + Number(x.amount), 0);
+      .filter((entry) => (entry.type || '').toLowerCase() === 'expense')
+      .reduce((sum, entry) => sum + Number(entry.amount), 0);
   }
 
-  getBalance() {
+  getBalance(): number {
     return this.getIncome() - this.getExpense();
   }
 
-  // ============================
-  // 📊 CHART (SAFE VERSION)
-  // ============================
-  createChart() {
-
+  createChart(): void {
     const canvas = document.getElementById('expenseChart') as HTMLCanvasElement;
     if (!canvas) return;
 
-    if (this.chart) {
-      this.chart.destroy();
-    }
+    this.chart?.destroy();
 
-    const categoryTotals: any = {};
-
+    const categoryTotals: Record<string, number> = {};
     this.expenses
-      .filter(e => (e.type || '').toLowerCase() === 'expense')
-      .forEach(e => {
-        const cat = e.category || 'Other';
-        categoryTotals[cat] =
-          (categoryTotals[cat] || 0) + Number(e.amount);
+      .filter((entry) => (entry.type || '').toLowerCase() === 'expense')
+      .forEach((entry) => {
+        const category = entry.category || 'Other';
+        categoryTotals[category] = (categoryTotals[category] || 0) + Number(entry.amount);
       });
 
-    let labels = Object.keys(categoryTotals);
-    let data = Object.values(categoryTotals);
-
-    // ✅ HANDLE EMPTY DATA
-    if (labels.length === 0) {
-      labels = ['No Data'];
-      data = [0];
-    }
-
-    const colors = [
-      '#6366F1',
-      '#22C55E',
-      '#F59E0B',
-      '#EF4444',
-      '#3B82F6',
-      '#8B5CF6'
-    ];
+    const labels = Object.keys(categoryTotals);
+    const data = Object.values(categoryTotals);
 
     this.chart = new Chart(canvas, {
       type: 'doughnut',
       data: {
-        labels: labels,
+        labels: labels.length ? labels : ['No data'],
         datasets: [
           {
-            data: data,
-            backgroundColor: colors,
-            borderWidth: 2,
+            data: data.length ? data : [1],
+            backgroundColor: ['#4F46E5', '#14B8A6', '#F97316', '#EC4899', '#06B6D4', '#A855F7'],
+            borderWidth: 3,
             borderColor: '#fff'
           }
         ]

@@ -1,419 +1,193 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-100 to-indigo-100 p-4 md:p-6">
-
-<div class="flex gap-6">
-
-  <!-- SIDEBAR -->
-  <aside class="w-64 bg-white rounded-3xl shadow-xl p-6 hidden lg:block h-screen sticky top-0">
-
-    <h2 class="text-2xl font-bold text-indigo-700 mb-8">
-      💰 HomeBudget
-    </h2>
-
-    <nav class="space-y-4">
-
-      <a
-        href="#"
-        class="block bg-indigo-100 text-indigo-700 px-4 py-3 rounded-xl font-medium">
-
-        📊 Dashboard
-
-      </a>
-
-      <a
-        routerLink="/expenses"
-        class="block hover:bg-gray-100 px-4 py-3 rounded-xl transition">
-
-        💸 Expenses
-
-      </a>
-
-      <a
-        href="#"
-        class="block hover:bg-gray-100 px-4 py-3 rounded-xl transition">
-
-        📈 Analytics
-
-      </a>
-
-      <a
-        href="#"
-        class="block hover:bg-gray-100 px-4 py-3 rounded-xl transition">
-
-        ⚙ Settings
-
-      </a>
-
-    </nav>
-
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <div class="flex-1">
-
-    <!-- HEADER -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-
-      <div>
-        <h1 class="text-4xl font-bold text-indigo-700">
-          📊 Dashboard
-        </h1>
-
-        <p class="text-gray-500 mt-1">
-          Manage your personal finances easily
-        </p>
+<main class="app-shell p-4 md:p-6 xl:p-8">
+  <div class="mx-auto flex max-w-7xl gap-6">
+    <aside class="glass-panel sticky top-6 hidden h-[calc(100vh-3rem)] w-72 shrink-0 rounded-[2rem] p-6 lg:flex lg:flex-col">
+      <div class="mb-8">
+        <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 via-fuchsia-500 to-orange-400 text-2xl font-black text-white shadow-lg">
+          HB
+        </div>
+        <h2 class="text-2xl font-black text-slate-950">HomeBudgetAI</h2>
+        <p class="mt-1 text-sm text-slate-500">Colorful money control</p>
       </div>
 
-      <button
-        routerLink="/expenses"
-        class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl shadow-lg transition duration-300 text-lg font-semibold">
+      <nav class="space-y-2">
+        <a routerLink="/dashboard" class="flex items-center gap-3 rounded-2xl bg-indigo-600 px-4 py-3 font-semibold text-white shadow-lg shadow-indigo-200">
+          Dashboard
+        </a>
+        <a routerLink="/expenses" class="flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold text-slate-600 transition hover:bg-white hover:text-indigo-700">
+          Transactions
+        </a>
+      </nav>
 
-        + Add Expense
+      <div class="mt-auto rounded-3xl bg-gradient-to-br from-teal-400 via-cyan-500 to-indigo-600 p-5 text-white shadow-xl">
+        <p class="text-sm font-semibold uppercase tracking-wide text-white/80">Balance health</p>
+        <p class="mt-2 text-3xl font-black money-text">₹{{ total }}</p>
+        <p class="mt-3 text-sm text-white/85">Track spending, income, and category trends in one bright workspace.</p>
+      </div>
+    </aside>
 
-      </button>
+    <section class="min-w-0 flex-1">
+      <header class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p class="text-sm font-bold uppercase tracking-[0.22em] text-fuchsia-600">Personal finance hub</p>
+          <h1 class="mt-2 text-4xl font-black leading-tight text-slate-950 md:text-5xl">Dashboard</h1>
+          <p class="mt-2 max-w-2xl text-slate-600">A brighter view of income, expenses, balance, and the transactions shaping your month.</p>
+        </div>
 
-    </div>
+        <a routerLink="/expenses" class="gradient-button inline-flex items-center justify-center rounded-2xl px-5 py-3 font-bold transition">
+          Add transaction
+        </a>
+      </header>
 
-    <!-- SUMMARY CARDS -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+      <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <article class="soft-card overflow-hidden rounded-3xl p-5">
+          <div class="flex items-center justify-between">
+            <p class="font-semibold text-slate-500">Total balance</p>
+            <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-bold text-indigo-700">Net</span>
+          </div>
+          <p class="mt-4 text-4xl font-black text-indigo-700 money-text">₹{{ total }}</p>
+          <div class="mt-5 h-2 rounded-full bg-slate-100">
+            <div class="h-2 w-3/4 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400"></div>
+          </div>
+        </article>
 
-      <!-- TOTAL -->
-      <div class="bg-white p-6 rounded-3xl shadow-lg hover:scale-105 transition duration-300">
+        <article class="soft-card overflow-hidden rounded-3xl p-5">
+          <div class="flex items-center justify-between">
+            <p class="font-semibold text-slate-500">Income</p>
+            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">Inflow</span>
+          </div>
+          <p class="mt-4 text-4xl font-black text-emerald-600 money-text">₹{{ income }}</p>
+          <div class="mt-5 h-2 rounded-full bg-emerald-50">
+            <div class="h-2 w-4/5 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400"></div>
+          </div>
+        </article>
 
-        <p class="text-gray-500 text-sm mb-2">
-          Total Balance
-        </p>
-
-        <h2 class="text-3xl font-bold text-indigo-600">
-          ₹{{ total }}
-        </h2>
-
+        <article class="soft-card overflow-hidden rounded-3xl p-5">
+          <div class="flex items-center justify-between">
+            <p class="font-semibold text-slate-500">Expense</p>
+            <span class="rounded-full bg-rose-100 px-3 py-1 text-xs font-bold text-rose-700">Outflow</span>
+          </div>
+          <p class="mt-4 text-4xl font-black text-rose-600 money-text">₹{{ expense }}</p>
+          <div class="mt-5 h-2 rounded-full bg-rose-50">
+            <div class="h-2 w-2/3 rounded-full bg-gradient-to-r from-rose-500 to-orange-400"></div>
+          </div>
+        </article>
       </div>
 
-      <!-- INCOME -->
-      <div class="bg-white p-6 rounded-3xl shadow-lg hover:scale-105 transition duration-300">
-
-        <p class="text-gray-500 text-sm mb-2">
-          Income
-        </p>
-
-        <h2 class="text-3xl font-bold text-green-600">
-          ₹{{ income }}
-        </h2>
-
-      </div>
-
-      <!-- EXPENSE -->
-      <div class="bg-white p-6 rounded-3xl shadow-lg hover:scale-105 transition duration-300">
-
-        <p class="text-gray-500 text-sm mb-2">
-          Expense
-        </p>
-
-        <h2 class="text-3xl font-bold text-red-500">
-          ₹{{ expense }}
-        </h2>
-
-      </div>
-
-    </div>
-
-    <!-- ANALYTICS -->
-    <div class="bg-white p-6 rounded-3xl shadow-xl mb-8">
-
-      <div class="flex justify-between items-center mb-5">
-
-        <h2 class="text-2xl font-semibold text-gray-800">
-          Analytics Dashboard
-        </h2>
-
-        <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm">
-          Live Analytics
-        </span>
-
-      </div>
-
-      <!-- CHART GRID -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        <!-- BAR CHART -->
-        <div class="bg-gray-50 rounded-2xl p-4 shadow-inner">
-
-          <h3 class="text-lg font-semibold text-gray-700 mb-4">
-            Monthly Expenses
-          </h3>
-
-          <div class="h-[350px]">
-
+      <section class="mb-6 grid grid-cols-1 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+        <article class="glass-panel rounded-[2rem] p-5">
+          <div class="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-black text-slate-950">Monthly expenses</h2>
+              <p class="text-sm text-slate-500">Spending rhythm across your saved dates.</p>
+            </div>
+            <span class="rounded-full bg-cyan-100 px-3 py-1 text-xs font-bold text-cyan-700">Live</span>
+          </div>
+          <div class="chart-box">
             <canvas id="barChart"></canvas>
-
           </div>
+        </article>
 
-        </div>
-
-        <!-- PIE CHART -->
-        <div class="bg-gray-50 rounded-2xl p-4 shadow-inner">
-
-          <h3 class="text-lg font-semibold text-gray-700 mb-4">
-            Category Breakdown
-          </h3>
-
-          <div class="h-[350px]">
-
+        <article class="glass-panel rounded-[2rem] p-5">
+          <div class="mb-4">
+            <h2 class="text-xl font-black text-slate-950">Category mix</h2>
+            <p class="text-sm text-slate-500">Where the money is going.</p>
+          </div>
+          <div class="chart-box">
             <canvas id="pieChart"></canvas>
-
           </div>
+        </article>
+      </section>
 
+      <section class="glass-panel rounded-[2rem] p-5">
+        <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-xl font-black text-slate-950">Recent transactions</h2>
+            <p class="text-sm text-slate-500">{{ expenses.length }} saved transactions</p>
+          </div>
+          <a routerLink="/expenses" class="rounded-2xl bg-slate-950 px-4 py-2 text-center text-sm font-bold text-white transition hover:bg-indigo-700">
+            Manage all
+          </a>
         </div>
 
-      </div>
+        <div *ngIf="expenses.length === 0" class="rounded-3xl border border-dashed border-slate-300 bg-white/70 px-6 py-12 text-center">
+          <p class="text-lg font-bold text-slate-700">No transactions yet</p>
+          <p class="mt-1 text-slate-500">Add your first income or expense to light up the dashboard.</p>
+        </div>
 
-    </div>
-
-    <!-- RECENT TRANSACTIONS -->
-    <div class="bg-white p-6 rounded-3xl shadow-xl">
-
-      <div class="flex justify-between items-center mb-5">
-
-        <h2 class="text-2xl font-semibold text-gray-800">
-          Recent Transactions
-        </h2>
-
-        <span class="text-sm text-gray-500">
-          {{ expenses.length }} Transactions
-        </span>
-
-      </div>
-
-      <!-- EMPTY -->
-      <div
-        *ngIf="expenses.length === 0"
-        class="text-center text-gray-500 py-10">
-
-        No transactions found
-
-      </div>
-
-      <!-- TABLE -->
-      <div
-        *ngIf="expenses.length > 0"
-        class="overflow-x-auto">
-
-        <table class="w-full">
-
-          <thead>
-
-            <tr class="border-b text-left text-gray-500">
-
-              <th class="pb-3">Title</th>
-              <th class="pb-3">Category</th>
-              <th class="pb-3">Type</th>
-              <th class="pb-3">Amount</th>
-              <th class="pb-3">Date</th>
-              <th class="pb-3">Actions</th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            <tr
-              *ngFor="let e of expenses"
-              class="border-b hover:bg-gray-50 transition duration-200">
-
-              <!-- TITLE -->
-              <td class="py-4 font-medium">
-
-                {{ e.title }}
-
-              </td>
-
-              <!-- CATEGORY -->
-              <td class="py-4">
-
-                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm">
-
-                  {{ e.category }}
-
-                </span>
-
-              </td>
-
-              <!-- TYPE -->
-              <td class="py-4">
-
-                <span
-                  class="px-3 py-1 rounded-full text-sm font-medium"
-                  [ngClass]="e.type === 'Income'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'">
-
-                  {{ e.type }}
-
-                </span>
-
-              </td>
-
-              <!-- AMOUNT -->
-              <td class="py-4 font-semibold">
-
-                <span
-                  [ngClass]="e.type === 'Income'
-                    ? 'text-green-600'
-                    : 'text-red-500'">
-
+        <div *ngIf="expenses.length > 0" class="overflow-x-auto">
+          <table class="w-full min-w-[760px] border-separate border-spacing-y-3">
+            <thead>
+              <tr class="text-left text-xs font-black uppercase tracking-wide text-slate-400">
+                <th class="px-4">Title</th>
+                <th class="px-4">Category</th>
+                <th class="px-4">Type</th>
+                <th class="px-4">Amount</th>
+                <th class="px-4">Date</th>
+                <th class="px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of expenses" class="bg-white shadow-sm">
+                <td class="rounded-l-2xl px-4 py-4 font-bold text-slate-900">{{ e.title }}</td>
+                <td class="px-4 py-4">
+                  <span class="rounded-full bg-indigo-50 px-3 py-1 text-sm font-bold text-indigo-700">{{ e.category || 'Other' }}</span>
+                </td>
+                <td class="px-4 py-4">
+                  <span class="rounded-full px-3 py-1 text-sm font-bold" [ngClass]="(e.type || '').toLowerCase() === 'income' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'">
+                    {{ e.type }}
+                  </span>
+                </td>
+                <td class="px-4 py-4 font-black money-text" [ngClass]="(e.type || '').toLowerCase() === 'income' ? 'text-emerald-600' : 'text-rose-600'">
                   ₹{{ e.amount }}
-
-                </span>
-
-              </td>
-
-              <!-- DATE -->
-              <td class="py-4 text-gray-500">
-
-                {{ e.date | date:'mediumDate' }}
-
-              </td>
-
-              <!-- ACTIONS -->
-              <td class="py-4">
-
-                <div class="flex gap-2">
-
-                  <!-- EDIT -->
-                  <button
-                    (click)="openEdit(e)"
-                    class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded-lg text-sm transition">
-
-                    Edit
-
-                  </button>
-
-                  <!-- DELETE -->
-                  <button
-                    (click)="deleteExpense(e.id)"
-                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm transition">
-
-                    Delete
-
-                  </button>
-
-                </div>
-
-              </td>
-
-            </tr>
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
+                </td>
+                <td class="px-4 py-4 text-slate-500">{{ e.date | date:'mediumDate' }}</td>
+                <td class="rounded-r-2xl px-4 py-4">
+                  <div class="flex justify-end gap-2">
+                    <button (click)="openEdit(e)" class="rounded-xl bg-amber-100 px-3 py-2 text-sm font-bold text-amber-700 transition hover:bg-amber-200">Edit</button>
+                    <button (click)="deleteExpense(e.id)" class="rounded-xl bg-rose-100 px-3 py-2 text-sm font-bold text-rose-700 transition hover:bg-rose-200">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
   </div>
+</main>
 
-</div>
+<div *ngIf="isEditModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
+  <div class="glass-panel w-full max-w-lg rounded-[2rem] p-6">
+    <h2 class="text-2xl font-black text-slate-950">Edit transaction</h2>
 
-<!-- EDIT MODAL -->
-<div
-  *ngIf="isEditModalOpen"
-  class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-
-  <div class="bg-white p-6 rounded-3xl shadow-2xl w-[90%] max-w-md">
-
-    <!-- TITLE -->
-    <h2 class="text-2xl font-bold text-indigo-700 mb-5">
-      Edit Transaction
-    </h2>
-
-    <!-- TITLE INPUT -->
-    <div class="mb-4">
-
-      <label class="block text-gray-600 mb-2">
+    <div class="mt-5 grid gap-4">
+      <label class="grid gap-2 text-sm font-bold text-slate-600">
         Title
+        <input [(ngModel)]="selectedExpense.title" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100" />
       </label>
 
-      <input
-        [(ngModel)]="selectedExpense.title"
-        type="text"
-        class="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-
-    </div>
-
-    <!-- AMOUNT -->
-    <div class="mb-4">
-
-      <label class="block text-gray-600 mb-2">
+      <label class="grid gap-2 text-sm font-bold text-slate-600">
         Amount
+        <input [(ngModel)]="selectedExpense.amount" type="number" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100" />
       </label>
 
-      <input
-        [(ngModel)]="selectedExpense.amount"
-        type="number"
-        class="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-
-    </div>
-
-    <!-- CATEGORY -->
-    <div class="mb-4">
-
-      <label class="block text-gray-600 mb-2">
+      <label class="grid gap-2 text-sm font-bold text-slate-600">
         Category
+        <input [(ngModel)]="selectedExpense.category" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100" />
       </label>
 
-      <input
-        [(ngModel)]="selectedExpense.category"
-        type="text"
-        class="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-
-    </div>
-
-    <!-- TYPE -->
-    <div class="mb-6">
-
-      <label class="block text-gray-600 mb-2">
+      <label class="grid gap-2 text-sm font-bold text-slate-600">
         Type
+        <select [(ngModel)]="selectedExpense.type" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100">
+          <option value="Expense">Expense</option>
+          <option value="Income">Income</option>
+        </select>
       </label>
-
-      <select
-        [(ngModel)]="selectedExpense.type"
-        class="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400">
-
-        <option value="Expense">
-          Expense
-        </option>
-
-        <option value="Income">
-          Income
-        </option>
-
-      </select>
-
     </div>
 
-    <!-- BUTTONS -->
-    <div class="flex justify-end gap-3">
-
-      <button
-        (click)="closeModal()"
-        class="bg-gray-300 hover:bg-gray-400 px-5 py-2 rounded-xl transition">
-
-        Cancel
-
-      </button>
-
-      <button
-        (click)="updateExpense()"
-        class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl transition">
-
-        Update
-
-      </button>
-
+    <div class="mt-6 flex justify-end gap-3">
+      <button (click)="closeModal()" class="rounded-2xl bg-slate-100 px-5 py-3 font-bold text-slate-700 transition hover:bg-slate-200">Cancel</button>
+      <button (click)="updateExpense()" class="gradient-button rounded-2xl px-5 py-3 font-bold transition">Update</button>
     </div>
-
   </div>
-
 </div>

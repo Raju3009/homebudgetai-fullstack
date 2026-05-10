@@ -1,3 +1,81 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  color-scheme: light;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --ink: #172033;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 12% 16%, rgba(255, 136, 101, 0.22), transparent 28rem),
+    radial-gradient(circle at 84% 4%, rgba(20, 184, 166, 0.2), transparent 30rem),
+    linear-gradient(135deg, #fff7ed 0%, #eef2ff 45%, #ecfeff 100%);
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  color: var(--ink);
+  background: transparent;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.46)),
+    radial-gradient(circle at 14% 18%, rgba(251, 146, 60, 0.22), transparent 22rem),
+    radial-gradient(circle at 88% 12%, rgba(45, 212, 191, 0.26), transparent 26rem),
+    radial-gradient(circle at 64% 78%, rgba(168, 85, 247, 0.17), transparent 24rem);
+}
+
+.glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 24px 60px rgba(79, 70, 229, 0.13);
+  backdrop-filter: blur(18px);
+}
+
+.soft-card {
+  border: 1px solid rgba(226, 232, 240, 0.84);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.gradient-button {
+  background: linear-gradient(135deg, #4f46e5 0%, #ec4899 52%, #f97316 100%);
+  color: #fff;
+  box-shadow: 0 16px 28px rgba(236, 72, 153, 0.24);
+}
+
+.gradient-button:hover {
+  filter: saturate(1.08) brightness(1.02);
+  transform: translateY(-1px);
+}
+
+.money-text {
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-box {
+  height: clamp(18rem, 34vw, 24rem);
+}
