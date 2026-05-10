@@ -152,17 +152,17 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
-{
-  var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//using (var scope = app.Services.CreateScope())
+//{
+//  var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-  await db.Database.EnsureCreatedAsync();
+//  await db.Database.EnsureCreatedAsync();
 
-  await SeedData.ApplyAsync(
-      db,
-      scope.ServiceProvider.GetRequiredService<IPasswordService>()
-  );
-}
+//  await SeedData.ApplyAsync(
+//      db,
+//      scope.ServiceProvider.GetRequiredService<IPasswordService>()
+//  );
+//}
 
 app.Run();
 
