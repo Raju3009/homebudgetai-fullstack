@@ -2,7 +2,6 @@ using System.Text;
 using System.Text.Json.Serialization;
 using HomeBudgetAPI.Data;
 using HomeBudgetAPI.Middleware;
-using HomeBudgetAPI.Models;
 using HomeBudgetAPI.Repositories;
 using HomeBudgetAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -152,17 +151,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-//using (var scope = app.Services.CreateScope())
-//{
-//  var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+// DATABASE MIGRATION
+using (var scope = app.Services.CreateScope())
+{
+  var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-//  await db.Database.EnsureCreatedAsync();
-
-//  await SeedData.ApplyAsync(
-//      db,
-//      scope.ServiceProvider.GetRequiredService<IPasswordService>()
-//  );
-//}
+  await db.Database.MigrateAsync();
+}
 
 app.Run();
 
