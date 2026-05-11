@@ -1,6 +1,7 @@
 [build]
-  command = "cd homebudget-ui && npm ci && npm run build -- --configuration production"
-  publish = "homebudget-ui/dist/homebudget-ui"
+  base = "homebudget-ui"
+  command = "npm ci && npm run build -- --configuration production"
+  publish = "dist/homebudget-ui/browser"
 
 [[redirects]]
   from = "/*"
