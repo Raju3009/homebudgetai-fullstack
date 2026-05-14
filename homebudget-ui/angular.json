@@ -1,4 +1,4 @@
-﻿{
+{
     "$schema":  "./node_modules/@angular/cli/lib/config/schema.json",
     "version":  1,
     "cli":  {
@@ -16,7 +16,7 @@
                                                              "build":  {
                                                                            "builder":  "@angular/build:application",
                                                                            "options":  {
-                                                                             "outputPath": "dist/homebudget-ui/browser",
+                                                                                           "outputPath":  "dist/homebudget-ui/browser",
                                                                                            "browser":  "src/main.ts",
                                                                                            "tsConfig":  "tsconfig.app.json",
                                                                                            "assets":  [
@@ -28,7 +28,14 @@
                                                                                            "styles":  [
                                                                                                           "node_modules/bootstrap/dist/css/bootstrap.min.css",
                                                                                                           "src/styles.css"
-                                                                                                      ]
+                                                                                                      ],
+                                                                                           "allowedCommonJsDependencies":  [
+                                                                                                                               "html2canvas",
+                                                                                                                               "canvg",
+                                                                                                                               "core-js",
+                                                                                                                               "raf",
+                                                                                                                               "rgbcolor"
+                                                                                                                           ]
                                                                                        },
                                                                            "configurations":  {
                                                                                                   "production":  {

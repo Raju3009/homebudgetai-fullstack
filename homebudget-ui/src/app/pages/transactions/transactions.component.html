@@ -1,17 +1,27 @@
-﻿<section class="workspace">
+<section class="workspace premium-page">
   <form class="panel editor" [formGroup]="form" (ngSubmit)="save()">
-    <div class="section-head"><h2>{{ editingId ? 'Edit Transaction' : 'Add Transaction' }}</h2><p>Track income, expenses, notes, and dates</p></div>
-    <label>Title<input formControlName="title"></label><label>Category<input formControlName="category" list="categories"></label><datalist id="categories"><option>Food</option><option>Housing</option><option>Utilities</option><option>Transport</option><option>Salary</option><option>Side Income</option><option>Savings</option><option>Healthcare</option></datalist><label>Amount<input type="number" min="0.01" step="0.01" formControlName="amount"></label>
-    <label>Type<select formControlName="type"><option>Expense</option><option>Income</option></select></label><label>Date<input type="date" formControlName="date"></label><label>Notes<textarea formControlName="notes"></textarea></label>
-    <div class="actions"><button [disabled]="form.invalid">{{ editingId ? 'Update' : 'Add' }}</button><button type="button" class="secondary" (click)="reset()">Clear</button></div>
+    <div class="section-head"><div><h2>{{ editingId ? 'Edit transaction' : 'Add transaction' }}</h2><p>Capture income, expenses, notes, and category metadata.</p></div><span class="badge">Secure form</span></div>
+    <label>Title<input formControlName="title" placeholder="Groceries, Salary, Rent"></label>
+    <label>Category<input formControlName="category" list="categories" placeholder="Food"></label>
+    <datalist id="categories"><option>Food</option><option>Housing</option><option>Utilities</option><option>Transport</option><option>Salary</option><option>Side Income</option><option>Savings</option><option>Healthcare</option><option>Entertainment</option></datalist>
+    <div class="form-row"><label>Amount<input type="number" min="0.01" step="0.01" formControlName="amount"></label><label>Type<select formControlName="type"><option>Expense</option><option>Income</option></select></label></div>
+    <label>Date<input type="date" formControlName="date"></label>
+    <label>Notes<textarea formControlName="notes" placeholder="Optional memo for reports"></textarea></label>
+    <div class="actions"><button class="btn-primary" [disabled]="form.invalid">{{ editingId ? 'Update transaction' : 'Add transaction' }}</button><button type="button" class="btn-secondary" (click)="reset()">Clear</button></div>
     <p class="success" *ngIf="message()">{{ message() }}</p><p class="error" *ngIf="error()">{{ error() }}</p>
   </form>
+
   <section class="panel table-panel">
-    <div class="section-head"><h2>Transactions</h2><p>Search, filter, paginate, and export</p></div>
-    <form class="filters" [formGroup]="filters" (ngSubmit)="load(1)"><input placeholder="Search" formControlName="q"><input placeholder="Category" formControlName="category"><select formControlName="type"><option value="">All</option><option>Expense</option><option>Income</option></select><input type="date" formControlName="from"><input type="date" formControlName="to"><button>Filter</button><button type="button" class="secondary" (click)="exportCsv()">Export</button></form>
-    <div class="loading" *ngIf="loading()">Loading transactions...</div>
-    <div class="empty-state" *ngIf="!loading() && rows.length === 0">No transactions match this view.</div>
-    <div class="table-wrap" *ngIf="rows.length"><table><thead><tr><th>Date</th><th>Title</th><th>Category</th><th>Type</th><th>Amount</th><th></th></tr></thead><tbody><tr *ngFor="let row of rows"><td>{{ row.date | date }}</td><td>{{ row.title }}</td><td>{{ row.category }}</td><td><span class="badge" [class.income]="row.type === 'Income'">{{ row.type }}</span></td><td>{{ row.amount | currency }}</td><td><button class="icon" (click)="edit(row)">Edit</button><button class="icon danger" (click)="remove(row.id)">Delete</button></td></tr></tbody></table></div>
-    <div class="pager"><button class="secondary" [disabled]="page===1" (click)="load(page-1)">Previous</button><span>Page {{ page }} of {{ totalPages }}</span><button class="secondary" [disabled]="page===totalPages" (click)="load(page+1)">Next</button></div>
+    <div class="section-head"><div><h2>Transactions</h2><p>Search, filter, sort, paginate, and export.</p></div><button type="button" class="btn-primary" (click)="exportCsv()">Export CSV</button></div>
+    <form class="filters" [formGroup]="filters" (ngSubmit)="load(1)">
+      <input placeholder="Search" formControlName="q"><input placeholder="Category" formControlName="category"><select formControlName="type"><option value="">All</option><option>Expense</option><option>Income</option></select><input type="date" formControlName="from"><input type="date" formControlName="to"><button class="btn-secondary">Filter</button>
+    </form>
+    <div class="skeleton" *ngIf="loading()"></div>
+    <div class="empty-state" *ngIf="!loading() && rows.length === 0">No transactions match this view. Add a transaction to activate analytics.</div>
+    <div class="table-wrap" *ngIf="rows.length">
+      <table><thead><tr><th><button class="table-sort" (click)="sort('date')">Date</button></th><th><button class="table-sort" (click)="sort('title')">Title</button></th><th>Category</th><th>Type</th><th><button class="table-sort" (click)="sort('amount')">Amount</button></th><th>Actions</th></tr></thead>
+      <tbody><tr *ngFor="let row of rows"><td>{{ row.date | date }}</td><td><strong>{{ row.title }}</strong><small>{{ row.notes }}</small></td><td>{{ row.category }}</td><td><span class="badge" [class.income]="row.type === 'Income'" [class.expense]="row.type !== 'Income'">{{ row.type }}</span></td><td [class.success]="row.type === 'Income'" [class.error]="row.type !== 'Income'">{{ row.amount | currency }}</td><td><button class="btn-secondary" (click)="edit(row)">Edit</button><button class="btn-ghost error" (click)="remove(row.id)">Delete</button></td></tr></tbody></table>
+    </div>
+    <div class="pager"><button class="btn-secondary" [disabled]="page===1" (click)="load(page-1)">Previous</button><span>Page {{ page }} of {{ totalPages }}</span><button class="btn-secondary" [disabled]="page===totalPages" (click)="load(page+1)">Next</button></div>
   </section>
 </section>

@@ -1,0 +1,3 @@
+:host { display: block; }
+.inline-check { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--muted); }
+.inline-check input { width: auto; min-height: auto; }

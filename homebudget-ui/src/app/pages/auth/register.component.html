@@ -1,0 +1,51 @@
+<section class="auth-page premium-page">
+  <div class="auth-visual">
+    <div class="auth-copy">
+      <span class="badge success">Launch your finance OS</span>
+      <h1>Build better financial habits with AI.</h1>
+      <p>Create your secure workspace, set a monthly target, and start with a dashboard designed for spending clarity.</p>
+      <div class="feature-pills"><span>Multi-step onboarding</span><span>Password strength</span><span>Auto-login</span></div>
+    </div>
+  </div>
+
+  <div class="auth-card-wrap">
+    <form class="auth-card" [formGroup]="form" (ngSubmit)="submit()">
+      <div>
+        <span class="badge">Step {{ step() }} of 2</span>
+        <h2>Create account</h2>
+        <p>{{ step() === 1 ? 'Tell us who owns this workspace.' : 'Secure the account and set your first goal.' }}</p>
+      </div>
+
+      <div class="progress-line"><span [style.width.%]="step() === 1 ? 50 : 100"></span></div>
+
+      <ng-container *ngIf="step() === 1; else securityStep">
+        <label>Full name<input type="text" formControlName="fullName" autocomplete="name" placeholder="Your full name"></label>
+        <label>Email address<input type="email" formControlName="email" autocomplete="email" placeholder="you@example.com"></label>
+        <button type="button" class="btn-primary" (click)="next()">Continue</button>
+      </ng-container>
+
+      <ng-template #securityStep>
+        <label>Password
+          <div class="password-box">
+            <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" autocomplete="new-password">
+            <button type="button" class="btn-secondary" (click)="togglePassword()">{{ showPassword() ? 'Hide' : 'Show' }}</button>
+          </div>
+        </label>
+        <div><div class="progress-line"><span [style.width.%]="strength() * 25"></span></div><small>Password strength: {{ strengthLabel() }}</small></div>
+        <label>Confirm password
+          <div class="password-box">
+            <input [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword" autocomplete="new-password">
+            <button type="button" class="btn-secondary" (click)="toggleConfirmPassword()">{{ showConfirmPassword() ? 'Hide' : 'Show' }}</button>
+          </div>
+        </label>
+        <div class="form-row"><label>Currency<select formControlName="currency"><option>USD</option><option>INR</option><option>EUR</option><option>GBP</option></select></label><label>Monthly goal<input type="number" formControlName="monthlyGoal"></label></div>
+        <label class="inline-check"><input type="checkbox" formControlName="rememberMe"> Keep me signed in</label>
+        <p class="error" *ngIf="form.hasError('mismatch') && form.touched">Passwords do not match.</p>
+        <p class="error" *ngIf="error()">{{ error() }}</p>
+        <div class="auth-link-row"><button type="button" class="btn-secondary" (click)="step.set(1)">Back</button><button class="btn-primary" [disabled]="loading() || form.invalid">{{ loading() ? 'Creating...' : 'Create workspace' }}</button></div>
+      </ng-template>
+
+      <div class="auth-link-row"><span>Already have an account?</span><a routerLink="/login">Login</a></div>
+    </form>
+  </div>
+</section>
