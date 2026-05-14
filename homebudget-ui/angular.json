@@ -16,7 +16,7 @@
                                                              "build":  {
                                                                            "builder":  "@angular/build:application",
                                                                            "options":  {
-                                                                                           "outputPath":  "dist/homebudget-ui/browser",
+                                                                                           "outputPath":  "dist/homebudget-ui",
                                                                                            "browser":  "src/main.ts",
                                                                                            "tsConfig":  "tsconfig.app.json",
                                                                                            "assets":  [
