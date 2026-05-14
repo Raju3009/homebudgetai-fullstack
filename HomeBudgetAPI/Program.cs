@@ -103,18 +103,22 @@ app.MapControllers().RequireRateLimiting("api");
 
 if (builder.Configuration.GetValue("SeedDemoData", true))
 {
-  using var scope = app.Services.CreateScope();
-  var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
   try
   {
-    await db.Database.MigrateAsync();
+    using var scope = app.Services.CreateScope();
+
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var passwords = scope.ServiceProvider.GetRequiredService<IPasswordService>();
+
+    // Migration disabled temporarily for Render deployment
+    // await db.Database.MigrateAsync();
+
+    await SeedData.ApplyAsync(db, passwords);
   }
   catch (Exception ex)
   {
-    Console.WriteLine(ex.Message);
+    Console.WriteLine($"Startup Error: {ex.Message}");
   }
-  var passwords = scope.ServiceProvider.GetRequiredService<IPasswordService>();
-  await SeedData.ApplyAsync(db, passwords);
 }
 
 app.Run();
