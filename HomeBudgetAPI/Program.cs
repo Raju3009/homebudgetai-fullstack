@@ -105,7 +105,14 @@ if (builder.Configuration.GetValue("SeedDemoData", true))
 {
   using var scope = app.Services.CreateScope();
   var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-  await db.Database.MigrateAsync();
+  try
+  {
+    await db.Database.MigrateAsync();
+  }
+  catch (Exception ex)
+  {
+    Console.WriteLine(ex.Message);
+  }
   var passwords = scope.ServiceProvider.GetRequiredService<IPasswordService>();
   await SeedData.ApplyAsync(db, passwords);
 }
