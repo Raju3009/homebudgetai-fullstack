@@ -36,17 +36,44 @@ export class RegisterComponent {
     rememberMe: [true]
   }, { validators: passwordsMatch });
 
-  strength = computed(() => {
-    const password = this.form.controls.password.value;
-    let score = 0;
-    if (password.length >= 8) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/\d/.test(password)) score++;
-    if (/[^A-Za-z0-9]/.test(password)) score++;
-    return score;
-  });
+ strength = computed(() => {
 
-  strengthLabel = computed(() => ['Weak', 'Fair', 'Good', 'Strong'][Math.max(this.strength() - 1, 0)] ?? 'Weak');
+  const password =
+    this.form.controls.password.value || '';
+
+  let score = 0;
+
+  if (password.length >= 8)
+    score++;
+
+  if (/[A-Z]/.test(password))
+    score++;
+
+  if (/[0-9]/.test(password))
+    score++;
+
+  if (/[^A-Za-z0-9]/.test(password))
+    score++;
+
+  return score;
+});
+
+ strengthLabel = computed(() => {
+
+  const score =
+    this.strength();
+
+  if (score <= 1)
+    return 'Weak';
+
+  if (score === 2)
+    return 'Fair';
+
+  if (score === 3)
+    return 'Good';
+
+  return 'Strong';
+});
 
   next() {
     this.form.controls.fullName.markAsTouched();
@@ -58,14 +85,51 @@ export class RegisterComponent {
   togglePassword() { this.showPassword.update(value => !value); }
   toggleConfirmPassword() { this.showConfirmPassword.update(value => !value); }
 
-  submit() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    const value = this.form.getRawValue();
-    this.loading.set(true);
-    this.error.set('');
-    this.auth.register(value.fullName, value.email, value.password, value.rememberMe).subscribe({
-      next: () => this.router.navigateByUrl('/app/dashboard'),
-      error: error => { this.error.set(error.error?.message || 'Registration failed.'); this.loading.set(false); }
-    });
+ submit() {
+
+  if (this.form.invalid) {
+
+    this.form.markAllAsTouched();
+
+    return;
   }
-}
+
+  const value =
+    this.form.getRawValue();
+
+  this.loading.set(true);
+
+  this.error.set('');
+
+  this.auth.register({
+
+    fullName: value.fullName,
+
+    email: value.email,
+
+    password: value.password
+
+  }).subscribe({
+
+    next: () => {
+
+      this.loading.set(false);
+
+      this.router.navigateByUrl(
+        '/app/dashboard'
+      );
+    },
+
+    error: error => {
+
+      this.error.set(
+
+        error.error?.message ||
+
+        'Registration failed.'
+      );
+
+      this.loading.set(false);
+    }
+  });
+}}

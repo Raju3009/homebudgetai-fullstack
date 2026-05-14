@@ -1,3 +1,219 @@
-:host { display: block; }
-.suggestion { padding: 0.95rem; border-radius: 16px; background: rgba(255,255,255,.5); border: 1px solid var(--line); margin-bottom: 0.75rem; }
-.dark-mode .suggestion { background: rgba(15,23,42,.42); }
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* =========================
+   AI Suggestions Container
+========================= */
+
+.ai-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* =========================
+   Suggestion Card
+========================= */
+
+.suggestion {
+  position: relative;
+
+  padding: 1rem 1.1rem;
+
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.7);
+
+  border: 1px solid rgba(255,255,255,0.25);
+
+  backdrop-filter: blur(14px);
+
+  -webkit-backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 10px 30px rgba(15,23,42,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+
+  overflow: hidden;
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Glow effect */
+
+.suggestion::before {
+  content: '';
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(99,102,241,0.08),
+      rgba(16,185,129,0.08)
+    );
+
+  opacity: 0;
+
+  transition: opacity 0.3s ease;
+
+  pointer-events: none;
+}
+
+/* Hover */
+
+.suggestion:hover {
+  transform: translateY(-4px);
+
+  border-color: rgba(99,102,241,0.25);
+
+  box-shadow:
+    0 16px 40px rgba(15,23,42,0.12),
+    0 0 20px rgba(99,102,241,0.08);
+}
+
+.suggestion:hover::before {
+  opacity: 1;
+}
+
+/* Text */
+
+.suggestion p {
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: 0.95rem;
+
+  line-height: 1.6;
+
+  font-weight: 500;
+}
+
+/* Optional title */
+
+.suggestion-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  margin-bottom: 0.6rem;
+
+  font-size: 0.85rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.02em;
+
+  text-transform: uppercase;
+
+  color: #6366f1;
+}
+
+/* AI icon bubble */
+
+.suggestion-icon {
+  width: 34px;
+  height: 34px;
+
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #6366f1,
+      #8b5cf6
+    );
+
+  color: white;
+
+  box-shadow:
+    0 8px 20px rgba(99,102,241,0.25);
+}
+
+/* =========================
+   Dark Mode
+========================= */
+
+.dark-mode .suggestion {
+
+  background:
+    rgba(15,23,42,0.65);
+
+  border:
+    1px solid rgba(255,255,255,0.06);
+
+  box-shadow:
+    0 12px 28px rgba(0,0,0,0.35);
+}
+
+.dark-mode .suggestion::before {
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(99,102,241,0.12),
+      rgba(16,185,129,0.12)
+    );
+}
+
+.dark-mode .suggestion p {
+  color: #e2e8f0;
+}
+
+.dark-mode .suggestion-title {
+  color: #a5b4fc;
+}
+
+/* =========================
+   Animation
+========================= */
+
+.suggestion {
+  animation: fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp {
+
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================
+   Mobile Responsive
+========================= */
+
+@media (max-width: 768px) {
+
+  .suggestion {
+    padding: 0.9rem;
+    border-radius: 16px;
+  }
+
+  .suggestion p {
+    font-size: 0.9rem;
+  }
+
+  .suggestion-icon {
+    width: 30px;
+    height: 30px;
+  }
+}

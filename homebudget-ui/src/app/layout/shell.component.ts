@@ -139,7 +139,7 @@ export class ShellComponent {
   collapsed = signal(localStorage.getItem('homebudgetai.sidebar') === 'collapsed');
   dark = signal(localStorage.getItem('homebudgetai.theme') === 'dark');
   pageTitle = computed(() => 'Budget Command Center');
-  initials = computed(() => (this.auth.user()?.fullName || 'Demo User').split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase());
+  initials = computed(() => (this.auth.user()?.fullName || 'Demo User').split(' ').map((x: string) => x[0]).join('').slice(0, 2).toUpperCase());
 
   constructor(public auth: AuthService) {}
 

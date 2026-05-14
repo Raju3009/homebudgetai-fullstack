@@ -1,4 +1,357 @@
-:host { display: block; }
-.inline-check { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--muted); }
-.inline-check input { width: auto; min-height: auto; }
-.form-row label { flex: 1 1 150px; }
+:host{
+  display:block;
+  width:100%;
+}
+
+/* =========================
+   AUTH PAGE
+========================= */
+
+.auth-page{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  background:
+    radial-gradient(circle at top left,#0f766e 0%,transparent 30%),
+    radial-gradient(circle at top right,#7c3aed 0%,transparent 30%),
+    #020617;
+}
+
+/* =========================
+   LEFT SIDE
+========================= */
+
+.auth-visual{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:4rem;
+}
+
+.auth-copy{
+  max-width:620px;
+}
+
+.auth-copy h1{
+  font-size:5.5rem;
+  line-height:0.95;
+  font-weight:800;
+  color:white;
+  margin:2rem 0;
+  letter-spacing:-0.05em;
+}
+
+.auth-copy p{
+  font-size:1.35rem;
+  line-height:1.7;
+  color:#cbd5e1;
+  margin-bottom:2rem;
+}
+
+/* =========================
+   FEATURE PILLS
+========================= */
+
+.feature-pills{
+  display:flex;
+  gap:1rem;
+  flex-wrap:wrap;
+}
+
+.feature-pills span{
+  padding:.9rem 1.2rem;
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.08);
+  color:#fff;
+  font-weight:600;
+  backdrop-filter:blur(12px);
+}
+
+/* =========================
+   RIGHT SIDE
+========================= */
+
+.auth-card-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:2rem;
+}
+
+.auth-card{
+  width:100%;
+  max-width:470px;
+  background:rgba(255,255,255,.92);
+  border-radius:32px;
+  padding:2rem;
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.35);
+  backdrop-filter:blur(20px);
+}
+
+.auth-card h2{
+  font-size:2.3rem;
+  margin-top:.5rem;
+  margin-bottom:.3rem;
+  color:#0f172a;
+}
+
+.auth-card p{
+  color:#64748b;
+}
+
+/* =========================
+   LABELS
+========================= */
+
+label{
+  display:flex;
+  flex-direction:column;
+  gap:.55rem;
+  margin-top:1rem;
+  font-weight:600;
+  color:#0f172a;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+input,
+select{
+  width:100%;
+  min-height:58px;
+  border:none;
+  border-radius:18px;
+  background:#f1f5f9;
+  padding:0 1rem;
+  font-size:1rem;
+  outline:none;
+  transition:all .25s ease;
+}
+
+input:focus,
+select:focus{
+  background:white;
+  box-shadow:
+    0 0 0 3px rgba(99,102,241,.15);
+}
+
+/* =========================
+   PASSWORD BOX
+========================= */
+
+.password-box{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+}
+
+.password-box input{
+  flex:1;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn-primary{
+  border:none;
+  border-radius:18px;
+  padding:1rem 1.4rem;
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #4f46e5
+    );
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .25s ease;
+}
+
+.btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:
+    0 10px 25px rgba(79,70,229,.3);
+}
+
+.btn-secondary{
+  border:none;
+  border-radius:16px;
+  padding:.9rem 1.1rem;
+  background:#e2e8f0;
+  color:#0f172a;
+  font-weight:700;
+  cursor:pointer;
+}
+
+/* =========================
+   PROGRESS
+========================= */
+
+.progress-line{
+  width:100%;
+  height:12px;
+  border-radius:999px;
+  overflow:hidden;
+  background:#e2e8f0;
+  margin:1.2rem 0;
+}
+
+.progress-line span{
+  display:block;
+  height:100%;
+  background:
+    linear-gradient(
+      90deg,
+      #7c3aed,
+      #06b6d4
+    );
+  transition:all .3s ease;
+}
+
+/* =========================
+   PASSWORD STRENGTH
+========================= */
+
+.strength-wrap{
+  margin-top:10px;
+}
+
+.strength-bar{
+  width:100%;
+  height:10px;
+  background:#e5e7eb;
+  border-radius:999px;
+  overflow:hidden;
+  margin-bottom:6px;
+}
+
+.strength-bar span{
+  display:block;
+  height:100%;
+  width:0%;
+  transition:all .3s ease;
+}
+
+.strength-bar span.weak{
+  background:#ef4444;
+}
+
+.strength-bar span.fair{
+  background:#f59e0b;
+}
+
+.strength-bar span.good{
+  background:#3b82f6;
+}
+
+.strength-bar span.strong{
+  background:#22c55e;
+}
+
+/* =========================
+   FORM ROW
+========================= */
+
+.form-row{
+  display:flex;
+  gap:1rem;
+  flex-wrap:wrap;
+}
+
+.form-row label{
+  flex:1 1 150px;
+}
+
+/* =========================
+   CHECKBOX
+========================= */
+
+.inline-check{
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  color:#64748b;
+  margin-top:1rem;
+}
+
+.inline-check input{
+  width:auto;
+  min-height:auto;
+}
+
+/* =========================
+   LINKS
+========================= */
+
+.auth-link-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:1.5rem;
+  gap:1rem;
+}
+
+.auth-link-row a{
+  color:#4f46e5;
+  font-weight:700;
+  text-decoration:none;
+}
+
+/* =========================
+   BADGES
+========================= */
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:.45rem .9rem;
+  border-radius:999px;
+  background:rgba(99,102,241,.1);
+  color:#4f46e5;
+  font-size:.85rem;
+  font-weight:700;
+}
+
+.badge.success{
+  background:rgba(16,185,129,.12);
+  color:#10b981;
+}
+
+/* =========================
+   ERROR
+========================= */
+
+.error{
+  color:#ef4444;
+  display:block;
+  margin-top:6px;
+  font-size:.92rem;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:1000px){
+
+  .auth-page{
+    grid-template-columns:1fr;
+  }
+
+  .auth-visual{
+    display:none;
+  }
+
+  .auth-card-wrap{
+    padding:1rem;
+  }
+
+  .auth-card{
+    max-width:100%;
+  }
+}

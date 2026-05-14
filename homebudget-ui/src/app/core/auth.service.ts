@@ -1,85 +1,264 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { catchError, of, tap, throwError } from 'rxjs';
-import { environment } from '../../environments/environment';
+import {
+  Injectable,
+  signal
+} from '@angular/core';
 
-export interface AuthUser { token: string; email: string; fullName: string; role: string; expiresAt: string; refreshToken?: string; }
+import {
+  HttpClient,
+  HttpHeaders
+} from '@angular/common/http';
 
-@Injectable({ providedIn: 'root' })
+import {
+  Observable,
+  tap
+} from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
-  private readonly key = 'homebudgetai.auth';
-  private readonly state = signal<AuthUser | null>(this.read());
-  readonly user = computed(() => this.state());
-  readonly isAuthenticated = computed(() => !!this.state()?.token && !this.isExpired(this.state()));
-  readonly isAdmin = computed(() => this.state()?.role === 'Admin' && this.isAuthenticated());
 
-  constructor(private http: HttpClient, private router: Router) {
-    if (this.state() && this.isExpired(this.state())) this.clear();
-  }
+  private baseUrl =
+    'http://localhost:8080/api';
 
-  login(email: string, password: string, rememberMe = true) {
-    return this.http.post<AuthUser>(`${environment.apiUrl}/Auth/login`, { email, password }).pipe(
-      catchError(error => {
-        if (email.toLowerCase() === 'demo@homebudget.ai' && password === 'Demo@12345') return of(this.demoUser());
-        return throwError(() => error);
-      }),
-      tap(user => this.store(user, rememberMe))
+  // =========================
+  // USER SIGNAL
+  // =========================
+
+  private userSignal =
+    signal<any>(this.loadUser());
+
+  constructor(
+    private http: HttpClient
+  ) {}
+
+  // =========================
+  // LOGIN
+  // =========================
+
+  login(data: any): Observable<any> {
+
+    return this.http.post<any>(
+
+      `${this.baseUrl}/auth/login`,
+
+      data
+
+    ).pipe(
+
+      tap(response => {
+
+        this.storeAuth(response);
+      })
     );
   }
 
-  register(fullName: string, email: string, password: string, rememberMe = true) {
-    return this.http.post<AuthUser>(`${environment.apiUrl}/Auth/register`, { fullName, email, password }).pipe(
-      catchError(() => of({ ...this.demoUser(), fullName, email, role: 'User' })),
-      tap(user => this.store(user, rememberMe))
+  // =========================
+  // REGISTER
+  // =========================
+
+  register(data: any): Observable<any> {
+
+    return this.http.post<any>(
+
+      `${this.baseUrl}/auth/register`,
+
+      data
+
+    ).pipe(
+
+      tap(response => {
+
+        this.storeAuth(response);
+      })
     );
   }
 
-  forgotPassword(email: string) {
-    return this.http.post<{ message: string; resetToken?: string }>(`${environment.apiUrl}/Auth/forgot-password`, { email }).pipe(catchError(() => of({ message: 'Reset token generated for demo delivery.', resetToken: 'DEMO-RESET-2026' })));
+  // =========================
+  // FORGOT PASSWORD
+  // =========================
+
+  forgotPassword(
+    email: string
+  ): Observable<any> {
+
+    return this.http.post<any>(
+
+      `${this.baseUrl}/auth/forgot-password`,
+
+      { email }
+    );
   }
 
-  resetPassword(email: string, token: string, newPassword: string) {
-    return this.http.post<{ message: string }>(`${environment.apiUrl}/Auth/reset-password`, { email, token, newPassword }).pipe(catchError(() => of({ message: 'Password reset successful.' })));
+  // =========================
+  // RESET PASSWORD
+  // =========================
+
+  resetPassword(
+    data: any
+  ): Observable<any> {
+
+    return this.http.post<any>(
+
+      `${this.baseUrl}/auth/reset-password`,
+
+      data
+    );
   }
 
-  logout(redirect = true) {
-    this.clear();
-    if (redirect) this.router.navigateByUrl('/login');
+  // =========================
+  // STORE AUTH
+  // =========================
+
+  private storeAuth(
+    response: any
+  ): void {
+
+    if (response.token) {
+
+      localStorage.setItem(
+        'token',
+        response.token
+      );
+    }
+
+    if (response.refreshToken) {
+
+      localStorage.setItem(
+        'refreshToken',
+        response.refreshToken
+      );
+    }
+
+    if (response.user) {
+
+      localStorage.setItem(
+
+        'user',
+
+        JSON.stringify(
+          response.user
+        )
+      );
+
+      this.userSignal.set(
+        response.user
+      );
+    }
   }
 
-  token() {
-    const user = this.state();
-    if (!user || this.isExpired(user)) { this.clear(); return null; }
-    return user.token;
+  // =========================
+  // LOAD USER
+  // =========================
+
+  private loadUser(): any {
+
+    const user =
+      localStorage.getItem('user');
+
+    return user
+      ? JSON.parse(user)
+      : null;
   }
 
-  hasRole(role: string) { return this.state()?.role === role && this.isAuthenticated(); }
+  // =========================
+  // TOKEN
+  // =========================
 
-  private demoUser(): AuthUser {
-    return { token: 'demo-token', email: 'demo@homebudget.ai', fullName: 'Demo User', role: 'Admin', expiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(), refreshToken: 'demo-refresh-token' };
+  token(): string | null {
+
+    return localStorage.getItem(
+      'token'
+    );
   }
 
-  private store(user: AuthUser, rememberMe: boolean) {
-    this.clearStorage();
-    const storage = rememberMe ? localStorage : sessionStorage;
-    storage.setItem(this.key, JSON.stringify(user));
-    this.state.set(user);
+  // =========================
+  // GET TOKEN
+  // =========================
+
+  getToken(): string | null {
+
+    return this.token();
   }
 
-  private read(): AuthUser | null {
-    const raw = localStorage.getItem(this.key) ?? sessionStorage.getItem(this.key);
-    if (!raw) return null;
-    try {
-      const user = JSON.parse(raw) as AuthUser;
-      return this.isExpired(user) ? null : user;
-    } catch { return null; }
+  // =========================
+  // USER
+  // =========================
+
+  user() {
+
+    return this.userSignal();
   }
 
-  private isExpired(user: AuthUser | null) {
-    return !user?.expiresAt || new Date(user.expiresAt).getTime() <= Date.now();
+  // =========================
+  // GET USER
+  // =========================
+
+  getUser(): any {
+
+    return this.user();
   }
 
-  private clear() { this.clearStorage(); this.state.set(null); }
-  private clearStorage() { localStorage.removeItem(this.key); sessionStorage.removeItem(this.key); }
+  // =========================
+  // AUTH CHECK
+  // =========================
+
+  isAuthenticated(): boolean {
+
+    return !!this.token();
+  }
+
+  // =========================
+  // ROLE CHECK
+  // =========================
+
+  hasRole(role: string): boolean {
+
+    return this.user()?.role === role;
+  }
+
+  // =========================
+  // LOGOUT
+  // =========================
+
+  logout(
+    redirect: boolean = true
+  ): void {
+
+    localStorage.removeItem(
+      'token'
+    );
+
+    localStorage.removeItem(
+      'refreshToken'
+    );
+
+    localStorage.removeItem(
+      'user'
+    );
+
+    this.userSignal.set(null);
+
+    if (redirect) {
+
+      window.location.href =
+        '/login';
+    }
+  }
+
+  // =========================
+  // AUTH HEADERS
+  // =========================
+
+  getAuthHeaders(): HttpHeaders {
+
+    const token =
+      this.token();
+
+    return new HttpHeaders({
+
+      Authorization:
+        `Bearer ${token}`
+    });
+  }
 }

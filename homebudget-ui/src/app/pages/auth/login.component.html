@@ -1,39 +1,190 @@
 <section class="auth-page premium-page">
+
   <div class="auth-visual">
+
     <div class="auth-copy">
-      <span class="badge success">Secure fintech workspace</span>
-      <h1>Welcome back to your money command center.</h1>
-      <p>Track spending, protect savings, and review AI-backed finance signals with a polished dashboard built for daily use.</p>
-      <div class="feature-pills"><span>JWT protected</span><span>Animated analytics</span><span>Demo ready</span></div>
+
+      <span class="badge success">
+        Secure fintech workspace
+      </span>
+
+      <h1>
+        Welcome back to your money command center.
+      </h1>
+
+      <p>
+        Track spending, protect savings, and review
+        AI-backed finance insights with a premium
+        analytics dashboard.
+      </p>
+
+      <div class="feature-pills">
+        <span>JWT Protected</span>
+        <span>Animated Analytics</span>
+        <span>Enterprise UI</span>
+      </div>
+
     </div>
+
   </div>
 
   <div class="auth-card-wrap">
-    <form class="auth-card" [formGroup]="form" (ngSubmit)="submit()">
-      <div>
-        <span class="badge">HomeBudgetAI</span>
-        <h2>Sign in</h2>
-        <p>Use the demo credentials or your registered account.</p>
+
+    <form
+      class="auth-card"
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+    >
+
+      <div class="auth-header">
+
+        <span class="badge">
+          HomeBudgetAI
+        </span>
+
+        <h2>
+          Sign in
+        </h2>
+
+        <p>
+          Continue to your financial workspace.
+        </p>
+
       </div>
 
-      <label>Email address<input type="email" formControlName="email" autocomplete="email" placeholder="you@example.com"></label>
-      <label>Password
-        <div class="password-box">
-          <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" autocomplete="current-password" placeholder="Enter password">
-          <button type="button" class="btn-secondary" (click)="togglePassword()">{{ showPassword() ? 'Hide' : 'Show' }}</button>
-        </div>
+      <label>
+
+        <span>Email Address</span>
+
+        <input
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          placeholder="you@example.com"
+        >
+
       </label>
 
+      <small
+        class="field-error"
+        *ngIf="
+          form.controls.email.touched &&
+          form.controls.email.invalid
+        "
+      >
+        Please enter a valid email address.
+      </small>
+
+      <label>
+
+        <span>Password</span>
+
+        <div class="password-box">
+
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+            placeholder="Enter password"
+          >
+
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="togglePassword()"
+          >
+            {{ showPassword() ? 'Hide' : 'Show' }}
+          </button>
+
+        </div>
+
+      </label>
+
+      <small
+        class="field-error"
+        *ngIf="
+          form.controls.password.touched &&
+          form.controls.password.invalid
+        "
+      >
+        Password is required.
+      </small>
+
       <div class="auth-link-row">
-        <label class="inline-check"><input type="checkbox" formControlName="rememberMe"> Remember me</label>
-        <a routerLink="/forgot-password">Forgot password?</a>
+
+        <label class="inline-check">
+
+          <input
+            type="checkbox"
+            formControlName="rememberMe"
+          >
+
+          <span>
+            Remember me
+          </span>
+
+        </label>
+
+        <a routerLink="/forgot-password">
+          Forgot password?
+        </a>
+
       </div>
 
-      <p class="error" *ngIf="error()">{{ error() }}</p>
-      <button class="btn-primary" [disabled]="loading() || form.invalid">{{ loading() ? 'Signing in...' : 'Login to dashboard' }}</button>
+      <div
+        class="error-box"
+        *ngIf="error()"
+      >
+        {{ error() }}
+      </div>
 
-      <div class="auth-link-row"><span>New to HomeBudgetAI?</span><a routerLink="/register">Create account</a></div>
-      <div class="empty-state"><strong>Demo credentials</strong><br>Email: demo@homebudget.ai<br>Password: Demo@12345</div>
+      <button
+        class="btn-primary login-btn"
+        [disabled]="loading() || form.invalid"
+      >
+
+        <span *ngIf="!loading()">
+          Login to Dashboard
+        </span>
+
+        <span *ngIf="loading()">
+          Signing in...
+        </span>
+
+      </button>
+
+      <div class="auth-link-row footer-row">
+
+        <span>
+          New to HomeBudgetAI?
+        </span>
+
+        <a routerLink="/register">
+          Create account
+        </a>
+
+      </div>
+
+      <div class="demo-box">
+
+        <strong>
+          Demo Credentials
+        </strong>
+
+        <div>
+          Email:
+          demo@homebudget.ai
+        </div>
+
+        <div>
+          Password:
+          Demo@12345
+        </div>
+
+      </div>
+
     </form>
+
   </div>
+
 </section>

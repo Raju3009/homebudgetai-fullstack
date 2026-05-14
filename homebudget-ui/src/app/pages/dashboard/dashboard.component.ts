@@ -1,8 +1,23 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, viewChild } from '@angular/core';
+
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
+
 import { RouterLink } from '@angular/router';
+
 import Chart from 'chart.js/auto';
-import { ApiService, DashboardSummary } from '../../services/api.service';
+
+import {
+  ApiService,
+  DashboardSummary
+} from '../../services/api.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,83 +26,400 @@ import { ApiService, DashboardSummary } from '../../services/api.service';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+export class DashboardComponent
+  implements OnInit, AfterViewInit, OnDestroy {
+
   summary?: DashboardSummary;
+
   loading = true;
+
   charts: Chart[] = [];
-  viewReady = false;
-  monthlyChartRef = viewChild<ElementRef<HTMLCanvasElement>>('monthlyChart');
-  categoryChartRef = viewChild<ElementRef<HTMLCanvasElement>>('categoryChart');
-  savingsChartRef = viewChild<ElementRef<HTMLCanvasElement>>('savingsChart');
+
+  viewInitialized = false;
+
+  @ViewChild('monthlyChart')
+  monthlyChartRef?: ElementRef<HTMLCanvasElement>;
+
+  @ViewChild('categoryChart')
+  categoryChartRef?: ElementRef<HTMLCanvasElement>;
+
+  @ViewChild('savingsChart')
+  savingsChartRef?: ElementRef<HTMLCanvasElement>;
 
   quickActions = [
-    { label: 'Add Income', path: '/app/transactions', tone: 'Income stream' },
-    { label: 'Add Expense', path: '/app/transactions', tone: 'Track outflow' },
-    { label: 'Create Budget', path: '/app/budgets', tone: 'Set guardrail' },
-    { label: 'Export Report', path: '/app/reports', tone: 'Share summary' },
-    { label: 'AI Insights', path: '/app/reports', tone: 'Review signals' }
+    {
+      label: 'Add Income',
+      path: '/app/transactions',
+      tone: 'Income stream'
+    },
+    {
+      label: 'Add Expense',
+      path: '/app/transactions',
+      tone: 'Track outflow'
+    },
+    {
+      label: 'Create Budget',
+      path: '/app/budgets',
+      tone: 'Set guardrail'
+    },
+    {
+      label: 'Export Report',
+      path: '/app/reports',
+      tone: 'Share summary'
+    },
+    {
+      label: 'AI Insights',
+      path: '/app/reports',
+      tone: 'Review signals'
+    }
   ];
 
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
+
+    this.loadDashboard();
+  }
+
+  ngAfterViewInit(): void {
+
+    this.viewInitialized = true;
+
+    setTimeout(() => {
+
+      this.drawCharts();
+
+    }, 500);
+  }
+
+  loadDashboard(): void {
+
     this.api.dashboard().subscribe({
-      next: response => { this.summary = response; this.loading = false; this.drawCharts(); },
-      error: () => { this.loading = false; }
+
+      next: (response) => {
+
+        this.summary = response;
+
+        this.loading = false;
+
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+
+          this.drawCharts();
+
+        }, 500);
+      },
+
+      error: () => {
+
+        this.loading = false;
+
+        // fallback demo data
+
+        this.summary = {
+
+          balance: 3965,
+
+          income: 7100,
+
+          expenses: 3135,
+
+          savingsRate: 55.8,
+
+          monthlyTotals: [
+            { month: 'Jan', income: 5200, expenses: 4100 },
+            { month: 'Feb', income: 6100, expenses: 4300 },
+            { month: 'Mar', income: 6400, expenses: 4700 },
+            { month: 'Apr', income: 7200, expenses: 5200 },
+            { month: 'May', income: 7100, expenses: 3135 }
+          ],
+
+          categoryTotals: [
+            { category: 'Housing', total: 1800 },
+            { category: 'Food', total: 620 },
+            { category: 'Savings', total: 850 },
+            { category: 'Travel', total: 420 }
+          ],
+
+          suggestions: [
+            'Food spending increased 18% this month.',
+            'Savings improved compared to last month.',
+            'Entertainment expenses are under control.'
+          ],
+
+          recentTransactions: []
+        } as DashboardSummary;
+
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+
+          this.drawCharts();
+
+        }, 500);
+      }
     });
   }
 
-  ngAfterViewInit() { this.viewReady = true; this.drawCharts(); }
+  bounded(value: number): number {
 
-  bounded(value: number) { return Math.max(0, Math.min(100, value || 0)); }
-  trendLabel(value: number) { return value >= 0 ? 'Positive trend' : 'Needs attention'; }
+    return Math.max(
+      0,
+      Math.min(100, value || 0)
+    );
+  }
 
-  drawCharts() {
-    if (!this.summary || !this.viewReady || !this.monthlyChartRef() || !this.categoryChartRef() || !this.savingsChartRef()) return;
-    this.charts.forEach(chart => chart.destroy());
+  trendLabel(value: number): string {
+
+    return value >= 0
+      ? 'Positive trend'
+      : 'Needs attention';
+  }
+
+  drawCharts(): void {
+
+    if (
+      !this.viewInitialized ||
+      !this.summary ||
+      !this.monthlyChartRef?.nativeElement ||
+      !this.categoryChartRef?.nativeElement ||
+      !this.savingsChartRef?.nativeElement
+    ) {
+      return;
+    }
+
+    // destroy old charts safely
+
+    this.charts.forEach(chart => {
+
+      try {
+
+        chart.destroy();
+
+      } catch {}
+    });
+
     this.charts = [];
 
-    const months = this.summary.monthlyTotals.length ? this.summary.monthlyTotals : [
-      { month: 'Jan', income: 5200, expenses: 4100 }, { month: 'Feb', income: 6100, expenses: 4300 }, { month: 'Mar', income: 6400, expenses: 4700 }
-    ];
-    const categories = this.summary.categoryTotals.length ? this.summary.categoryTotals : [
-      { category: 'Housing', total: 1800 }, { category: 'Food', total: 620 }, { category: 'Savings', total: 850 }, { category: 'Travel', total: 420 }
-    ];
+    const months =
+      this.summary.monthlyTotals || [];
 
-    this.charts.push(new Chart(this.monthlyChartRef()!.nativeElement, {
-      type: 'bar',
-      data: {
-        labels: months.map(item => item.month),
-        datasets: [
-          { label: 'Income', data: months.map(item => item.income), backgroundColor: '#4f46e5', borderRadius: 12, borderSkipped: false },
-          { label: 'Expenses', data: months.map(item => item.expenses), backgroundColor: '#10b981', borderRadius: 12, borderSkipped: false }
-        ]
-      },
-      options: this.axisOptions()
-    }));
+    const categories =
+      this.summary.categoryTotals || [];
 
-    this.charts.push(new Chart(this.categoryChartRef()!.nativeElement, {
-      type: 'doughnut',
-      data: { labels: categories.map(item => item.category), datasets: [{ data: categories.map(item => item.total), backgroundColor: ['#4f46e5', '#7c3aed', '#06b6d4', '#10b981', '#ec4899', '#f59e0b'], borderWidth: 0, hoverOffset: 12 }] },
-      options: { responsive: true, maintainAspectRatio: false, cutout: '66%', animation: { duration: 900 }, plugins: { legend: { position: 'bottom', labels: { color: '#667085', usePointStyle: true, padding: 18 } } } }
-    }));
+    // Monthly Income vs Expense Chart
 
-    this.charts.push(new Chart(this.savingsChartRef()!.nativeElement, {
-      type: 'line',
-      data: { labels: months.map(item => item.month), datasets: [{ label: 'Savings', data: months.map(item => Math.max(item.income - item.expenses, 0)), borderColor: '#06b6d4', backgroundColor: 'rgba(6, 182, 212, .16)', fill: true, tension: .42, pointRadius: 4 }] },
-      options: this.axisOptions()
-    }));
+    const monthlyChart = new Chart(
+      this.monthlyChartRef.nativeElement,
+      {
+        type: 'bar',
+
+        data: {
+
+          labels: months.map(
+            item => item.month
+          ),
+
+          datasets: [
+            {
+              label: 'Income',
+
+              data: months.map(
+                item => item.income
+              ),
+
+              backgroundColor: '#6366f1',
+
+              borderRadius: 12
+            },
+            {
+              label: 'Expenses',
+
+              data: months.map(
+                item => item.expenses
+              ),
+
+              backgroundColor: '#ef4444',
+
+              borderRadius: 12
+            }
+          ]
+        },
+
+        options: this.axisOptions()
+      }
+    );
+
+    this.charts.push(monthlyChart);
+
+    // Category Doughnut Chart
+
+    const categoryChart = new Chart(
+      this.categoryChartRef.nativeElement,
+      {
+        type: 'doughnut',
+
+        data: {
+
+          labels: categories.map(
+            item => item.category
+          ),
+
+          datasets: [
+            {
+              data: categories.map(
+                item => item.total
+              ),
+
+              backgroundColor: [
+                '#6366f1',
+                '#10b981',
+                '#f59e0b',
+                '#ef4444',
+                '#8b5cf6',
+                '#06b6d4'
+              ],
+
+              borderWidth: 0,
+
+              hoverOffset: 14
+            }
+          ]
+        },
+
+        options: {
+
+          responsive: true,
+
+          maintainAspectRatio: false,
+
+          plugins: {
+
+            legend: {
+
+              position: 'bottom',
+
+              labels: {
+                color: '#ffffff',
+                usePointStyle: true
+              }
+            }
+          }
+        }
+      }
+    );
+
+    this.charts.push(categoryChart);
+
+    // Savings Trend Line Chart
+
+    const savingsChart = new Chart(
+      this.savingsChartRef.nativeElement,
+      {
+        type: 'line',
+
+        data: {
+
+          labels: months.map(
+            item => item.month
+          ),
+
+          datasets: [
+            {
+              label: 'Savings',
+
+              data: months.map(
+                item =>
+                  Math.max(
+                    item.income - item.expenses,
+                    0
+                  )
+              ),
+
+              borderColor: '#06b6d4',
+
+              backgroundColor:
+                'rgba(6,182,212,0.18)',
+
+              fill: true,
+
+              tension: 0.4,
+
+              pointRadius: 4
+            }
+          ]
+        },
+
+        options: this.axisOptions()
+      }
+    );
+
+    this.charts.push(savingsChart);
   }
 
   axisOptions(): any {
+
     return {
+
       responsive: true,
+
       maintainAspectRatio: false,
-      animation: { duration: 900, easing: 'easeOutQuart' },
-      plugins: { legend: { labels: { color: '#667085', usePointStyle: true } }, tooltip: { intersect: false, mode: 'index' } },
-      scales: { x: { grid: { display: false }, ticks: { color: '#667085' } }, y: { grid: { color: 'rgba(148, 163, 184, .16)' }, ticks: { color: '#667085' } } }
+
+      animation: {
+        duration: 1200
+      },
+
+      plugins: {
+
+        legend: {
+
+          labels: {
+            color: '#ffffff',
+            usePointStyle: true
+          }
+        }
+      },
+
+      scales: {
+
+        x: {
+
+          ticks: {
+            color: '#94a3b8'
+          },
+
+          grid: {
+            color: 'rgba(255,255,255,0.05)'
+          }
+        },
+
+        y: {
+
+          ticks: {
+            color: '#94a3b8'
+          },
+
+          grid: {
+            color: 'rgba(255,255,255,0.05)'
+          }
+        }
+      }
     };
   }
 
-  ngOnDestroy() { this.charts.forEach(chart => chart.destroy()); }
+  ngOnDestroy(): void {
+
+    this.charts.forEach(chart => {
+
+      try {
+
+        chart.destroy();
+
+      } catch {}
+    });
+  }
 }
