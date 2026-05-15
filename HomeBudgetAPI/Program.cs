@@ -71,12 +71,7 @@ builder.Services.AddSwaggerGen(options =>
 // =========================
 
 var connectionString =
-    builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? builder.Configuration["DATABASE_URL"];
-
-var provider =
-    builder.Configuration["DatabaseProvider"]
-    ?? "SqlServer";
+    builder.Configuration.GetConnectionString("DefaultConnection");
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
@@ -87,24 +82,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-  if (
-      provider.Equals(
-          "PostgreSQL",
-          StringComparison.OrdinalIgnoreCase
-      )
-      ||
-      provider.Equals(
-          "Postgres",
-          StringComparison.OrdinalIgnoreCase
-      )
-  )
-  {
-    options.UseNpgsql(connectionString);
-  }
-  else
-  {
-    options.UseSqlServer(connectionString);
-  }
+  options.UseNpgsql(connectionString);
 });
 
 // =========================
@@ -274,42 +252,25 @@ app.MapControllers()
    .RequireRateLimiting("api");
 
 // =========================
-// SEED DATA
+// DATABASE MIGRATION
 // =========================
 
-if (
-    builder.Configuration.GetValue(
-        "SeedDemoData",
-        true
-    )
-)
+try
 {
-  try
-  {
-    using var scope =
-        app.Services.CreateScope();
+  using var scope =
+      app.Services.CreateScope();
 
-    var db =
-        scope.ServiceProvider
-            .GetRequiredService<AppDbContext>();
+  var db =
+      scope.ServiceProvider
+          .GetRequiredService<AppDbContext>();
 
-    var passwords =
-        scope.ServiceProvider
-            .GetRequiredService<IPasswordService>();
-
-    await db.Database.MigrateAsync();
-
-    await SeedData.ApplyAsync(
-        db,
-        passwords
-    );
-  }
-  catch (Exception ex)
-  {
-    Console.WriteLine(
-        $"Startup Error: {ex.Message}"
-    );
-  }
+  await db.Database.MigrateAsync();
+}
+catch (Exception ex)
+{
+  Console.WriteLine(
+      $"Database Migration Error: {ex.Message}"
+  );
 }
 
 // =========================
