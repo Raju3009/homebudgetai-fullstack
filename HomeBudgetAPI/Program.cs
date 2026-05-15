@@ -311,7 +311,7 @@ if (
 
     // Uncomment if needed
 
-    // await db.Database.MigrateAsync();
+     await db.Database.MigrateAsync();
 
     await SeedData.ApplyAsync(
         db,
