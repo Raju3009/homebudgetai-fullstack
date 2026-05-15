@@ -111,32 +111,20 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // CORS
 // =========================
 
-var allowedOrigins =
-    builder.Configuration
-        .GetSection("Cors:AllowedOrigins")
-        .Get<string[]>()
-    ?? Array.Empty<string>();
-
 builder.Services.AddCors(options =>
 {
-  options.AddPolicy("Frontend", policy =>
-  {
-    if (
-        allowedOrigins.Length == 0
-        || allowedOrigins.Contains("*")
-    )
-    {
-      policy.AllowAnyOrigin();
-    }
-    else
-    {
-      policy.WithOrigins(allowedOrigins);
-    }
-
-    policy
-        .AllowAnyHeader()
-        .AllowAnyMethod();
-  });
+  options.AddPolicy("AllowAngular",
+      policy =>
+      {
+        policy
+              .WithOrigins(
+                  "http://localhost:4200",
+                  "https://homebudget-ui.netlify.app"
+              )
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+      });
 });
 
 // =========================
@@ -274,7 +262,7 @@ if (!app.Environment.IsProduction())
   app.UseHttpsRedirection();
 }
 
-app.UseCors("Frontend");
+app.UseCors("AllowAngular");
 
 app.UseRateLimiter();
 
@@ -309,9 +297,7 @@ if (
         scope.ServiceProvider
             .GetRequiredService<IPasswordService>();
 
-    // Uncomment if needed
-
-     await db.Database.MigrateAsync();
+    await db.Database.MigrateAsync();
 
     await SeedData.ApplyAsync(
         db,
