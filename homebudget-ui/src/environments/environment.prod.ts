@@ -1,4 +1,4 @@
 ﻿export const environment = {
   production: true,
-  apiUrl: 'https://homebudgetai-api.onrender.com/api'
+  apiUrl: 'https://homebudgetai-fullstack-2.onrender.com/api'
 };
