@@ -12,14 +12,14 @@ import {
   Observable,
   tap
 } from 'rxjs';
-
+import { environment } from '../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
   private baseUrl =
-    'http://localhost:8080/api';
+    environment.apiUrl;
 
   // =========================
   // USER SIGNAL
@@ -130,21 +130,26 @@ export class AuthService {
       );
     }
 
-    if (response.user) {
+    // BACKEND RETURNS DIRECT USER DATA
+    // NOT response.user
 
-      localStorage.setItem(
+    const user = {
 
-        'user',
+      email: response.email,
 
-        JSON.stringify(
-          response.user
-        )
-      );
+      fullName: response.fullName,
 
-      this.userSignal.set(
-        response.user
-      );
-    }
+      role: response.role
+    };
+
+    localStorage.setItem(
+
+      'user',
+
+      JSON.stringify(user)
+    );
+
+    this.userSignal.set(user);
   }
 
   // =========================
