@@ -154,7 +154,7 @@ export class LoginComponent {
         // REDIRECT TO DASHBOARD
 
         this.router.navigate([
-          '/dashboard'
+          '/app/dashboard'
         ]);
       },
 

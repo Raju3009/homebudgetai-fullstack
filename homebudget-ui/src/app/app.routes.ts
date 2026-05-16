@@ -44,93 +44,106 @@ export const routes: Routes = [
   },
 
   // =========================
-  // DASHBOARD
+  // APP LAYOUT
   // =========================
 
   {
-    path: 'dashboard',
+    path: 'app',
 
     loadComponent: () =>
 
-      import('./pages/dashboard/dashboard.component')
-        .then(m => m.DashboardComponent),
+      import('./layout/shell.component')
+        .then(m => m.ShellComponent),
 
-    canActivate: [authGuard]
-  },
+    canActivate: [authGuard],
 
-  // =========================
-  // BUDGETS
-  // =========================
+    children: [
 
-  {
-    path: 'budgets',
+      // DASHBOARD
 
-    loadComponent: () =>
+      {
+        path: 'dashboard',
 
-      import('./pages/budgets/budgets.component')
-        .then(m => m.BudgetsComponent),
+        loadComponent: () =>
 
-    canActivate: [authGuard]
-  },
+          import('./pages/dashboard/dashboard.component')
+            .then(m => m.DashboardComponent)
+      },
 
-  // =========================
-  // REPORTS
-  // =========================
+      // BUDGETS
 
-  {
-    path: 'reports',
+      {
+        path: 'budgets',
 
-    loadComponent: () =>
+        loadComponent: () =>
 
-      import('./pages/reports/reports.component')
-        .then(m => m.ReportsComponent),
+          import('./pages/budgets/budgets.component')
+            .then(m => m.BudgetsComponent)
+      },
 
-    canActivate: [authGuard]
-  },
+      // REPORTS
 
-  // =========================
-  // TRANSACTIONS
-  // =========================
+      {
+        path: 'reports',
 
-  {
-    path: 'transactions',
+        loadComponent: () =>
 
-    loadComponent: () =>
+          import('./pages/reports/reports.component')
+            .then(m => m.ReportsComponent)
+      },
 
-      import('./pages/transactions/transactions.component')
-        .then(m => m.TransactionsComponent),
+      // TRANSACTIONS
 
-    canActivate: [authGuard]
-  },
+      {
+        path: 'transactions',
 
-  // =========================
-  // SETTINGS
-  // =========================
+        loadComponent: () =>
 
-  {
-    path: 'settings',
+          import('./pages/transactions/transactions.component')
+            .then(m => m.TransactionsComponent)
+      },
 
-    loadComponent: () =>
+      // SETTINGS
 
-      import('./pages/settings/settings.component')
-        .then(m => m.SettingsComponent),
+      {
+        path: 'settings',
 
-    canActivate: [authGuard]
-  },
+        loadComponent: () =>
 
-  // =========================
-  // PROFILE
-  // =========================
+          import('./pages/settings/settings.component')
+            .then(m => m.SettingsComponent)
+      },
 
-  {
-    path: 'profile',
+      // PROFILE
 
-    loadComponent: () =>
+      {
+        path: 'profile',
 
-      import('./pages/profile/profile.component')
-        .then(m => m.ProfileComponent),
+        loadComponent: () =>
 
-    canActivate: [authGuard]
+          import('./pages/profile/profile.component')
+            .then(m => m.ProfileComponent)
+      },
+
+      // ACTIVITY
+
+      {
+        path: 'activity',
+
+        loadComponent: () =>
+
+          import('./pages/activity/activity.component')
+            .then(m => m.ActivityComponent)
+      },
+
+      // DEFAULT
+
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      }
+    ]
   },
 
   // =========================
