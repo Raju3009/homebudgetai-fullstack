@@ -18,7 +18,8 @@ import {
   RouterLink
 } from '@angular/router';
 
-import { AuthService } from '../../core/auth.service';
+import { AuthService }
+from '../../core/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -37,41 +38,71 @@ import { AuthService } from '../../core/auth.service';
 })
 export class LoginComponent {
 
-  private fb = inject(FormBuilder);
+  // =========================
+  // INJECTS
+  // =========================
 
-  private auth = inject(AuthService);
+  private fb =
+    inject(FormBuilder);
 
-  private router = inject(Router);
+  private auth =
+    inject(AuthService);
 
-  private route = inject(ActivatedRoute);
+  private router =
+    inject(Router);
 
-  loading = signal(false);
+  private route =
+    inject(ActivatedRoute);
 
-  error = signal(
-    this.route.snapshot.queryParamMap.get('expired')
-      ? 'Your session expired. Please login again.'
-      : ''
-  );
+  // =========================
+  // STATE
+  // =========================
 
-  showPassword = signal(false);
+  loading =
+    signal(false);
 
-  form = this.fb.nonNullable.group({
+  error =
+    signal(
 
-    email: [
-      'demo@homebudget.ai',
-      [
-        Validators.required,
-        Validators.email
-      ]
-    ],
+      this.route
+        .snapshot
+        .queryParamMap
+        .get('expired')
 
-    password: [
-      'Demo@12345',
-      Validators.required
-    ],
+        ? 'Your session expired. Please login again.'
 
-    rememberMe: [true]
-  });
+        : ''
+    );
+
+  showPassword =
+    signal(false);
+
+  // =========================
+  // FORM
+  // =========================
+
+  form =
+    this.fb.nonNullable.group({
+
+      email: [
+        'demo@homebudget.ai',
+        [
+          Validators.required,
+          Validators.email
+        ]
+      ],
+
+      password: [
+        'Demo@12345',
+        Validators.required
+      ],
+
+      rememberMe: [true]
+    });
+
+  // =========================
+  // TOGGLE PASSWORD
+  // =========================
 
   togglePassword(): void {
 
@@ -80,7 +111,13 @@ export class LoginComponent {
     );
   }
 
+  // =========================
+  // LOGIN
+  // =========================
+
   submit(): void {
+
+    // INVALID FORM
 
     if (this.form.invalid) {
 
@@ -89,6 +126,8 @@ export class LoginComponent {
       return;
     }
 
+    // LOADING
+
     this.loading.set(true);
 
     this.error.set('');
@@ -96,28 +135,30 @@ export class LoginComponent {
     const value =
       this.form.getRawValue();
 
-    const returnUrl =
-      this.route.snapshot.queryParamMap.get('returnUrl')
-      || '/app/dashboard';
+    // LOGIN REQUEST
 
     this.auth.login({
 
       email: value.email,
 
-      password: value.password,
-
-    
+      password: value.password
 
     }).subscribe({
+
+      // SUCCESS
 
       next: () => {
 
         this.loading.set(false);
 
-        this.router.navigateByUrl(
-          returnUrl
-        );
+        // REDIRECT TO DASHBOARD
+
+        this.router.navigate([
+          '/dashboard'
+        ]);
       },
+
+      // ERROR
 
       error: error => {
 

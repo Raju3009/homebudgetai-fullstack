@@ -12,11 +12,18 @@ import {
   Observable,
   tap
 } from 'rxjs';
-import { environment } from '../../environments/environment';
+
+import { environment }
+from '../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+
+  // =========================
+  // API URL
+  // =========================
 
   private baseUrl =
     environment.apiUrl;
@@ -49,6 +56,7 @@ export class AuthService {
       tap(response => {
 
         this.storeAuth(response);
+
       })
     );
   }
@@ -70,6 +78,7 @@ export class AuthService {
       tap(response => {
 
         this.storeAuth(response);
+
       })
     );
   }
@@ -87,6 +96,7 @@ export class AuthService {
       `${this.baseUrl}/auth/forgot-password`,
 
       { email }
+
     );
   }
 
@@ -103,16 +113,19 @@ export class AuthService {
       `${this.baseUrl}/auth/reset-password`,
 
       data
+
     );
   }
 
   // =========================
-  // STORE AUTH
+  // STORE AUTH DATA
   // =========================
 
   private storeAuth(
     response: any
   ): void {
+
+    // TOKEN
 
     if (response.token) {
 
@@ -122,6 +135,8 @@ export class AuthService {
       );
     }
 
+    // REFRESH TOKEN
+
     if (response.refreshToken) {
 
       localStorage.setItem(
@@ -130,16 +145,18 @@ export class AuthService {
       );
     }
 
-    // BACKEND RETURNS DIRECT USER DATA
-    // NOT response.user
+    // USER
 
     const user = {
 
-      email: response.email,
+      email:
+        response.email,
 
-      fullName: response.fullName,
+      fullName:
+        response.fullName,
 
-      role: response.role
+      role:
+        response.role
     };
 
     localStorage.setItem(
@@ -148,6 +165,8 @@ export class AuthService {
 
       JSON.stringify(user)
     );
+
+    // UPDATE SIGNAL
 
     this.userSignal.set(user);
   }
@@ -217,7 +236,9 @@ export class AuthService {
   // ROLE CHECK
   // =========================
 
-  hasRole(role: string): boolean {
+  hasRole(
+    role: string
+  ): boolean {
 
     return this.user()?.role === role;
   }
