@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeBudgetAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260514130432_PremiumV1")]
-    partial class PremiumV1
+    [Migration("20260515132802_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

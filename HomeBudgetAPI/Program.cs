@@ -82,7 +82,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-  options.UseNpgsql(connectionString);
+  options.UseSqlServer(connectionString);
 });
 
 // =========================
