@@ -13,8 +13,8 @@
   grid-template-columns:1.1fr .9fr;
   background:
     radial-gradient(circle at top left,#0f766e 0%,transparent 30%),
-    radial-gradient(circle at top right,#7c3aed 0%,transparent 30%),
-    #020617;
+    radial-gradient(circle at top right,#d97706 0%,transparent 30%),
+    #071311;
 }
 
 /* =========================
@@ -38,13 +38,13 @@
   font-weight:800;
   color:white;
   margin:2rem 0;
-  letter-spacing:-0.05em;
+  letter-spacing:0;
 }
 
 .auth-copy p{
   font-size:1.35rem;
   line-height:1.7;
-  color:#cbd5e1;
+  color:#d6e3de;
   margin-bottom:2rem;
 }
 
@@ -94,11 +94,11 @@
   font-size:2.3rem;
   margin-top:.5rem;
   margin-bottom:.3rem;
-  color:#0f172a;
+  color:#13231f;
 }
 
 .auth-card p{
-  color:#64748b;
+  color:#65736f;
 }
 
 /* =========================
@@ -111,7 +111,7 @@ label{
   gap:.55rem;
   margin-top:1rem;
   font-weight:600;
-  color:#0f172a;
+  color:#13231f;
 }
 
 /* =========================
@@ -124,7 +124,7 @@ select{
   min-height:58px;
   border:none;
   border-radius:18px;
-  background:#f1f5f9;
+  background:#f3f7f4;
   padding:0 1rem;
   font-size:1rem;
   outline:none;
@@ -135,7 +135,7 @@ input:focus,
 select:focus{
   background:white;
   box-shadow:
-    0 0 0 3px rgba(99,102,241,.15);
+    0 0 0 3px rgba(15,118,110,.15);
 }
 
 /* =========================
@@ -163,8 +163,8 @@ select:focus{
   background:
     linear-gradient(
       135deg,
-      #7c3aed,
-      #4f46e5
+      #0f766e,
+      #2563eb
     );
   color:white;
   font-weight:700;
@@ -175,15 +175,15 @@ select:focus{
 .btn-primary:hover{
   transform:translateY(-2px);
   box-shadow:
-    0 10px 25px rgba(79,70,229,.3);
+    0 10px 25px rgba(15,118,110,.28);
 }
 
 .btn-secondary{
   border:none;
   border-radius:16px;
   padding:.9rem 1.1rem;
-  background:#e2e8f0;
-  color:#0f172a;
+  background:#e3ece8;
+  color:#13231f;
   font-weight:700;
   cursor:pointer;
 }
@@ -197,7 +197,7 @@ select:focus{
   height:12px;
   border-radius:999px;
   overflow:hidden;
-  background:#e2e8f0;
+  background:#e3ece8;
   margin:1.2rem 0;
 }
 
@@ -207,8 +207,8 @@ select:focus{
   background:
     linear-gradient(
       90deg,
-      #7c3aed,
-      #06b6d4
+      #0f766e,
+      #d97706
     );
   transition:all .3s ease;
 }
@@ -224,7 +224,7 @@ select:focus{
 .strength-bar{
   width:100%;
   height:10px;
-  background:#e5e7eb;
+  background:#e2ebe7;
   border-radius:999px;
   overflow:hidden;
   margin-bottom:6px;
@@ -238,19 +238,19 @@ select:focus{
 }
 
 .strength-bar span.weak{
-  background:#ef4444;
+  background:#dc2626;
 }
 
 .strength-bar span.fair{
-  background:#f59e0b;
+  background:#d97706;
 }
 
 .strength-bar span.good{
-  background:#3b82f6;
+  background:#2563eb;
 }
 
 .strength-bar span.strong{
-  background:#22c55e;
+  background:#16a34a;
 }
 
 /* =========================
@@ -275,7 +275,7 @@ select:focus{
   display:inline-flex;
   align-items:center;
   gap:.5rem;
-  color:#64748b;
+  color:#65736f;
   margin-top:1rem;
 }
 
@@ -297,7 +297,7 @@ select:focus{
 }
 
 .auth-link-row a{
-  color:#4f46e5;
+  color:#0f766e;
   font-weight:700;
   text-decoration:none;
 }
@@ -311,15 +311,15 @@ select:focus{
   align-items:center;
   padding:.45rem .9rem;
   border-radius:999px;
-  background:rgba(99,102,241,.1);
-  color:#4f46e5;
+  background:rgba(15,118,110,.1);
+  color:#0f766e;
   font-size:.85rem;
   font-weight:700;
 }
 
 .badge.success{
   background:rgba(16,185,129,.12);
-  color:#10b981;
+  color:#16a34a;
 }
 
 /* =========================
@@ -327,7 +327,7 @@ select:focus{
 ========================= */
 
 .error{
-  color:#ef4444;
+  color:#dc2626;
   display:block;
   margin-top:6px;
   font-size:.92rem;

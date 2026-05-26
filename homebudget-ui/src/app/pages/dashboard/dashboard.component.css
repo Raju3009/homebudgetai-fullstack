@@ -56,8 +56,8 @@
   background:
     linear-gradient(
       135deg,
-      rgba(99,102,241,0.08),
-      rgba(16,185,129,0.08)
+      rgba(15,118,110,0.09),
+      rgba(217,119,6,0.08)
     );
 
   opacity: 0;
@@ -72,11 +72,11 @@
 .suggestion:hover {
   transform: translateY(-4px);
 
-  border-color: rgba(99,102,241,0.25);
+  border-color: rgba(15,118,110,0.25);
 
   box-shadow:
     0 16px 40px rgba(15,23,42,0.12),
-    0 0 20px rgba(99,102,241,0.08);
+    0 0 20px rgba(15,118,110,0.09);
 }
 
 .suggestion:hover::before {
@@ -88,7 +88,7 @@
 .suggestion p {
   margin: 0;
 
-  color: #0f172a;
+  color: #13231f;
 
   font-size: 0.95rem;
 
@@ -114,7 +114,7 @@
 
   text-transform: uppercase;
 
-  color: #6366f1;
+  color: #0f766e;
 }
 
 /* AI icon bubble */
@@ -132,14 +132,14 @@
   background:
     linear-gradient(
       135deg,
-      #6366f1,
-      #8b5cf6
+      #0f766e,
+      #2563eb
     );
 
   color: white;
 
   box-shadow:
-    0 8px 20px rgba(99,102,241,0.25);
+    0 8px 20px rgba(15,118,110,0.25);
 }
 
 /* =========================
@@ -163,17 +163,17 @@
   background:
     linear-gradient(
       135deg,
-      rgba(99,102,241,0.12),
-      rgba(16,185,129,0.12)
+      rgba(15,118,110,0.14),
+      rgba(217,119,6,0.12)
     );
 }
 
 .dark-mode .suggestion p {
-  color: #e2e8f0;
+  color: #e3ece8;
 }
 
 .dark-mode .suggestion-title {
-  color: #a5b4fc;
+  color: #5eead4;
 }
 
 /* =========================

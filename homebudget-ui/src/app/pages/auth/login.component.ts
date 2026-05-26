@@ -85,7 +85,7 @@ export class LoginComponent {
     this.fb.nonNullable.group({
 
       email: [
-        'demo@homebudget.ai',
+        'b@gmail.com',
         [
           Validators.required,
           Validators.email
@@ -93,7 +93,7 @@ export class LoginComponent {
       ],
 
       password: [
-        'Demo@12345',
+        '12345678',
         Validators.required
       ],
 

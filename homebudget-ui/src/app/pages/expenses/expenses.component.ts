@@ -123,12 +123,12 @@ loadExpenses() {
     });
 
     const colors = [
-      '#6366F1', // indigo
-      '#22C55E', // green
-      '#F59E0B', // yellow
-      '#EF4444', // red
-      '#3B82F6', // blue
-      '#8B5CF6'  // purple
+      '#0f766e', // teal
+      '#16a34a', // green
+      '#d97706', // amber
+      '#dc2626', // red
+      '#2563eb', // blue
+      '#db2777'  // rose
     ];
 
     this.chart = new Chart(canvas, {

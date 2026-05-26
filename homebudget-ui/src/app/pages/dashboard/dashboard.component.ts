@@ -232,7 +232,7 @@ export class DashboardComponent
                 item => item.income
               ),
 
-              backgroundColor: '#6366f1',
+              backgroundColor: '#0f766e',
 
               borderRadius: 12
             },
@@ -243,7 +243,7 @@ export class DashboardComponent
                 item => item.expenses
               ),
 
-              backgroundColor: '#ef4444',
+              backgroundColor: '#dc2626',
 
               borderRadius: 12
             }
@@ -276,12 +276,12 @@ export class DashboardComponent
               ),
 
               backgroundColor: [
-                '#6366f1',
-                '#10b981',
-                '#f59e0b',
-                '#ef4444',
-                '#8b5cf6',
-                '#06b6d4'
+                '#0f766e',
+                '#16a34a',
+                '#d97706',
+                '#dc2626',
+                '#2563eb',
+                '#0891b2'
               ],
 
               borderWidth: 0,
@@ -340,10 +340,10 @@ export class DashboardComponent
                   )
               ),
 
-              borderColor: '#06b6d4',
+              borderColor: '#0891b2',
 
               backgroundColor:
-                'rgba(6,182,212,0.18)',
+                'rgba(8,145,178,0.18)',
 
               fill: true,
 
