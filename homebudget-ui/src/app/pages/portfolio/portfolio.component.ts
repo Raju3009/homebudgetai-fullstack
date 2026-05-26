@@ -17,6 +17,7 @@ import {
   Linkedin,
   Mail,
   Moon,
+  Phone,
   Server,
   ShieldCheck,
   Sparkles,
@@ -42,6 +43,7 @@ const icons = {
   Linkedin,
   Mail,
   Moon,
+  Phone,
   Server,
   ShieldCheck,
   Sparkles,
@@ -139,7 +141,7 @@ export class PortfolioComponent {
       category: 'fullstack' as const,
       summary: 'A production-style finance management application built with Angular, ASP.NET Core Web API, SQL Server, JWT security, dashboards, and deployment-ready architecture.',
       links: {
-        live: 'https://hilarious-frangollo-d046e9.netlify.app',
+        live: 'https://raju3009.github.io/homebudgetai-fullstack/',
         github: 'https://github.com/Raju3009/homebudgetai-fullstack'
       },
       badges: ['ASP.NET Core', 'Angular', 'SQL Server', 'EF Core', 'JWT', 'Swagger', 'REST APIs', 'Docker'],
@@ -170,7 +172,7 @@ export class PortfolioComponent {
       category: 'frontend' as const,
       summary: 'Responsive Angular interface with protected routes, reusable page patterns, animated cards, analytics sections, and mobile-first improvements.',
       links: {
-        live: 'https://hilarious-frangollo-d046e9.netlify.app',
+        live: 'https://raju3009.github.io/homebudgetai-fullstack/',
         github: 'https://github.com/Raju3009/homebudgetai-fullstack'
       },
       badges: ['Angular', 'TypeScript', 'CSS', 'Bootstrap', 'Responsive UI'],

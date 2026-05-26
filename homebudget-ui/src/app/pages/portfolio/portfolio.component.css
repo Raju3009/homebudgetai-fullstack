@@ -3,42 +3,42 @@
 }
 
 .portfolio-shell {
-  --portfolio-bg: #06110f;
-  --portfolio-surface: rgba(12, 27, 24, 0.74);
-  --portfolio-card: rgba(255, 255, 255, 0.08);
-  --portfolio-text: #f7fffb;
-  --portfolio-muted: #a6bab4;
-  --portfolio-line: rgba(224, 246, 238, 0.14);
-  --portfolio-brand: #14b8a6;
-  --portfolio-blue: #60a5fa;
-  --portfolio-amber: #f59e0b;
-  --portfolio-danger: #ef4444;
+  --portfolio-bg: #070a1f;
+  --portfolio-surface: rgba(13, 18, 42, 0.82);
+  --portfolio-card: rgba(255, 255, 255, 0.1);
+  --portfolio-text: #f8fbff;
+  --portfolio-muted: #bac7e5;
+  --portfolio-line: rgba(222, 232, 255, 0.16);
+  --portfolio-brand: #22d3ee;
+  --portfolio-blue: #8b5cf6;
+  --portfolio-amber: #f97316;
+  --portfolio-danger: #fb7185;
   --portfolio-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
   color: var(--portfolio-text);
   background:
-    radial-gradient(circle at 12% 8%, rgba(20, 184, 166, 0.22), transparent 30%),
-    radial-gradient(circle at 86% 12%, rgba(96, 165, 250, 0.2), transparent 28%),
-    radial-gradient(circle at 50% 100%, rgba(245, 158, 11, 0.14), transparent 30%),
+    radial-gradient(circle at 12% 8%, rgba(34, 211, 238, 0.28), transparent 32%),
+    radial-gradient(circle at 86% 12%, rgba(139, 92, 246, 0.28), transparent 30%),
+    radial-gradient(circle at 50% 100%, rgba(236, 72, 153, 0.2), transparent 34%),
     var(--portfolio-bg);
   font-family: Inter, Poppins, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   scroll-behavior: smooth;
 }
 
 .portfolio-shell.light-mode {
-  --portfolio-bg: #f6faf8;
-  --portfolio-surface: rgba(255, 255, 255, 0.82);
-  --portfolio-card: rgba(255, 255, 255, 0.74);
-  --portfolio-text: #10231f;
-  --portfolio-muted: #64746f;
-  --portfolio-line: rgba(16, 35, 31, 0.12);
+  --portfolio-bg: #f8fbff;
+  --portfolio-surface: rgba(255, 255, 255, 0.86);
+  --portfolio-card: rgba(255, 255, 255, 0.78);
+  --portfolio-text: #111827;
+  --portfolio-muted: #5f6f8a;
+  --portfolio-line: rgba(32, 41, 69, 0.13);
   --portfolio-shadow: 0 24px 80px rgba(17, 40, 34, 0.12);
   background:
-    radial-gradient(circle at 12% 8%, rgba(20, 184, 166, 0.14), transparent 30%),
-    radial-gradient(circle at 86% 12%, rgba(96, 165, 250, 0.12), transparent 28%),
-    linear-gradient(135deg, #fbfefc 0%, #edf8f4 100%);
+    radial-gradient(circle at 12% 8%, rgba(34, 211, 238, 0.2), transparent 32%),
+    radial-gradient(circle at 86% 12%, rgba(139, 92, 246, 0.18), transparent 30%),
+    linear-gradient(135deg, #ffffff 0%, #eef6ff 48%, #fff1f7 100%);
 }
 
 .portfolio-shell * {
@@ -160,7 +160,7 @@
   color: #fff;
   font-weight: 900;
   background: linear-gradient(135deg, var(--portfolio-brand), var(--portfolio-amber));
-  box-shadow: 0 16px 40px rgba(20, 184, 166, 0.28);
+  box-shadow: 0 16px 40px rgba(34, 211, 238, 0.3);
 }
 
 .nav-links {
@@ -221,8 +221,8 @@
 .btn-primary {
   padding: 0.78rem 1.05rem;
   color: #fff;
-  background: linear-gradient(135deg, var(--portfolio-brand), var(--portfolio-blue));
-  box-shadow: 0 16px 44px rgba(20, 184, 166, 0.24);
+  background: linear-gradient(135deg, var(--portfolio-brand), var(--portfolio-blue) 52%, #ec4899);
+  box-shadow: 0 16px 44px rgba(34, 211, 238, 0.28);
 }
 
 .btn-secondary,
@@ -245,7 +245,7 @@
 
 .filter-tabs button.active {
   color: #fff;
-  background: linear-gradient(135deg, var(--portfolio-brand), var(--portfolio-blue));
+  background: linear-gradient(135deg, var(--portfolio-brand), var(--portfolio-blue) 52%, #ec4899);
 }
 
 .hero-section,
@@ -287,7 +287,7 @@
   border-radius: 999px;
   padding: 0.42rem 0.72rem;
   color: var(--portfolio-brand);
-  background: rgba(20, 184, 166, 0.1);
+  background: rgba(34, 211, 238, 0.12);
   font-weight: 900;
   font-size: 0.83rem;
 }
@@ -346,6 +346,7 @@
 }
 
 .hero-meta span,
+.hero-meta a,
 .badge-row span,
 .info-meta span,
 .project-card-head span {
@@ -544,7 +545,7 @@ pre {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--portfolio-brand), var(--portfolio-blue), var(--portfolio-amber));
+  background: linear-gradient(90deg, var(--portfolio-brand), var(--portfolio-blue), #ec4899, var(--portfolio-amber));
 }
 
 .featured-project {
@@ -577,7 +578,7 @@ pre {
   color: var(--portfolio-muted);
   text-align: center;
   background:
-    linear-gradient(135deg, rgba(20, 184, 166, 0.16), rgba(96, 165, 250, 0.12)),
+    linear-gradient(135deg, rgba(34, 211, 238, 0.16), rgba(139, 92, 246, 0.16)),
     rgba(255, 255, 255, 0.07);
 }
 
@@ -599,7 +600,7 @@ pre {
 .mock-chart i {
   width: 13%;
   border-radius: 999px 999px 8px 8px;
-  background: linear-gradient(180deg, var(--portfolio-brand), var(--portfolio-blue));
+  background: linear-gradient(180deg, var(--portfolio-brand), var(--portfolio-blue) 58%, #ec4899);
 }
 
 .mock-chart i:nth-child(1) { height: 50%; }
@@ -663,7 +664,7 @@ pre {
   border-radius: 14px;
   color: #fff;
   font-weight: 900;
-  background: linear-gradient(135deg, var(--portfolio-brand), var(--portfolio-blue));
+  background: linear-gradient(135deg, var(--portfolio-brand), var(--portfolio-blue) 52%, #ec4899);
 }
 
 .info-card,
@@ -676,7 +677,7 @@ pre {
   align-items: center;
   border: 1px solid var(--portfolio-line);
   padding: 1.4rem;
-  background: linear-gradient(135deg, rgba(20, 184, 166, 0.16), rgba(96, 165, 250, 0.1));
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.16), rgba(236, 72, 153, 0.12));
 }
 
 .contact-form {
@@ -714,8 +715,8 @@ pre {
 
 .contact-form input:focus,
 .contact-form textarea:focus {
-  border-color: rgba(20, 184, 166, 0.7);
-  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.12);
+  border-color: rgba(34, 211, 238, 0.72);
+  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.14);
 }
 
 .portfolio-footer {
@@ -840,4 +841,43 @@ pre {
   .screenshot-frame.large {
     min-height: 210px;
   }
+}
+.contact-links a,
+.hero-meta a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-secondary:hover,
+.icon-link:hover,
+.theme-toggle:hover {
+  border-color: rgba(34, 211, 238, 0.48);
+  background: rgba(34, 211, 238, 0.12);
+  box-shadow: 0 14px 38px rgba(139, 92, 246, 0.18);
+}
+
+.featured-project,
+.hero-card,
+.skill-card,
+.project-card,
+.info-card,
+.contact-form {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.055)),
+    var(--portfolio-card);
+}
+
+.hero-copy h1 {
+  background: linear-gradient(90deg, #ffffff, var(--portfolio-brand) 42%, #f0abfc 72%, #fed7aa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.light-mode .hero-copy h1 {
+  background: linear-gradient(90deg, #111827, #0891b2 42%, #7c3aed 72%, #db2777);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
