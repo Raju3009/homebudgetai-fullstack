@@ -1,59 +1,130 @@
-# HomebudgetUi
+# Katkuri Raju Portfolio and HomeBudgetAI Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.7.
+This Angular application now serves as a professional developer portfolio for **Katkuri Raju** and keeps the HomeBudgetAI finance application available behind the protected app routes.
 
-## Development server
+## Portfolio Overview
 
-To start a local development server, run:
+The default `/` route is a premium, recruiter-focused full-stack developer portfolio built with Angular standalone components. It highlights:
 
-```bash
-ng serve
+- Hero section with resume, GitHub, LinkedIn, and contact actions.
+- About section written for fresher full-stack developer roles.
+- Skills grouped by frontend, backend, database, and tools.
+- Featured HomeBudgetAI project with live demo, GitHub link, tech badges, architecture highlights, and screenshot placeholders.
+- Project filtering for full-stack, backend, and frontend work.
+- Experience and learning journey timeline.
+- Education and certification sections from the resume.
+- Contact form that opens an email draft to `rajkatkuri05@gmail.com`.
+- Dark/light mode toggle, glassmorphism cards, smooth animations, responsive mobile layouts, and SEO metadata.
+
+## Main Project Featured
+
+**HomeBudgetAI - Full Stack Finance Management Platform**
+
+Tech stack:
+
+- ASP.NET Core Web API
+- Angular
+- SQL Server
+- Entity Framework Core
+- JWT Authentication
+- Swagger
+- C#
+- TypeScript
+- HTML, CSS, Bootstrap
+- GitHub, REST APIs
+
+Highlighted features:
+
+- User authentication and JWT authorization
+- Expense management and income tracking
+- Dashboard analytics
+- SQL database operations
+- Repository pattern and service layer architecture
+- Middleware exception handling
+- Rate limiting
+- Responsive UI
+- Cloud deployment-ready architecture
+
+## Important Routes
+
+- `/` - Katkuri Raju developer portfolio
+- `/login` - HomeBudgetAI login
+- `/register` - HomeBudgetAI registration
+- `/app/dashboard` - Protected HomeBudgetAI app dashboard
+- `/resume/Katkuri_Raju_Resume.pdf` - Resume download asset
+
+## Local Development
+
+```powershell
+cd D:\project\homebudgetai-fullstack\homebudget-ui
+npm install
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Open `http://localhost:4200/`.
 
-## Code scaffolding
+## Production Build
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```powershell
+cd D:\project\homebudgetai-fullstack\homebudget-ui
+npm run build -- --configuration production
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Build output is generated in:
 
-```bash
-ng generate --help
+```text
+dist/homebudget-ui
 ```
 
-## Building
+## Deployment
 
-To build the project run:
+### Netlify
 
-```bash
-ng build
+This repository already includes `netlify.toml` from the root project. The frontend build should use:
+
+```toml
+[build]
+  base = "homebudget-ui"
+  command = "npm ci && npm run build -- --configuration production"
+  publish = "dist/homebudget-ui/browser"
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### GitHub Pages or Static Hosting
 
-## Running unit tests
+Run the production build and upload the generated browser output folder from:
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
+```text
+homebudget-ui/dist/homebudget-ui/browser
 ```
 
-## Running end-to-end tests
+For Angular client-side routing, configure fallback redirects to `index.html`.
 
-For end-to-end (e2e) testing, run:
+## Resume Asset
 
-```bash
-ng e2e
+The resume PDF is copied into:
+
+```text
+public/resume/Katkuri_Raju_Resume.pdf
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+The portfolio download button points to this file.
 
-## Additional Resources
+## Quality Checks
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Before deployment, run:
+
+```powershell
+npm run build -- --configuration production
+```
+
+Recommended optional checks:
+
+```powershell
+npm test
+```
+
+## Contact
+
+- Email: `rajkatkuri05@gmail.com`
+- GitHub: `https://github.com/Raju3009`
+- LinkedIn: `https://www.linkedin.com/in/katkuri-raju0930`

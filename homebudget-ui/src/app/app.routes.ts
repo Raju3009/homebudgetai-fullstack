@@ -13,8 +13,8 @@ export const routes: Routes = [
 
     loadComponent: () =>
 
-      import('./pages/landing/landing.component')
-        .then(m => m.LandingComponent)
+      import('./pages/portfolio/portfolio.component')
+        .then(m => m.PortfolioComponent)
   },
 
   // =========================
