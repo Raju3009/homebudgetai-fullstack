@@ -1,4 +1,4 @@
-<section class="workspace premium-page">
+﻿<section class="workspace premium-page">
   <form class="panel editor" [formGroup]="form" (ngSubmit)="save()">
     <div class="section-head"><div><h2>{{ editingId ? 'Edit transaction' : 'Add transaction' }}</h2><p>Capture income, expenses, notes, and category metadata.</p></div><span class="badge">Secure form</span></div>
     <label>Title<input formControlName="title" placeholder="Groceries, Salary, Rent"></label>
@@ -20,8 +20,9 @@
     <div class="empty-state" *ngIf="!loading() && rows.length === 0">No transactions match this view. Add a transaction to activate analytics.</div>
     <div class="table-wrap" *ngIf="rows.length">
       <table><thead><tr><th><button class="table-sort" (click)="sort('date')">Date</button></th><th><button class="table-sort" (click)="sort('title')">Title</button></th><th>Category</th><th>Type</th><th><button class="table-sort" (click)="sort('amount')">Amount</button></th><th>Actions</th></tr></thead>
-      <tbody><tr *ngFor="let row of rows"><td>{{ row.date | date }}</td><td><strong>{{ row.title }}</strong><small>{{ row.notes }}</small></td><td>{{ row.category }}</td><td><span class="badge" [class.income]="row.type === 'Income'" [class.expense]="row.type !== 'Income'">{{ row.type }}</span></td><td [class.success]="row.type === 'Income'" [class.error]="row.type !== 'Income'">{{ row.amount | currency }}</td><td><button class="btn-secondary" (click)="edit(row)">Edit</button><button class="btn-ghost error" (click)="remove(row.id)">Delete</button></td></tr></tbody></table>
+      <tbody><tr *ngFor="let row of rows"><td>{{ row.date | date }}</td><td><strong>{{ row.title }}</strong><small>{{ row.notes }}</small></td><td>{{ row.category }}</td><td><span class="badge" [class.income]="row.type === 'Income'" [class.expense]="row.type !== 'Income'">{{ row.type }}</span></td><td [class.success]="row.type === 'Income'" [class.error]="row.type !== 'Income'">{{ row.amount | currency:'INR' }}</td><td><button class="btn-secondary" (click)="edit(row)">Edit</button><button class="btn-ghost error" (click)="remove(row.id)">Delete</button></td></tr></tbody></table>
     </div>
     <div class="pager"><button class="btn-secondary" [disabled]="page===1" (click)="load(page-1)">Previous</button><span>Page {{ page }} of {{ totalPages }}</span><button class="btn-secondary" [disabled]="page===totalPages" (click)="load(page+1)">Next</button></div>
   </section>
 </section>
+

@@ -1,190 +1,101 @@
-<section class="auth-page premium-page">
+﻿<section class="auth-page premium-page login-premium">
 
-  <div class="auth-visual">
+  <div class="auth-visual login-visual">
+    <video class="login-bg-video" autoplay muted loop playsinline poster="images/Raju_profile.jpg">
+      <source src="videos/finance-bg.mp4" type="video/mp4">
+    </video>
+    <div class="login-video-shade"></div>
 
-    <div class="auth-copy">
-
-      <span class="badge success">
-        Secure fintech workspace
-      </span>
+    <div class="auth-copy login-copy">
+      <span class="badge success">Secure fintech workspace</span>
 
       <h1>
-        Welcome back to your money command center.
+        <span>Welcome back</span>
+        <strong>to your AI money command center.</strong>
       </h1>
 
       <p>
-        Track spending, protect savings, and review
-        AI-backed finance insights with a premium
-        analytics dashboard.
+        Track expenses in INR, review animated analytics, and get clear AI suggestions that explain what changed and what to do next.
       </p>
 
       <div class="feature-pills">
         <span>JWT Protected</span>
-        <span>Animated Analytics</span>
-        <span>Enterprise UI</span>
+        <span>INR Finance Tracking</span>
+        <span>AI Suggestions</span>
       </div>
 
+      <div class="login-preview-card">
+        <div class="preview-dots"><i></i><i></i><i></i></div>
+        <strong>₹42,800</strong>
+        <span>Projected monthly savings</span>
+        <div class="preview-bars"><i></i><i></i><i></i><i></i></div>
+      </div>
     </div>
-
   </div>
 
-  <div class="auth-card-wrap">
+  <div class="auth-card-wrap login-card-wrap">
+    <div class="login-loading-overlay" *ngIf="loading()" aria-live="polite">
+      <div class="premium-loader"><span></span><span></span><span></span></div>
+      <strong>Opening your dashboard...</strong>
+      <small>Preparing analytics, AI suggestions, and workspace data.</small>
+    </div>
 
-    <form
-      class="auth-card"
-      [formGroup]="form"
-      (ngSubmit)="submit()"
-    >
-
+    <form class="auth-card login-card" [formGroup]="form" (ngSubmit)="submit()">
       <div class="auth-header">
-
-        <span class="badge">
-          HomeBudgetAI
-        </span>
-
-        <h2>
-          Sign in
-        </h2>
-
-        <p>
-          Continue to your financial workspace.
-        </p>
-
+        <span class="badge">HomeBudgetAI</span>
+        <h2>Sign in</h2>
+        <p>Continue to your financial workspace.</p>
       </div>
 
       <label>
-
         <span>Email Address</span>
-
-        <input
-          type="email"
-          formControlName="email"
-          autocomplete="email"
-          placeholder="you@example.com"
-        >
-
+        <input type="email" formControlName="email" autocomplete="email" placeholder="you@example.com">
       </label>
 
-      <small
-        class="field-error"
-        *ngIf="
-          form.controls.email.touched &&
-          form.controls.email.invalid
-        "
-      >
+      <small class="field-error" *ngIf="form.controls.email.touched && form.controls.email.invalid">
         Please enter a valid email address.
       </small>
 
       <label>
-
         <span>Password</span>
-
         <div class="password-box">
-
-          <input
-            [type]="showPassword() ? 'text' : 'password'"
-            formControlName="password"
-            autocomplete="current-password"
-            placeholder="Enter password"
-          >
-
-          <button
-            type="button"
-            class="btn-secondary"
-            (click)="togglePassword()"
-          >
+          <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" autocomplete="current-password" placeholder="Enter password">
+          <button type="button" class="btn-secondary" (click)="togglePassword()">
             {{ showPassword() ? 'Hide' : 'Show' }}
           </button>
-
         </div>
-
       </label>
 
-      <small
-        class="field-error"
-        *ngIf="
-          form.controls.password.touched &&
-          form.controls.password.invalid
-        "
-      >
+      <small class="field-error" *ngIf="form.controls.password.touched && form.controls.password.invalid">
         Password is required.
       </small>
 
       <div class="auth-link-row">
-
         <label class="inline-check">
-
-          <input
-            type="checkbox"
-            formControlName="rememberMe"
-          >
-
-          <span>
-            Remember me
-          </span>
-
+          <input type="checkbox" formControlName="rememberMe">
+          <span>Remember me</span>
         </label>
-
-        <a routerLink="/forgot-password">
-          Forgot password?
-        </a>
-
+        <a routerLink="/forgot-password">Forgot password?</a>
       </div>
 
-      <div
-        class="error-box"
-        *ngIf="error()"
-      >
-        {{ error() }}
-      </div>
+      <div class="error-box" *ngIf="error()">{{ error() }}</div>
 
-      <button
-        class="btn-primary login-btn"
-        [disabled]="loading() || form.invalid"
-      >
-
-        <span *ngIf="!loading()">
-          Login to Dashboard
-        </span>
-
-        <span *ngIf="loading()">
-          Signing in...
-        </span>
-
+      <button class="btn-primary login-btn" [disabled]="loading() || form.invalid">
+        <span class="button-spinner" *ngIf="loading()"></span>
+        <span>{{ loading() ? 'Signing in...' : 'Login to Dashboard' }}</span>
       </button>
 
       <div class="auth-link-row footer-row">
-
-        <span>
-          New to HomeBudgetAI?
-        </span>
-
-        <a routerLink="/register">
-          Create account
-        </a>
-
+        <span>New to HomeBudgetAI?</span>
+        <a routerLink="/register">Create account</a>
       </div>
 
       <div class="demo-box">
-
-        <strong>
-          Demo Credentials
-        </strong>
-
-        <div>
-          Email:
-          demo@homebudget.ai
-        </div>
-
-        <div>
-          Password:
-          Demo@12345
-        </div>
-
+        <strong>Demo Credentials</strong>
+        <div>Email: demo@homebudget.ai</div>
+        <div>Password: Demo@12345</div>
       </div>
-
     </form>
-
   </div>
 
 </section>

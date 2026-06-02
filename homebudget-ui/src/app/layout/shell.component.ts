@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, OnDestroy, computed, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import {
   Bell,
@@ -126,7 +126,7 @@ const icons = {
     </nav>
   </div>`
 })
-export class ShellComponent {
+export class ShellComponent implements OnDestroy {
   readonly navItems = [
     { label: 'Dashboard', path: '/app/dashboard', icon: 'LayoutDashboard', exact: true },
     { label: 'Transactions', path: '/app/transactions', icon: 'CreditCard' },
@@ -141,7 +141,20 @@ export class ShellComponent {
   pageTitle = computed(() => 'Budget Command Center');
   initials = computed(() => (this.auth.user()?.fullName || 'Demo User').split(' ').map((x: string) => x[0]).join('').slice(0, 2).toUpperCase());
 
-  constructor(public auth: AuthService) {}
+  private themeHandler = (event: Event) => {
+    const detail = (event as CustomEvent<{ dark: boolean }>).detail;
+    if (typeof detail?.dark === 'boolean') {
+      this.dark.set(detail.dark);
+    }
+  };
+
+  constructor(public auth: AuthService) {
+    window.addEventListener('homebudgetai-theme', this.themeHandler);
+  }
+
+  ngOnDestroy() {
+    window.removeEventListener('homebudgetai-theme', this.themeHandler);
+  }
 
   toggleCollapsed() {
     this.collapsed.update(value => !value);
@@ -153,3 +166,4 @@ export class ShellComponent {
     localStorage.setItem('homebudgetai.theme', this.dark() ? 'dark' : 'light');
   }
 }
+

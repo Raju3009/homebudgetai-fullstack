@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 
 import {
   AfterViewInit,
@@ -165,6 +165,18 @@ export class DashboardComponent
     });
   }
 
+  aiSuggestions(): string[] {
+    const base = this.summary?.suggestions ?? [];
+    const curated = [
+      'Review your top category before adding new discretionary expenses this week.',
+      'Keep one recurring transfer active so savings stay automatic after every income cycle.',
+      'If expenses cross 70% of income, pause non-essential purchases and update your budget limits.',
+      'Export a monthly report before salary day to compare the previous month clearly.',
+      'Use notes on transactions so future AI insights can explain patterns more accurately.'
+    ];
+
+    return [...new Set([...base, ...curated])].slice(0, 8);
+  }
   bounded(value: number): number {
 
     return Math.max(
@@ -423,3 +435,4 @@ export class DashboardComponent
     });
   }
 }
+

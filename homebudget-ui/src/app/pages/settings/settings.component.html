@@ -1,0 +1,87 @@
+<section class="workspace premium-page settings-page">
+  <form class="panel editor settings-card" [formGroup]="form" (ngSubmit)="save()">
+    <div class="section-head">
+      <div>
+        <h2>Settings</h2>
+        <p>Theme, currency, language, notifications, and account preferences.</p>
+      </div>
+      <span class="badge">Workspace controls</span>
+    </div>
+
+    <div class="status-panel" *ngIf="loading()">
+      Loading your settings...
+    </div>
+
+    <div class="form-grid" *ngIf="!loading()">
+      <label>
+        Theme
+        <select formControlName="theme">
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+
+      <label>
+        Currency
+        <select formControlName="currency">
+          <option value="INR">INR - Indian Rupee</option>
+          <option value="USD">USD - US Dollar</option>
+          <option value="EUR">EUR - Euro</option>
+          <option value="GBP">GBP - British Pound</option>
+        </select>
+      </label>
+
+      <label>
+        Language
+        <select formControlName="language">
+          <option value="en">English</option>
+          <option value="hi">Hindi</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="toggle-list" *ngIf="!loading()">
+      <label class="toggle-row">
+        <span><strong>Email notifications</strong><small>Receive important account and finance updates.</small></span>
+        <input type="checkbox" formControlName="emailNotifications">
+      </label>
+
+      <label class="toggle-row">
+        <span><strong>Push notifications</strong><small>Show alerts for budgets and key activity.</small></span>
+        <input type="checkbox" formControlName="pushNotifications">
+      </label>
+
+      <label class="toggle-row">
+        <span><strong>Monthly digest</strong><small>Send a monthly finance summary and report reminder.</small></span>
+        <input type="checkbox" formControlName="monthlyDigest">
+      </label>
+    </div>
+
+    <div class="settings-actions" *ngIf="!loading()">
+      <button class="btn-primary" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Saving...' : 'Save settings' }}
+      </button>
+      <p class="success" *ngIf="message()">{{ message() }}</p>
+      <p class="error" *ngIf="error()">{{ error() }}</p>
+    </div>
+  </form>
+
+  <section class="panel security-card">
+    <div class="section-head">
+      <div>
+        <h2>Security posture</h2>
+        <p>Production-style security features used in this full-stack app.</p>
+      </div>
+    </div>
+
+    <div class="security-grid">
+      <div class="category-row"><span>JWT protected API routes</span><strong class="success">Active</strong></div>
+      <div class="category-row"><span>Refresh token support</span><strong class="success">Enabled</strong></div>
+      <div class="category-row"><span>Role-based authorization</span><strong class="success">Ready</strong></div>
+      <div class="category-row"><span>Rate limiting and exception middleware</span><strong class="success">Configured</strong></div>
+    </div>
+  </section>
+</section>

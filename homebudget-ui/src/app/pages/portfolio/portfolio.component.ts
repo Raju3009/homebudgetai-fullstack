@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
+  
   ArrowRight,
   Award,
   BarChart3,
@@ -23,11 +24,14 @@ import {
   Sparkles,
   Sun,
   TerminalSquare,
+  Trophy,
   UserRound,
-  LucideAngularModule
+  LucideAngularModule,
+  DownloadIcon
 } from 'lucide-angular';
 
 const icons = {
+ 
   ArrowRight,
   Award,
   BarChart3,
@@ -35,6 +39,7 @@ const icons = {
   CheckCircle2,
   Code2,
   Database,
+  DownloadIcon,
   Download,
   ExternalLink,
   Github,
@@ -49,6 +54,7 @@ const icons = {
   Sparkles,
   Sun,
   TerminalSquare,
+  Trophy,
   UserRound
 };
 
@@ -83,10 +89,17 @@ export class PortfolioComponent {
   ];
 
   readonly stats = [
-    { value: '1+', label: 'Full-stack product built' },
-    { value: '20+', label: 'API workflows practiced' },
+    { value: '1', label: 'Production-style full-stack app' },
+    { value: '20+', label: 'API workflows implemented' },
     { value: '2025', label: 'AI and ML graduate' },
     { value: '7.5', label: 'B.Tech CGPA' }
+  ];
+
+  readonly projectMetrics = [
+    { label: 'Frontend', value: 'Angular 21' },
+    { label: 'Backend', value: 'ASP.NET Core' },
+    { label: 'Database', value: 'SQL Server' },
+    { label: 'Security', value: 'JWT Auth' }
   ];
 
   readonly skillGroups = [

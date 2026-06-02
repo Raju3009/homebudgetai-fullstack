@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService, Budget, Goal } from '../../services/api.service';
@@ -17,12 +17,12 @@ import { ApiService, Budget, Goal } from '../../services/api.service';
     <article class="panel full"><div class="section-head"><div><h2>Budget health</h2><p>Progress bars update from transaction totals.</p></div></div><div class="empty-state" *ngIf="!loading() && budgets.length === 0">No budgets yet. Create one to start monitoring spend.</div></article>
     <article class="panel" *ngFor="let budget of budgets">
       <div class="section-head"><div><h2>{{ budget.name }}</h2><p>{{ budget.category }} | {{ budget.month | date:'MMM yyyy' }}</p></div><span class="badge" [class.danger]="percent(budget) >= budget.alertThreshold">{{ percent(budget) | number:'1.0-0' }}%</span></div>
-      <strong>{{ budget.spentAmount | currency }} / {{ budget.limitAmount | currency }}</strong>
+      <strong>{{ budget.spentAmount | currency:'INR' }} / {{ budget.limitAmount | currency:'INR' }}</strong>
       <div class="progress-line"><span [style.width.%]="bounded(percent(budget))"></span></div>
       <p class="muted">{{ percent(budget) >= budget.alertThreshold ? 'Overspending alert active' : 'Within planned range' }}</p>
       <div class="actions"><button class="btn-secondary" (click)="edit(budget)">Edit</button><button class="btn-ghost error" (click)="remove(budget.id)">Delete</button></div>
     </article>
-    <article class="panel full"><div class="section-head"><div><h2>Financial goals</h2><p>Portfolio-worthy goal cards for savings milestones.</p></div></div><div class="quick-grid"><div class="quick-action" *ngFor="let goal of goals"><strong>{{ goal.name }}</strong><small>{{ goal.currentAmount | currency }} of {{ goal.targetAmount | currency }}</small><div class="progress-line"><span [style.width.%]="bounded(goal.currentAmount / goal.targetAmount * 100)"></span></div></div></div></article>
+    <article class="panel full"><div class="section-head"><div><h2>Financial goals</h2><p>Portfolio-worthy goal cards for savings milestones.</p></div></div><div class="quick-grid"><div class="quick-action" *ngFor="let goal of goals"><strong>{{ goal.name }}</strong><small>{{ goal.currentAmount | currency:'INR' }} of {{ goal.targetAmount | currency:'INR' }}</small><div class="progress-line"><span [style.width.%]="bounded(goal.currentAmount / goal.targetAmount * 100)"></span></div></div></div></article>
   </section>
 </section>` })
 export class BudgetsComponent implements OnInit {
@@ -38,3 +38,4 @@ export class BudgetsComponent implements OnInit {
   remove(id: number) { this.api.deleteBudget(id).subscribe(() => this.load()); }
   reset() { this.editingId = null; this.form.reset({ name: '', category: 'Food', limitAmount: 1000, alertThreshold: 80, month: new Date().toISOString().slice(0, 7) }); }
 }
+

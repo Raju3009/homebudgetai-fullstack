@@ -1,94 +1,113 @@
-<main class="portfolio-shell" [class.light-mode]="theme() === 'light'">
-  <div class="ambient ambient-one"></div>
-  <div class="ambient ambient-two"></div>
-  <div class="grid-overlay"></div>
+﻿<main class="portfolio-shell" [class.light-mode]="theme() === 'light'">
+  <div class="mesh-layer"></div>
 
   <nav class="portfolio-nav" aria-label="Portfolio navigation">
     <a class="portfolio-brand" href="#top" aria-label="Katkuri Raju portfolio home">
-      <span>KR</span>
-      <strong>Katkuri Raju</strong>
+      <img src="images/Raju_profile.jpg" alt="Katkuri Raju" />
+      <span><strong>Katkuri Raju</strong><small>Full Stack Developer</small></span>
     </a>
 
     <div class="nav-links">
       <a *ngFor="let link of navLinks" [href]="link.href">{{ link.label }}</a>
     </div>
 
-    <button class="theme-toggle" type="button" (click)="toggleTheme()" [attr.aria-label]="theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
+    <button class="theme-toggle" type="button" (click)="toggleTheme()"
+      [attr.aria-label]="theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
       <lucide-icon [name]="theme() === 'dark' ? 'Sun' : 'Moon'" size="18"></lucide-icon>
     </button>
   </nav>
 
   <section id="top" class="hero-section section-reveal">
     <div class="hero-copy">
-      <span class="eyebrow"><lucide-icon name="Sparkles" size="16"></lucide-icon> Fresher full-stack developer portfolio</span>
-      <h1>Katkuri Raju</h1>
-      <div class="typing-line">Full Stack Developer</div>
-      <p class="hero-subtitle">ASP.NET Core | Angular | SQL Server | JWT Authentication | Cloud Deployment</p>
-      <p class="hero-intro">I build secure, scalable, and responsive web applications with a strong focus on backend APIs, clean full-stack architecture, and polished product-style user experiences.</p>
+      <span class="eyebrow"><lucide-icon name="Sparkles" size="16"></lucide-icon> Recruiter-ready full-stack
+        portfolio</span>
+      <h1 style="height: 243%;">Katkuri Raju</h1>
+      <div class="typing-line">ASP.NET Core + Angular Developer</div>
+      <p class="hero-subtitle">I build secure finance-focused web applications with REST APIs, JWT authentication, SQL
+        Server, responsive Angular UI, and deployment-ready architecture.</p>
 
-      <div class="hero-actions">
-        <a class="btn-primary" href="/resume/Katkuri_Raju_Resume.pdf" download>
-          <lucide-icon name="Download" size="17"></lucide-icon>
-          Download Resume
-        </a>
-        <a class="btn-secondary" href="#contact">
-          <lucide-icon name="Mail" size="17"></lucide-icon>
-          Contact
-        </a>
-        <a class="btn-secondary" href="https://raju3009.github.io/homebudgetai-fullstack/" target="_blank" rel="noreferrer">
-          <lucide-icon name="ExternalLink" size="17"></lucide-icon>
-          Live Demo
-        </a>
-        <a class="btn-secondary" href="/login">
-          <lucide-icon name="ArrowRight" size="17"></lucide-icon>
-          Open App
-        </a>
-        <a class="icon-link" href="https://github.com/Raju3009" target="_blank" rel="noreferrer" aria-label="GitHub profile">
-          <lucide-icon name="Github" size="20"></lucide-icon>
-        </a>
-        <a class="icon-link" href="https://www.linkedin.com/in/katkuri-raju0930" target="_blank" rel="noreferrer" aria-label="LinkedIn profile">
-          <lucide-icon name="Linkedin" size="20"></lucide-icon>
-        </a>
-      </div>
+    <div class="hero-actions">
+  <a class="btn-primary" href="resume/Katkuri_Raju_Resume.pdf" download>
+    Download Resume
+  </a>
+
+  <a class="btn-secondary" href="https://hilarious-frangollo-d046e9.netlify.app/login" target="_blank" rel="noreferrer">
+    Live Demo
+  </a>
+
+  <a class="btn-secondary" href="https://github.com/Raju3009/homebudgetai-fullstack" target="_blank" rel="noreferrer">
+    GitHub
+  </a>
+
+  <a class="btn-secondary" href="https://www.linkedin.com/in/katkuri-raju0930" target="_blank" rel="noreferrer">
+    LinkedIn
+  </a>
+
+  <a class="btn-secondary" href="#contact">
+    Contact
+  </a>
+</div>
 
       <div class="hero-meta">
         <span>Hyderabad, India</span>
-        <span>Open to full-stack developer roles</span>
-        <a href="mailto:rajkatkuri05@gmail.com"><lucide-icon name="Mail" size="16"></lucide-icon> rajkatkuri05@gmail.com</a>
-        <a href="tel:+919391988931">+91 9391988931</a>
+        <span>Open to fresher full-stack roles</span>
+     <a href="mailto:rajkatkuri05@gmail.com">
+  📧 rajkatkuri05@gmail.com
+</a>
+        <a href="tel:+919391988931"><lucide-icon name="Phone" size="16"></lucide-icon> +91 9391988931</a>
       </div>
     </div>
 
-    <aside class="hero-card" aria-label="Developer profile summary">
-      <div class="terminal-card">
-        <div class="terminal-dots"><span></span><span></span><span></span></div>
-        <pre><code>{{ codeSnippet }}</code></pre>
-      </div>
+    <aside class="profile-stage" aria-label="Katkuri Raju professional profile">
+    
+      <div class="portrait-card floating-portrait">
+        <img src="images/Raju_profile.jpg" alt="Katkuri Raju profile photo" />
+        <div class="portrait-caption">
+          <strong>Katkuri Raju</strong>
+          <span>Full-stack developer | Hyderabad, India</span>
+          <small>ASP.NET Core, Angular, SQL Server, JWT Auth</small>
+        </div>
+</div>
 
-      <div class="stats-grid">
-        <article *ngFor="let stat of stats">
-          <strong>{{ stat.value }}</strong>
-          <span>{{ stat.label }}</span>
-        </article>
-      </div>
+
+
+<div class="terminal-card">
+  <div class="terminal-dots">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <pre><code>{{ codeSnippet }}</code></pre>
+</div>
     </aside>
+  </section>
+
+  
+  <section class="proof-strip section-reveal" aria-label="Portfolio proof points">
+    <article *ngFor="let stat of stats">
+      <strong>{{ stat.value }}</strong>
+      <span>{{ stat.label }}</span>
+    </article>
   </section>
 
   <section id="about" class="portfolio-section section-reveal">
     <div class="section-kicker"><lucide-icon name="UserRound" size="18"></lucide-icon> About me</div>
     <div class="split-layout">
       <div>
-        <h2>Fresher developer with real project-building discipline.</h2>
-        <p>I am a self-taught and project-driven full-stack developer passionate about backend engineering, API development, and modern frontend experiences. My focus is to build practical applications that are secure, maintainable, and useful for real users.</p>
-        <p>I enjoy working with ASP.NET Core Web API, Angular, SQL Server, Entity Framework Core, and JWT authentication. I am especially interested in scalable application architecture, product development, clean code, and learning how professional engineering teams ship reliable software.</p>
+        <h2>Fresher developer with practical product-building discipline.</h2>
+        <p>I am a project-driven full-stack developer focused on building reliable web applications, clean API
+          boundaries, and polished user experiences. My strongest work is HomeBudgetAI, a finance management platform
+          that connects Angular screens with ASP.NET Core APIs and SQL Server data.</p>
+        <p>I care about authentication, maintainable backend structure, responsive UI, clear documentation, and making a
+          project easy for recruiters and engineering teams to understand.</p>
       </div>
       <div class="about-panel glass-card">
         <h3>Profile snapshot</h3>
         <ul>
-          <li><strong>Current focus:</strong> Full-stack web development</li>
+          <li><strong>Role target:</strong> Full-stack developer / backend trainee</li>
           <li><strong>Core strength:</strong> ASP.NET Core APIs and Angular UI</li>
           <li><strong>Mindset:</strong> Build, test, improve, document</li>
-          <li><strong>Goal:</strong> Join a product team as a full-stack developer</li>
+          <li><strong>Location:</strong> Hyderabad, India</li>
         </ul>
       </div>
     </div>
@@ -98,9 +117,9 @@
     <div class="section-heading">
       <div>
         <div class="section-kicker"><lucide-icon name="Layers3" size="18"></lucide-icon> Skills</div>
-        <h2>Technology stack I use to build full-stack applications.</h2>
+        <h2>Technology stack for full-stack finance applications.</h2>
       </div>
-      <p>Balanced across frontend, backend, databases, API testing, and developer tools.</p>
+      <p>Balanced across frontend, backend, database work, API testing, and deployment readiness.</p>
     </div>
 
     <div class="skills-grid">
@@ -126,7 +145,8 @@
         <h2>HomeBudgetAI is the main project recruiters should review first.</h2>
       </div>
       <div class="filter-tabs" aria-label="Project filters">
-        <button *ngFor="let filter of projectFilters" type="button" [class.active]="activeFilter() === filter.value" (click)="activeFilter.set(filter.value)">
+        <button *ngFor="let filter of projectFilters" type="button" [class.active]="activeFilter() === filter.value"
+          (click)="activeFilter.set(filter.value)">
           {{ filter.label }}
         </button>
       </div>
@@ -134,30 +154,50 @@
 
     <article class="featured-project glass-card">
       <div class="project-copy">
-        <span class="eyebrow"><lucide-icon name="BarChart3" size="16"></lucide-icon> Main featured project</span>
+        <span class="eyebrow"><lucide-icon name="Trophy" size="16"></lucide-icon> Main featured project</span>
         <h3>HomeBudgetAI - Full Stack Finance Management Platform</h3>
-        <p>HomeBudgetAI is a full-stack finance management application built to demonstrate real-world engineering skills: secure authentication, REST APIs, database operations, analytics dashboards, responsive Angular UI, and cloud deployment readiness.</p>
-        <div class="project-actions">
-          <a class="btn-primary" href="https://raju3009.github.io/homebudgetai-fullstack/" target="_blank" rel="noreferrer">
-            Live Demo <lucide-icon name="ExternalLink" size="16"></lucide-icon>
-          </a>
-          <a class="btn-secondary" href="https://github.com/Raju3009/homebudgetai-fullstack" target="_blank" rel="noreferrer">
-            GitHub <lucide-icon name="Github" size="16"></lucide-icon>
-          </a>
-          <a class="btn-secondary" href="/login">Open App</a>
+        <p>HomeBudgetAI demonstrates secure authentication, REST API workflows, dashboard analytics, budgets,
+          transactions, reports, settings, and deployment-ready frontend/backend architecture.</p>
+        <div class="metric-strip">
+          <span *ngFor="let metric of projectMetrics"><small>{{ metric.label }}</small>{{ metric.value }}</span>
         </div>
+       <div class="project-actions">
+
+  <a class="btn-primary"
+     href="https://raju3009.github.io/homebudgetai-fullstack/"
+     target="_blank"
+     rel="noreferrer">
+    Live Demo →
+  </a>
+
+  <a class="btn-secondary"
+     href="https://github.com/Raju3009/homebudgetai-fullstack"
+     target="_blank"
+     rel="noreferrer">
+    GitHub
+  </a>
+
+  <a class="btn-secondary"
+     href="https://raju3009.github.io/homebudgetai-fullstack/"
+     target="_blank"
+     rel="noreferrer">
+    Open App →
+  </a>
+
+</div>
       </div>
 
-      <div class="screenshot-board" aria-label="Project screenshots placeholders">
-        <div class="screenshot-frame large">
-          <span>Dashboard analytics screenshot</span>
-          <div class="mock-chart"><i></i><i></i><i></i><i></i><i></i></div>
-        </div>
-        <div class="screenshot-frame">
-          <span>Login and JWT auth</span>
-        </div>
-        <div class="screenshot-frame">
-          <span>Transactions and budgets</span>
+      <div class="product-preview" aria-label="HomeBudgetAI product visual preview">
+        <video autoplay muted loop playsinline poster="images/Raju_profile.jpg">
+          <source src="videos/finance-bg.mp4" type="video/mp4" />
+        </video>
+        <div class="preview-glass">
+          <div class="preview-top"><span></span><span></span><span></span></div>
+          <div class="preview-cards">
+            <div><small>Total balance</small><strong>â‚¹3.9L</strong></div>
+            <div><small>Savings rate</small><strong>55.8%</strong></div>
+            <div class="wide"><small>Income vs expenses</small><i></i><i></i><i></i><i></i></div>
+          </div>
         </div>
       </div>
     </article>
@@ -173,7 +213,8 @@
           <span *ngFor="let badge of project.badges">{{ badge }}</span>
         </div>
         <ul>
-          <li *ngFor="let item of project.highlights"><lucide-icon name="CheckCircle2" size="16"></lucide-icon>{{ item }}</li>
+          <li *ngFor="let item of project.highlights"><lucide-icon name="CheckCircle2" size="16"></lucide-icon>{{ item
+            }}</li>
         </ul>
         <div class="project-links">
           <a *ngIf="project.links.live" [href]="project.links.live" target="_blank" rel="noreferrer">Live demo</a>
@@ -186,7 +227,8 @@
   <section id="journey" class="portfolio-section section-reveal">
     <div class="section-heading">
       <div>
-        <div class="section-kicker"><lucide-icon name="TerminalSquare" size="18"></lucide-icon> Experience and learning journey</div>
+        <div class="section-kicker"><lucide-icon name="TerminalSquare" size="18"></lucide-icon> Experience and learning
+          journey</div>
         <h2>Project-based experience with a continuous learning mindset.</h2>
       </div>
       <p>Built around real application workflows, backend architecture, and recruiter-friendly project explanation.</p>
@@ -220,45 +262,67 @@
     </article>
   </section>
 
-  <section id="resume" class="portfolio-section resume-strip section-reveal">
-    <div>
-      <div class="section-kicker"><lucide-icon name="ShieldCheck" size="18"></lucide-icon> Resume</div>
-      <h2>Download my full-stack developer resume.</h2>
-      <p>Includes project experience, technical skills, education, certifications, and HomeBudgetAI details.</p>
+<section id="resume" class="portfolio-section resume-strip section-reveal">
+  <div>
+    <div class="section-kicker">
+      Resume
     </div>
-    <a class="btn-primary" href="/resume/Katkuri_Raju_Resume.pdf" download>
-      <lucide-icon name="Download" size="17"></lucide-icon>
-      Download PDF
-    </a>
-  </section>
+
+    <h2>Download My Resume</h2>
+
+    <p>
+      Includes technical skills, projects, education,
+      certifications, and HomeBudgetAI project details.
+    </p>
+  </div>
+
+  <a
+    class="btn-primary"
+    href="resume/Katkuri_Raju_Resume.pdf"
+    download>
+    Download PDF
+  </a>
+</section>
 
   <section id="contact" class="portfolio-section contact-section section-reveal">
     <div class="contact-copy">
       <div class="section-kicker"><lucide-icon name="Mail" size="18"></lucide-icon> Contact</div>
       <h2>Let us discuss full-stack developer opportunities.</h2>
-      <p>I am open to fresher full-stack developer roles, internships, trainee roles, and backend-focused opportunities where I can contribute, learn, and grow with a strong engineering team.</p>
+      <p>I am open to fresher full-stack developer roles, internships, trainee roles, and backend-focused opportunities
+        where I can contribute and grow with a strong engineering team.</p>
       <div class="contact-links">
-        <a href="mailto:rajkatkuri05@gmail.com"><lucide-icon name="Mail" size="16"></lucide-icon> rajkatkuri05@gmail.com</a>
-        <a href="tel:+919391988931"><lucide-icon name="Phone" size="16"></lucide-icon> +91 9391988931</a>
-        <a href="https://github.com/Raju3009" target="_blank" rel="noreferrer"><lucide-icon name="Github" size="16"></lucide-icon> github.com/Raju3009</a>
-        <a href="https://www.linkedin.com/in/katkuri-raju0930" target="_blank" rel="noreferrer"><lucide-icon name="Linkedin" size="16"></lucide-icon> linkedin.com/in/katkuri-raju0930</a>
-      </div>
+  <a href="mailto:rajkatkuri05@gmail.com">
+    rajkatkuri05@gmail.com
+  </a>
+
+  <a href="tel:+919391988931">
+    +91 9391988931
+  </a>
+
+  <a
+    href="https://github.com/Raju3009"
+    target="_blank"
+    rel="noreferrer">
+    GitHub
+  </a>
+
+  <a
+    href="https://www.linkedin.com/in/katkuri-raju0930"
+    target="_blank"
+    rel="noreferrer">
+    LinkedIn
+  </a>
+</div>
     </div>
 
     <form class="contact-form glass-card" (ngSubmit)="submitContact()">
-      <label>
-        Name
-        <input name="name" [(ngModel)]="contact.name" placeholder="Your name" required>
-      </label>
-      <label>
-        Email
-        <input name="email" [(ngModel)]="contact.email" type="email" placeholder="you@example.com" required>
-      </label>
-      <label>
-        Message
-        <textarea name="message" [(ngModel)]="contact.message" placeholder="Tell me about the role or opportunity" required></textarea>
-      </label>
-      <button class="btn-primary" type="submit">Send message <lucide-icon name="ArrowRight" size="17"></lucide-icon></button>
+      <label>Name<input name="name" [(ngModel)]="contact.name" placeholder="Your name" required></label>
+      <label>Email<input name="email" [(ngModel)]="contact.email" type="email" placeholder="you@example.com"
+          required></label>
+      <label>Message<textarea name="message" [(ngModel)]="contact.message"
+          placeholder="Tell me about the role or opportunity" required></textarea></label>
+      <button class="btn-primary" type="submit">Send message <lucide-icon name="ArrowRight"
+          size="17"></lucide-icon></button>
     </form>
   </section>
 
@@ -271,4 +335,5 @@
       <a href="tel:+919391988931">Phone</a>
     </div>
   </footer>
+  
 </main>

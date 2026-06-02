@@ -1,4 +1,4 @@
-:host {
+﻿:host {
   display: block;
   width: 100%;
 }
@@ -216,4 +216,105 @@
     width: 30px;
     height: 30px;
   }
+}
+.budget-health {
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.14), rgba(37, 99, 235, 0.08)),
+    var(--surface);
+}
+
+.health-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.health-grid article {
+  min-height: 104px;
+  display: grid;
+  align-content: space-between;
+  gap: 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 0.95rem;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: var(--soft-shadow);
+}
+
+.dark-mode .health-grid article {
+  background: rgba(13, 27, 24, 0.58);
+}
+
+.health-grid span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.health-grid strong {
+  color: var(--text);
+  font-size: 1.35rem;
+}
+
+.health-grid small {
+  line-height: 1.45;
+}
+
+.premium-ai-panel {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background: #061311;
+  min-height: 430px;
+}
+
+.ai-card-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.34;
+  filter: saturate(1.15) contrast(1.08);
+}
+
+.premium-ai-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(45, 212, 191, 0.3), transparent 36%),
+    linear-gradient(180deg, rgba(6, 19, 17, 0.56), rgba(6, 19, 17, 0.92));
+}
+
+.ai-card-content {
+  position: relative;
+  z-index: 1;
+}
+
+.premium-ai-panel .section-head h2,
+.premium-ai-panel .section-head p {
+  color: #fff;
+}
+
+.premium-ai-panel .suggestion {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+}
+
+.premium-ai-panel .suggestion p {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.premium-ai-panel .suggestion-title {
+  color: #5eead4;
+}
+
+.premium-ai-panel .suggestion:nth-child(2n) .suggestion-icon {
+  background: linear-gradient(135deg, #f59e0b, #38bdf8);
+}
+
+@media (max-width: 768px) {
+  .premium-ai-panel { min-height: auto; }
 }

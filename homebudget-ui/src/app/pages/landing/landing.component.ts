@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ArrowRight, BarChart3, Check, CreditCard, FileText, LockKeyhole, ShieldCheck, Sparkles, Target, WalletCards, LucideAngularModule } from 'lucide-angular';
@@ -46,11 +46,11 @@ const icons = { ArrowRight, BarChart3, Check, CreditCard, FileText, LockKeyhole,
             <span class="badge success">+12% savings</span>
           </div>
           <div class="preview-grid">
-            <div class="preview-card"><small>Balance</small><h2>$8,420</h2><span class="badge success">Healthy runway</span></div>
-            <div class="preview-card"><small>Income</small><h2>$7,100</h2><span class="badge success">On track</span></div>
-            <div class="preview-card"><small>Expenses</small><h2>$4,860</h2><span class="badge danger">Watch dining</span></div>
+            <div class="preview-card"><small>Balance</small><h2>₹8,42,000</h2><span class="badge success">Healthy runway</span></div>
+            <div class="preview-card"><small>Income</small><h2>₹7,10,000</h2><span class="badge success">On track</span></div>
+            <div class="preview-card"><small>Expenses</small><h2>₹4,86,000</h2><span class="badge danger">Watch dining</span></div>
             <div class="preview-card wide"><small>Income vs expenses</small><div class="mini-bars"><i style="height:72%"></i><i style="height:48%"></i><i style="height:88%"></i><i style="height:55%"></i><i style="height:80%"></i><i style="height:42%"></i><i style="height:95%"></i><i style="height:58%"></i></div></div>
-            <div class="preview-card tall"><small>AI insights</small><p>Food spending rose 18%. Move $240 from entertainment to protect your savings target.</p><p>Savings improved 12% after recurring transfers.</p></div>
+            <div class="preview-card tall"><small>AI insights</small><p>Food spending rose 18%. Move ₹20,000 from entertainment to protect your savings target.</p><p>Savings improved 12% after recurring transfers.</p></div>
           </div>
         </div>
       </div>
@@ -121,8 +121,8 @@ export class LandingComponent {
     { quote: 'Beautiful enough for a portfolio, practical enough for daily use.', name: 'Priya Shah', role: 'Consultant' }
   ];
   pricing = [
-    { tier: 'Free', price: '$0', copy: 'Start tracking quickly.', lines: ['Transactions', 'Dashboard', 'CSV export'] },
-    { tier: 'Pro', price: '$12/mo', copy: 'For serious households.', lines: ['AI insights', 'Budgets', 'PDF reports'] },
+    { tier: 'Free', price: '₹0', copy: 'Start tracking quickly.', lines: ['Transactions', 'Dashboard', 'CSV export'] },
+    { tier: 'Pro', price: '₹999/mo', copy: 'For serious households.', lines: ['AI insights', 'Budgets', 'PDF reports'] },
     { tier: 'Enterprise', price: 'Custom', copy: 'For teams and demos.', lines: ['Admin role', 'Audit activity', 'Priority deployment'] }
   ];
   faqs = [
@@ -131,3 +131,6 @@ export class LandingComponent {
     { q: 'Can I deploy it?', a: 'Netlify and Render configuration remain aligned with the Angular and .NET apps.' }
   ];
 }
+
+
+

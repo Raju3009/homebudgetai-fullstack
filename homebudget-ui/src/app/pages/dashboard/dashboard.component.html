@@ -1,4 +1,4 @@
-<section
+﻿<section
   class="page-grid premium-page"
   *ngIf="!loading && summary; else wait"
 >
@@ -149,7 +149,13 @@
 
   <!-- AI FINANCE ASSISTANT -->
 
-  <section class="panel ai-card">
+  <section class="panel ai-card premium-ai-panel">
+
+    <video class="ai-card-video" autoplay muted loop playsinline>
+      <source src="videos/finance-bg.mp4" type="video/mp4">
+    </video>
+
+    <div class="ai-card-content">
 
     <div class="section-head">
 
@@ -169,17 +175,12 @@
 
       <div
         class="suggestion"
-        *ngFor="let item of summary.suggestions"
+        *ngFor="let item of aiSuggestions(); let index = index"
       >
 
         <div class="suggestion-title">
-
-          <div class="suggestion-icon">
-            AI
-          </div>
-
-          Smart Insight
-
+          <div class="suggestion-icon">AI</div>
+          Smart Insight {{ index + 1 }}
         </div>
 
         <p>
@@ -192,10 +193,12 @@
 
     <div
       class="empty-state"
-      *ngIf="summary.suggestions.length === 0"
+      *ngIf="aiSuggestions().length === 0"
     >
       Add more transactions to unlock AI insights.
     </div>
+
+  </div>
 
   </section>
 
@@ -239,35 +242,52 @@
 
   </section>
 
-  <!-- HEATMAP -->
+  <!-- BUDGET HEALTH -->
 
-  <section class="panel">
+  <section class="panel budget-health">
 
     <div class="section-head">
 
       <div>
 
-        <h2>Monthly Spending Heatmap</h2>
+        <h2>Budget Health</h2>
 
         <p>
-          Activity intensity overview
+          Practical next steps from your current numbers
         </p>
 
       </div>
 
+      <span class="badge success">
+        Actionable
+      </span>
+
     </div>
 
-    <div class="heatmap">
+    <div class="health-grid">
 
-      <span
-        *ngFor="let cell of [].constructor(42)"
-      ></span>
+      <article>
+        <span>Spending control</span>
+        <strong>{{ summary.expenses <= summary.income ? 'Stable' : 'Review now' }}</strong>
+        <small>Keep expenses below monthly income.</small>
+      </article>
+
+      <article>
+        <span>Savings target</span>
+        <strong>{{ bounded(summary.savingsRate) | number:'1.0-0' }}%</strong>
+        <small>Aim for a consistent positive savings rate.</small>
+      </article>
+
+      <article>
+        <span>Next workflow</span>
+        <strong>Plan budget</strong>
+        <small>Use budgets and reports to stay ahead.</small>
+      </article>
 
     </div>
 
   </section>
-
-  <!-- TOP CATEGORIES -->
+<!-- TOP CATEGORIES -->
 
   <section class="panel">
 
@@ -399,3 +419,5 @@
   </section>
 
 </ng-template>
+
+

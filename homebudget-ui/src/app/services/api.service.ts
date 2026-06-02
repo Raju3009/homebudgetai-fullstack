@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError, of } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -84,15 +84,16 @@ export class ApiService {
     const income = demoTransactions.filter(x => x.type === 'Income').reduce((sum, x) => sum + x.amount, 0);
     const expenses = demoTransactions.filter(x => x.type === 'Expense').reduce((sum, x) => sum + x.amount, 0);
     const categories = ['Housing', 'Food', 'Utilities', 'Savings'].map(category => ({ category, total: demoTransactions.filter(x => x.category === category).reduce((sum, x) => sum + x.amount, 0) })).filter(x => x.total > 0);
-    return { income, expenses, balance: income - expenses, savingsRate: Math.round(((income - expenses) / income) * 1000) / 10, categoryTotals: categories, monthlyTotals: this.demoMonths(), recentTransactions: demoTransactions.slice(0, 6), suggestions: ['Food spending increased 18% this month.', 'Savings improved by 12% after recurring transfers.', 'You may exceed dining budget if weekend spending continues.'] };
+    return { income, expenses, balance: income - expenses, savingsRate: Math.round(((income - expenses) / income) * 1000) / 10, categoryTotals: categories, monthlyTotals: this.demoMonths(), recentTransactions: demoTransactions.slice(0, 6), suggestions: ['Food spending increased 18% this month. Review Food before your next weekly purchase.', 'Savings improved by 12% after recurring transfers. Keep the automatic transfer active.', 'Dining may exceed budget if weekend spending continues. Set a cap before Friday.', 'Your essentials are stable. Move surplus toward emergency savings first.', 'Export this month report before salary day to compare income and expenses clearly.'] };
   }
 
   private demoMonths() { return [{ month: 'Jan 2026', income: 5400, expenses: 3900 }, { month: 'Feb 2026', income: 6100, expenses: 4200 }, { month: 'Mar 2026', income: 6800, expenses: 4550 }, { month: 'Apr 2026', income: 6500, expenses: 4300 }, { month: 'May 2026', income: 7100, expenses: 3235 }]; }
   private demoBudgets(): Budget[] { return [{ id: 1, name: 'Essentials', category: 'Food', limitAmount: 900, spentAmount: 600, month: today.toISOString(), alertThreshold: 80, isActive: true }, { id: 2, name: 'Home base', category: 'Housing', limitAmount: 2000, spentAmount: 1800, month: today.toISOString(), alertThreshold: 90, isActive: true }, { id: 3, name: 'Utilities guardrail', category: 'Utilities', limitAmount: 250, spentAmount: 85, month: today.toISOString(), alertThreshold: 75, isActive: true }]; }
   private demoGoals(): Goal[] { return [{ id: 1, name: 'Emergency fund', targetAmount: 12000, currentAmount: 7400, dueDate: new Date(today.getFullYear(), today.getMonth() + 8, 1).toISOString(), color: '#16a34a' }, { id: 2, name: 'Vacation reserve', targetAmount: 4500, currentAmount: 1900, dueDate: new Date(today.getFullYear(), today.getMonth() + 5, 1).toISOString(), color: '#0f766e' }]; }
   private demoNotifications(): NotificationItem[] { return [{ id: 1, title: 'AI insight ready', message: 'Food spending increased 18% this month.', type: 'Insight', isRead: false, createdAt: iso(0) }, { id: 2, title: 'Budget alert', message: 'Housing is within the safe threshold.', type: 'Budget', isRead: true, createdAt: iso(1) }, { id: 3, title: 'Report available', message: 'Your monthly report is ready to export.', type: 'Report', isRead: false, createdAt: iso(2) }]; }
-  private demoSettings(): UserSetting { return { currency: 'USD', language: 'en', theme: 'system', emailNotifications: true, pushNotifications: true, monthlyDigest: true }; }
+  private demoSettings(): UserSetting { return { currency: 'INR', language: 'en', theme: 'system', emailNotifications: true, pushNotifications: true, monthlyDigest: true }; }
   private demoReport(): ReportSummary { const d = this.demoDashboard(); return { income: d.income, expenses: d.expenses, balance: d.balance, savingsRate: d.savingsRate, categories: d.categoryTotals, months: d.monthlyTotals, insights: d.suggestions, generatedAt: new Date().toISOString() }; }
   private transactionsCsv() { return ['Date,Type,Category,Title,Amount,Notes', ...demoTransactions.map(x => `${x.date},${x.type},${x.category},${x.title},${x.amount},${x.notes ?? ''}`)].join('\n'); }
   private reportCsv() { const report = this.demoReport(); return `Metric,Value\nIncome,${report.income}\nExpenses,${report.expenses}\nBalance,${report.balance}\nSavings Rate,${report.savingsRate}`; }
 }
+
