@@ -1,4 +1,4 @@
-﻿namespace HomeBudgetAPI.Services;
+namespace HomeBudgetAPI.Services;
 
 public interface IInsightService
 {

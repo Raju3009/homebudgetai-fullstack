@@ -105,9 +105,10 @@ builder.Services.AddCors(options =>
       {
         policy
               .WithOrigins(
-                  "http://localhost:4200",
-                  "https://homebudget-ui.netlify.app"
-              )
+    "http://localhost:4200",
+    "https://homebudget-ui.netlify.app",
+    "https://wondrous-khapse-cc5b19.netlify.app"
+)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
