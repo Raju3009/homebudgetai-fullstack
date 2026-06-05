@@ -43,6 +43,24 @@ export const routes: Routes = [
         .then(m => m.RegisterComponent)
   },
 
+  {
+    path: 'forgot-password',
+
+    loadComponent: () =>
+
+      import('./pages/auth/forgot-password.component')
+        .then(m => m.ForgotPasswordComponent)
+  },
+
+  {
+    path: 'reset-password',
+
+    loadComponent: () =>
+
+      import('./pages/auth/reset-password.component')
+        .then(m => m.ResetPasswordComponent)
+  },
+
   // =========================
   // APP LAYOUT
   // =========================

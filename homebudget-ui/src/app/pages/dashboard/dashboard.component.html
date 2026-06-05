@@ -1,423 +1,139 @@
-﻿<section
-  class="page-grid premium-page"
-  *ngIf="!loading && summary; else wait"
->
-
-  <!-- METRICS -->
-
-  <article class="metric">
-
-    <span>Total Balance</span>
-
-    <strong>
-      {{ summary.balance | currency:'INR' }}
-    </strong>
-
-    <small class="badge success">
-      {{ trendLabel(summary.balance) }}
-    </small>
-
-  </article>
-
-  <article class="metric">
-
-    <span>Income</span>
-
-    <strong>
-      {{ summary.income | currency:'INR' }}
-    </strong>
-
-    <small class="badge success">
-      Recurring streams active
-    </small>
-
-  </article>
-
-  <article class="metric">
-
-    <span>Expenses</span>
-
-    <strong>
-      {{ summary.expenses | currency:'INR' }}
-    </strong>
-
-    <small class="badge expense">
-      Optimize categories
-    </small>
-
-  </article>
-
-  <article class="metric">
-
-    <span>Savings Rate</span>
-
-    <strong>
-      {{ summary.savingsRate | number:'1.0-1' }}%
-    </strong>
-
-    <div class="progress-line">
-
-      <span
-        [style.width.%]="bounded(summary.savingsRate)"
-      ></span>
-
+<section class="dashboard-page premium-page" *ngIf="!loading && summary; else wait">
+  <section class="welcome-panel">
+    <div>
+      <span class="badge success">{{ currentMonth() }} summary</span>
+      <h2>Welcome back, {{ displayName() }} <span aria-hidden="true">&#128075;</span></h2>
+      <p>{{ monthSummary() }}</p>
     </div>
-
-  </article>
-
-  <!-- MONTHLY CHART -->
-
-  <section class="panel wide">
-
-    <div class="section-head">
-
-      <div>
-
-        <h2>Income vs Expenses</h2>
-
-        <p>
-          Animated monthly cash-flow performance
-        </p>
-
-      </div>
-
-      <span class="badge">
-        Live analytics
-      </span>
-
-    </div>
-
-    <div class="chart-container">
-
-      <canvas #monthlyChart></canvas>
-
-    </div>
-
-  </section>
-
-  <!-- CATEGORY CHART -->
-
-  <section class="panel">
-
-    <div class="section-head">
-
-      <div>
-
-        <h2>Category Analytics</h2>
-
-        <p>
-          Expense distribution overview
-        </p>
-
-      </div>
-
-    </div>
-
-    <div class="chart-container">
-
-      <canvas #categoryChart></canvas>
-
-    </div>
-
-  </section>
-
-  <!-- SAVINGS TREND -->
-
-  <section class="panel wide">
-
-    <div class="section-head">
-
-      <div>
-
-        <h2>Savings Trend</h2>
-
-        <p>
-          Surplus movement across recent months
-        </p>
-
-      </div>
-
-    </div>
-
-    <div class="chart-container">
-
-      <canvas #savingsChart></canvas>
-
-    </div>
-
-  </section>
-
-  <!-- AI FINANCE ASSISTANT -->
-
-  <section class="panel ai-card premium-ai-panel">
-
-    <video class="ai-card-video" autoplay muted loop playsinline>
-      <source src="videos/finance-bg.mp4" type="video/mp4">
-    </video>
-
-    <div class="ai-card-content">
-
-    <div class="section-head">
-
-      <div>
-
-        <h2>AI Financial Assistant</h2>
-
-        <p>
-          Smart insights from your spending patterns
-        </p>
-
-      </div>
-
-    </div>
-
-    <div class="ai-suggestions">
-
-      <div
-        class="suggestion"
-        *ngFor="let item of aiSuggestions(); let index = index"
-      >
-
-        <div class="suggestion-title">
-          <div class="suggestion-icon">AI</div>
-          Smart Insight {{ index + 1 }}
-        </div>
-
-        <p>
-          {{ item }}
-        </p>
-
-      </div>
-
-    </div>
-
-    <div
-      class="empty-state"
-      *ngIf="aiSuggestions().length === 0"
-    >
-      Add more transactions to unlock AI insights.
-    </div>
-
-  </div>
-
-  </section>
-
-  <!-- QUICK ACTIONS -->
-
-  <section class="panel full">
-
-    <div class="section-head">
-
-      <div>
-
-        <h2>Quick Actions</h2>
-
-        <p>
-          Fast finance workflows
-        </p>
-
-      </div>
-
-    </div>
-
-    <div class="quick-grid">
-
-      <a
-        class="quick-action"
-        *ngFor="let action of quickActions"
-        [routerLink]="action.path"
-      >
-
-        <strong>
-          {{ action.label }}
-        </strong>
-
-        <small>
-          {{ action.tone }}
-        </small>
-
-      </a>
-
-    </div>
-
-  </section>
-
-  <!-- BUDGET HEALTH -->
-
-  <section class="panel budget-health">
-
-    <div class="section-head">
-
-      <div>
-
-        <h2>Budget Health</h2>
-
-        <p>
-          Practical next steps from your current numbers
-        </p>
-
-      </div>
-
-      <span class="badge success">
-        Actionable
-      </span>
-
-    </div>
-
-    <div class="health-grid">
-
+    <div class="welcome-stats">
       <article>
-        <span>Spending control</span>
-        <strong>{{ summary.expenses <= summary.income ? 'Stable' : 'Review now' }}</strong>
-        <small>Keep expenses below monthly income.</small>
+        <small>Savings progress</small>
+        <strong>{{ summary.savingsRate | number:'1.0-1' }}%</strong>
+        <div class="progress-line"><span [style.width.%]="bounded(summary.savingsRate)"></span></div>
       </article>
-
       <article>
-        <span>Savings target</span>
-        <strong>{{ bounded(summary.savingsRate) | number:'1.0-0' }}%</strong>
-        <small>Aim for a consistent positive savings rate.</small>
+        <small>Budget health score</small>
+        <strong>{{ budgetHealthScore() }}/100</strong>
+        <div class="score-ring" [style.--score]="budgetHealthScore() + '%'"><span>{{ budgetHealthScore() }}</span></div>
       </article>
-
-      <article>
-        <span>Next workflow</span>
-        <strong>Plan budget</strong>
-        <small>Use budgets and reports to stay ahead.</small>
-      </article>
-
     </div>
-
   </section>
-<!-- TOP CATEGORIES -->
-
-  <section class="panel">
-
-    <div class="section-head">
-
-      <div>
-
-        <h2>Top Categories</h2>
-
-        <p>
-          Highest spend concentration
-        </p>
-
-      </div>
-
-    </div>
-
-    <div
-      class="category-row"
-      *ngFor="let item of summary.categoryTotals"
-    >
-
-      <span>
-        {{ item.category }}
-      </span>
-
-      <strong>
-        {{ item.total | currency:'INR' }}
-      </strong>
-
-    </div>
-
-    <div
-      class="empty-state"
-      *ngIf="summary.categoryTotals.length === 0"
-    >
-      No expense categories available.
-    </div>
-
-  </section>
-
-  <!-- RECENT TRANSACTIONS -->
-
-  <section class="panel wide">
-
-    <div class="section-head">
-
-      <div>
-
-        <h2>Recent Transactions</h2>
-
-        <p>
-          Latest financial activity
-        </p>
-
-      </div>
-
-      <a
-        class="btn-secondary"
-        routerLink="/app/transactions"
-      >
-        Manage
-      </a>
-
-    </div>
-
-    <div
-      class="category-row"
-      *ngFor="let item of summary.recentTransactions"
-    >
-
-      <span>
-
-        {{ item.title }}
-
-        <small>
-
-          {{ item.category }}
-          |
-          {{ item.date | date }}
-
-        </small>
-
-      </span>
-
-      <strong
-        [class.success]="item.type === 'Income'"
-        [class.error]="item.type !== 'Income'"
-      >
-
-        {{ item.amount | currency:'INR' }}
-
-      </strong>
-
-    </div>
-
-    <div
-      class="empty-state"
-      *ngIf="summary.recentTransactions.length === 0"
-    >
-      Add your first transaction to activate insights.
-    </div>
-
-  </section>
-
-</section>
-
-<!-- LOADING STATE -->
-
-<ng-template #wait>
 
   <section class="page-grid">
+    <article class="metric dashboard-metric income-card">
+      <div class="metric-icon">+</div>
+      <span>Total Income</span>
+      <strong>{{ summary.income | currency:'INR' }}</strong>
+      <small class="badge success">Recurring streams active</small>
+    </article>
 
-    <article
-      class="metric skeleton"
-      *ngFor="let item of [].constructor(4)"
-    ></article>
+    <article class="metric dashboard-metric expense-card">
+      <div class="metric-icon">-</div>
+      <span>Total Expenses</span>
+      <strong>{{ summary.expenses | currency:'INR' }}</strong>
+      <small class="badge expense">Optimize categories</small>
+    </article>
 
-    <section
-      class="panel wide skeleton"
-      style="min-height: 360px;"
-    ></section>
+    <article class="metric dashboard-metric savings-card">
+      <div class="metric-icon">%</div>
+      <span>Savings</span>
+      <strong>{{ savingsAmount() | currency:'INR' }}</strong>
+      <small class="badge success">{{ summary.savingsRate | number:'1.0-1' }}% savings rate</small>
+    </article>
 
-    <section
-      class="panel skeleton"
-      style="min-height: 360px;"
-    ></section>
+    <article class="metric dashboard-metric remaining-card">
+      <div class="metric-icon">=</div>
+      <span>Remaining Budget</span>
+      <strong>{{ remainingBudget() | currency:'INR' }}</strong>
+      <small class="badge" [class.danger]="remainingBudget() < 0">{{ trendLabel(remainingBudget()) }}</small>
+    </article>
 
+    <section class="panel wide">
+      <div class="section-head">
+        <div><h2>Income vs Expenses</h2><p>Smooth monthly cash-flow performance</p></div>
+        <span class="badge">Live analytics</span>
+      </div>
+      <div class="chart-container"><canvas #monthlyChart></canvas></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head"><div><h2>Category Analytics</h2><p>Expense distribution overview</p></div></div>
+      <div class="chart-container"><canvas #categoryChart></canvas></div>
+      <div class="empty-state visual-empty" *ngIf="summary.categoryTotals.length === 0">
+        <span></span>
+        Add transactions to build your category map.
+      </div>
+    </section>
+
+    <section class="panel wide">
+      <div class="section-head"><div><h2>Savings Trend</h2><p>Surplus movement across recent months</p></div></div>
+      <div class="chart-container"><canvas #savingsChart></canvas></div>
+    </section>
+
+    <section class="panel ai-card premium-ai-panel">
+      <video class="ai-card-video" autoplay muted loop playsinline>
+        <source src="videos/finance-bg.mp4" type="video/mp4">
+      </video>
+      <div class="ai-card-content">
+        <div class="section-head"><div><h2>AI Financial Assistant</h2><p>Smart insights from your spending patterns</p></div></div>
+        <div class="ai-suggestions">
+          <div class="suggestion" *ngFor="let item of aiSuggestions(); let index = index">
+            <div class="suggestion-title"><div class="suggestion-icon">AI</div>Smart Insight {{ index + 1 }}</div>
+            <p>{{ item }}</p>
+          </div>
+        </div>
+        <div class="empty-state" *ngIf="aiSuggestions().length === 0">Add more transactions to unlock AI insights.</div>
+      </div>
+    </section>
+
+    <section class="panel full">
+      <div class="section-head"><div><h2>Quick Actions</h2><p>Fast finance workflows</p></div></div>
+      <div class="quick-grid action-grid">
+        <a class="quick-action action-card" *ngFor="let action of quickActions" [routerLink]="action.path">
+          <span>{{ action.icon }}</span>
+          <strong>{{ action.label }}</strong>
+          <small>{{ action.tone }}</small>
+        </a>
+      </div>
+    </section>
+
+    <section class="panel budget-health">
+      <div class="section-head">
+        <div><h2>Budget Health</h2><p>Practical next steps from your current numbers</p></div>
+        <span class="badge success">{{ budgetHealthScore() >= 70 ? 'Healthy' : 'Review' }}</span>
+      </div>
+      <div class="health-grid">
+        <article><span>Spending control</span><strong>{{ summary.expenses <= summary.income ? 'Stable' : 'Review now' }}</strong><small>Keep expenses below monthly income.</small></article>
+        <article><span>Savings target</span><strong>{{ bounded(summary.savingsRate) | number:'1.0-0' }}%</strong><small>Aim for a consistent positive savings rate.</small></article>
+        <article><span>Next workflow</span><strong>Plan budget</strong><small>Use budgets and reports to stay ahead.</small></article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head"><div><h2>Top Categories</h2><p>Highest spend concentration</p></div></div>
+      <div class="category-row" *ngFor="let item of summary.categoryTotals"><span>{{ item.category }}</span><strong>{{ item.total | currency:'INR' }}</strong></div>
+      <div class="empty-state visual-empty" *ngIf="summary.categoryTotals.length === 0"><span></span>No expense categories available.</div>
+    </section>
+
+    <section class="panel wide">
+      <div class="section-head">
+        <div><h2>Recent Transactions</h2><p>Latest financial activity</p></div>
+        <a class="btn-secondary" routerLink="/app/transactions">Manage</a>
+      </div>
+      <div class="category-row transaction-row" *ngFor="let item of summary.recentTransactions">
+        <span>{{ item.title }}<small>{{ item.category }} | {{ item.date | date }}</small></span>
+        <strong [class.success]="item.type === 'Income'" [class.error]="item.type !== 'Income'">{{ item.amount | currency:'INR' }}</strong>
+      </div>
+      <div class="empty-state visual-empty" *ngIf="summary.recentTransactions.length === 0"><span></span>Add your first transaction to activate insights.</div>
+    </section>
   </section>
+</section>
 
+<ng-template #wait>
+  <section class="page-grid">
+    <article class="metric skeleton" *ngFor="let item of [].constructor(4)"></article>
+    <section class="panel wide skeleton" style="min-height: 360px;"></section>
+    <section class="panel skeleton" style="min-height: 360px;"></section>
+  </section>
 </ng-template>
-
 

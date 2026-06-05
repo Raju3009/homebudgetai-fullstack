@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   
@@ -29,6 +29,7 @@ import {
   LucideAngularModule,
   DownloadIcon
 } from 'lucide-angular';
+import { ToastService } from '../../shared/toast.service';
 
 const icons = {
  
@@ -71,7 +72,9 @@ export class PortfolioComponent {
   readonly icons = icons;
   readonly theme = signal<'dark' | 'light'>('dark');
   readonly activeFilter = signal<ProjectFilter>('all');
+  private toast = inject(ToastService);
   readonly contact = { name: '', email: '', message: '' };
+  readonly roles = ['Full Stack Developer', '.NET Developer', 'Angular Developer'];
 
   readonly codeSnippet = `const developer = {
   name: 'Katkuri Raju',
@@ -220,8 +223,16 @@ export class PortfolioComponent {
   }
 
   submitContact() {
+    if (!this.contact.email || !this.contact.message) {
+      this.toast.warning('Please enter your email and message.');
+      return;
+    }
+
+    this.toast.success('Opening your email client.');
     const subject = encodeURIComponent(`Portfolio inquiry from ${this.contact.name || 'Recruiter'}`);
     const body = encodeURIComponent(`Name: ${this.contact.name}\nEmail: ${this.contact.email}\n\n${this.contact.message}`);
     window.location.href = `mailto:rajkatkuri05@gmail.com?subject=${subject}&body=${body}`;
   }
 }
+
+

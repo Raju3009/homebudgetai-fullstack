@@ -1,4 +1,4 @@
-﻿<main class="portfolio-shell" [class.light-mode]="theme() === 'light'">
+<main class="portfolio-shell" [class.light-mode]="theme() === 'light'">
   <div class="mesh-layer"></div>
 
   <nav class="portfolio-nav" aria-label="Portfolio navigation">
@@ -21,8 +21,8 @@
     <div class="hero-copy">
       <span class="eyebrow"><lucide-icon name="Sparkles" size="16"></lucide-icon> Recruiter-ready full-stack
         portfolio</span>
-      <h1 style="height: 243%;">Katkuri Raju</h1>
-      <div class="typing-line">ASP.NET Core + Angular Developer</div>
+      <h1>Katkuri Raju</h1>
+      <div class="typing-line" aria-label="Developer roles"><span *ngFor="let role of roles">{{ role }}</span></div>
       <p class="hero-subtitle">I build secure finance-focused web applications with REST APIs, JWT authentication, SQL
         Server, responsive Angular UI, and deployment-ready architecture.</p>
 
@@ -52,9 +52,9 @@
         <span>Hyderabad, India</span>
         <span>Open to fresher full-stack roles</span>
      <a href="mailto:rajkatkuri05@gmail.com">
-  📧 rajkatkuri05@gmail.com
+  rajkatkuri05@gmail.com
 </a>
-        <a href="tel:+919391988931"> 📞+91 9391988931</a>
+        <a href="tel:+919391988931">+91 9391988931</a>
       </div>
     </div>
 
@@ -167,7 +167,7 @@
      href="https://wondrous-khapse-cc5b19.netlify.app/login"
      target="_blank"
      rel="noreferrer">
-    Live Demo →
+    Live Demo
   </a>
 
   <a class="btn-secondary"
@@ -181,7 +181,7 @@
      href="https://wondrous-khapse-cc5b19.netlify.app/login"
      target="_blank"
      rel="noreferrer">
-    Open App →
+    Open App
   </a>
 
 </div>
@@ -194,7 +194,7 @@
         <div class="preview-glass">
           <div class="preview-top"><span></span><span></span><span></span></div>
           <div class="preview-cards">
-            <div><small>Total balance</small><strong>â‚¹3.9L</strong></div>
+            <div><small>Total balance</small><strong>Rs 3.9L</strong></div>
             <div><small>Savings rate</small><strong>55.8%</strong></div>
             <div class="wide"><small>Income vs expenses</small><i></i><i></i><i></i><i></i></div>
           </div>

@@ -278,7 +278,7 @@ export class ResetPasswordComponent {
 
       Token: value.token,
 
-      Password: value.newPassword
+      NewPassword: value.newPassword
 
     }).subscribe({
 

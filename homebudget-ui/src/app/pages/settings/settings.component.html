@@ -1,87 +1,67 @@
-<section class="workspace premium-page settings-page">
-  <form class="panel editor settings-card" [formGroup]="form" (ngSubmit)="save()">
-    <div class="section-head">
-      <div>
-        <h2>Settings</h2>
-        <p>Theme, currency, language, notifications, and account preferences.</p>
-      </div>
+<section class="premium-page settings-page">
+  <div class="settings-hero panel full">
+    <div>
       <span class="badge">Workspace controls</span>
+      <h2>Settings</h2>
+      <p>Manage profile, preferences, notifications, security, and workspace details from one clean control center.</p>
     </div>
+    <div class="save-toast" *ngIf="lastSaved()">{{ lastSaved() }}</div>
+  </div>
 
-    <div class="status-panel" *ngIf="loading()">
-      Loading your settings...
-    </div>
-
-    <div class="form-grid" *ngIf="!loading()">
-      <label>
-        Theme
-        <select formControlName="theme">
-          <option value="system">System</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
-      </label>
-
-      <label>
-        Currency
-        <select formControlName="currency">
-          <option value="INR">INR - Indian Rupee</option>
-          <option value="USD">USD - US Dollar</option>
-          <option value="EUR">EUR - Euro</option>
-          <option value="GBP">GBP - British Pound</option>
-        </select>
-      </label>
-
-      <label>
-        Language
-        <select formControlName="language">
-          <option value="en">English</option>
-          <option value="hi">Hindi</option>
-          <option value="es">Spanish</option>
-          <option value="fr">French</option>
-        </select>
-      </label>
-    </div>
-
-    <div class="toggle-list" *ngIf="!loading()">
-      <label class="toggle-row">
-        <span><strong>Email notifications</strong><small>Receive important account and finance updates.</small></span>
-        <input type="checkbox" formControlName="emailNotifications">
-      </label>
-
-      <label class="toggle-row">
-        <span><strong>Push notifications</strong><small>Show alerts for budgets and key activity.</small></span>
-        <input type="checkbox" formControlName="pushNotifications">
-      </label>
-
-      <label class="toggle-row">
-        <span><strong>Monthly digest</strong><small>Send a monthly finance summary and report reminder.</small></span>
-        <input type="checkbox" formControlName="monthlyDigest">
-      </label>
-    </div>
-
-    <div class="settings-actions" *ngIf="!loading()">
-      <button class="btn-primary" type="submit" [disabled]="saving()">
-        {{ saving() ? 'Saving...' : 'Save settings' }}
-      </button>
-      <p class="success" *ngIf="message()">{{ message() }}</p>
-      <p class="error" *ngIf="error()">{{ error() }}</p>
-    </div>
-  </form>
-
-  <section class="panel security-card">
-    <div class="section-head">
-      <div>
-        <h2>Security posture</h2>
-        <p>Production-style security features used in this full-stack app.</p>
+  <div class="settings-layout">
+    <form class="panel settings-section" [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate>
+      <div class="section-head"><div><h2>Profile</h2><p>Name, email, and avatar.</p></div><span class="avatar-preview">{{ profileForm.getRawValue().fullName.slice(0, 2) || 'HB' }}</span></div>
+      <div class="status-panel" *ngIf="profileLoading()">Loading profile...</div>
+      <div class="form-grid" *ngIf="!profileLoading()">
+        <label>Name<input formControlName="fullName" placeholder="Your name"></label>
+        <label>Email<input formControlName="email" type="email"></label>
+        <label>Avatar URL<input formControlName="avatarUrl" placeholder="https://..."></label>
       </div>
-    </div>
+      <div class="settings-actions"><button class="btn-primary" type="submit" [disabled]="savingProfile()">{{ savingProfile() ? 'Saving...' : 'Save profile' }}</button></div>
+    </form>
 
-    <div class="security-grid">
-      <div class="category-row"><span>JWT protected API routes</span><strong class="success">Active</strong></div>
-      <div class="category-row"><span>Refresh token support</span><strong class="success">Enabled</strong></div>
-      <div class="category-row"><span>Role-based authorization</span><strong class="success">Ready</strong></div>
-      <div class="category-row"><span>Rate limiting and exception middleware</span><strong class="success">Configured</strong></div>
-    </div>
-  </section>
+    <form class="panel settings-section" [formGroup]="preferencesForm" (ngSubmit)="savePreferences()" novalidate>
+      <div class="section-head"><div><h2>Preferences</h2><p>Currency, theme, language, and notifications.</p></div></div>
+      <div class="status-panel" *ngIf="loading()">Loading preferences...</div>
+      <ng-container *ngIf="!loading()">
+        <div class="form-grid">
+          <label>Theme<select formControlName="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+          <label>Currency<select formControlName="currency"><option value="INR">INR - Indian Rupee</option><option value="USD">USD - US Dollar</option><option value="EUR">EUR - Euro</option><option value="GBP">GBP - British Pound</option></select></label>
+          <label>Language<select formControlName="language"><option value="en">English</option><option value="hi">Hindi</option><option value="es">Spanish</option><option value="fr">French</option></select></label>
+        </div>
+        <div class="toggle-list">
+          <label class="toggle-row"><span><strong>Email notifications</strong><small>Receive important account and finance updates.</small></span><input type="checkbox" formControlName="emailNotifications"></label>
+          <label class="toggle-row"><span><strong>Push notifications</strong><small>Show alerts for budgets and key activity.</small></span><input type="checkbox" formControlName="pushNotifications"></label>
+          <label class="toggle-row"><span><strong>Monthly digest</strong><small>Send a monthly finance summary and report reminder.</small></span><input type="checkbox" formControlName="monthlyDigest"></label>
+        </div>
+        <div class="settings-actions"><button class="btn-primary" type="submit" [disabled]="savingPreferences()">{{ savingPreferences() ? 'Saving...' : 'Save preferences' }}</button></div>
+      </ng-container>
+    </form>
+
+    <form class="panel settings-section" [formGroup]="securityForm" (ngSubmit)="changePassword()" novalidate>
+      <div class="section-head"><div><h2>Security</h2><p>Change password and manage access protection.</p></div><span class="badge success">Protected</span></div>
+      <div class="form-grid security-grid">
+        <label>Current Password<input type="password" formControlName="currentPassword" autocomplete="current-password"></label>
+        <label>New Password<input type="password" formControlName="newPassword" autocomplete="new-password"></label>
+        <label>Confirm Password<input type="password" formControlName="confirmPassword" autocomplete="new-password"></label>
+      </div>
+      <small class="error" *ngIf="securityForm.hasError('mismatch') && securityForm.touched">Passwords do not match.</small>
+      <label class="toggle-row two-factor"><span><strong>Two-Factor Authentication</strong><small>Prepared for production security workflows.</small></span><input type="checkbox" formControlName="twoFactor"></label>
+      <div class="settings-actions"><button class="btn-primary" type="submit" [disabled]="savingSecurity()">{{ savingSecurity() ? 'Saving...' : 'Change password' }}</button></div>
+    </form>
+
+    <form class="panel settings-section workspace-card" [formGroup]="workspaceForm" (ngSubmit)="saveWorkspace()" novalidate>
+      <div class="section-head"><div><h2>Workspace</h2><p>Simplified workspace management without extra footer text.</p></div></div>
+      <div class="form-grid">
+        <label>Workspace Name<input formControlName="workspaceName" placeholder="HomeBudgetAI Workspace"></label>
+        <label>Workspace Type<select formControlName="workspaceType"><option>Personal Finance</option><option>Family Budget</option><option>Freelance Finance</option><option>Student Budget</option></select></label>
+      </div>
+      <div class="workspace-summary">
+        <div><small>Members</small><strong>1 active user</strong></div>
+        <div><small>Plan</small><strong>AI Budget Workspace</strong></div>
+        <div><small>Status</small><strong class="success">Healthy</strong></div>
+      </div>
+      <div class="settings-actions"><button class="btn-primary" type="submit" [disabled]="savingWorkspace()">{{ savingWorkspace() ? 'Saving...' : 'Save workspace' }}</button></div>
+    </form>
+  </div>
 </section>

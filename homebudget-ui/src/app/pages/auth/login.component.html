@@ -1,46 +1,48 @@
-﻿<section class="auth-page premium-page login-premium">
-
+<section class="auth-page premium-page login-premium">
   <div class="auth-visual login-visual">
     <video class="login-bg-video" autoplay muted loop playsinline poster="images/Raju_profile.jpg">
       <source src="videos/finance-bg.mp4" type="video/mp4">
     </video>
     <div class="login-video-shade"></div>
+    <span class="floating-chip chip-one">Budget health +18%</span>
+    <span class="floating-chip chip-two">Savings runway 6.4 months</span>
+    <span class="floating-chip chip-three">AI insight ready</span>
 
     <div class="auth-copy login-copy">
       <span class="badge success">Secure fintech workspace</span>
-
       <h1>
-        <span>Welcome back</span>
-        <strong>to your AI money command center.</strong>
+        <span class="typing-text">{{ activeQuote().headline }}</span>
       </h1>
-
-      <p>
-        Track expenses in INR, review animated analytics, and get clear AI suggestions that explain what changed and what to do next.
-      </p>
+      <p>{{ activeQuote().detail }}</p>
 
       <div class="feature-pills">
-        <span>JWT Protected</span>
-        <span>INR Finance Tracking</span>
-        <span>AI Suggestions</span>
+        <span>JWT protected</span>
+        <span>Budget analytics</span>
+        <span>AI recommendations</span>
       </div>
 
       <div class="login-preview-card">
         <div class="preview-dots"><i></i><i></i><i></i></div>
-        <strong>₹42,800</strong>
+        <strong>{{ 42800 | currency:'INR' }}</strong>
         <span>Projected monthly savings</span>
         <div class="preview-bars"><i></i><i></i><i></i><i></i></div>
+      </div>
+
+      <div class="idle-tip" *ngIf="idle()">
+        <strong>Finance tip</strong>
+        <span>{{ activeTip() }}</span>
       </div>
     </div>
   </div>
 
   <div class="auth-card-wrap login-card-wrap">
-    <div class="login-loading-overlay" *ngIf="loading()" aria-live="polite">
+    <div class="login-loading-overlay" *ngIf="redirecting()" aria-live="polite">
       <div class="premium-loader"><span></span><span></span><span></span></div>
       <strong>Opening your dashboard...</strong>
       <small>Preparing analytics, AI suggestions, and workspace data.</small>
     </div>
 
-    <form class="auth-card login-card" [formGroup]="form" (ngSubmit)="submit()">
+    <form class="auth-card login-card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <div class="auth-header">
         <span class="badge">HomeBudgetAI</span>
         <h2>Sign in</h2>
@@ -49,25 +51,23 @@
 
       <label>
         <span>Email Address</span>
-        <input type="email" formControlName="email" autocomplete="email" placeholder="you@example.com">
+        <input type="email" formControlName="email" autocomplete="email" placeholder="you@example.com" aria-describedby="emailError">
       </label>
-
-      <small class="field-error" *ngIf="form.controls.email.touched && form.controls.email.invalid">
-        Please enter a valid email address.
+      <small id="emailError" class="field-error" *ngIf="form.controls.email.touched && form.controls.email.invalid">
+        {{ form.controls.email.hasError('required') ? 'Email is required.' : 'Please enter a valid email address' }}
       </small>
 
       <label>
         <span>Password</span>
         <div class="password-box">
-          <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" autocomplete="current-password" placeholder="Enter password">
+          <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" autocomplete="current-password" placeholder="Enter password" aria-describedby="passwordError">
           <button type="button" class="btn-secondary" (click)="togglePassword()">
             {{ showPassword() ? 'Hide' : 'Show' }}
           </button>
         </div>
       </label>
-
-      <small class="field-error" *ngIf="form.controls.password.touched && form.controls.password.invalid">
-        Password is required.
+      <small id="passwordError" class="field-error" *ngIf="form.controls.password.touched && form.controls.password.invalid">
+        Please enter your password.
       </small>
 
       <div class="auth-link-row">
@@ -80,22 +80,15 @@
 
       <div class="error-box" *ngIf="error()">{{ error() }}</div>
 
-      <button class="btn-primary login-btn" [disabled]="loading() || form.invalid">
+      <button class="btn-primary login-btn" type="submit" [disabled]="loading()">
         <span class="button-spinner" *ngIf="loading()"></span>
-        <span>{{ loading() ? 'Signing in...' : 'Login to Dashboard' }}</span>
+        <span>{{ loading() ? 'Signing In...' : 'Sign in securely' }}</span>
       </button>
 
       <div class="auth-link-row footer-row">
         <span>New to HomeBudgetAI?</span>
         <a routerLink="/register">Create account</a>
       </div>
-
-      <div class="demo-box">
-        <strong>Demo Credentials</strong>
-        <div>Email: demo@homebudget.ai</div>
-        <div>Password: Demo@12345</div>
-      </div>
     </form>
   </div>
-
 </section>

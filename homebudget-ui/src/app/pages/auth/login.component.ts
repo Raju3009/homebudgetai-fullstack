@@ -1,176 +1,129 @@
 import { CommonModule } from '@angular/common';
-
-import {
-  Component,
-  inject,
-  signal
-} from '@angular/core';
-
-import {
-  FormBuilder,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
-
-import {
-  ActivatedRoute,
-  Router,
-  RouterLink
-} from '@angular/router';
-
-import { AuthService }
-from '../../core/auth.service';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../core/auth.service';
+import { ToastService } from '../../shared/toast.service';
 
 @Component({
   selector: 'app-login',
-
   standalone: true,
-
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterLink
-  ],
-
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
-
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit, OnDestroy {
+  private fb = inject(FormBuilder);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private toast = inject(ToastService);
 
-  // =========================
-  // INJECTS
-  // =========================
+  readonly quotes = [
+    { headline: 'Take control of your finances.', detail: 'See cash flow, budgets, and savings signals in one calm workspace.' },
+    { headline: 'Track smarter. Save faster.', detail: 'Turn every transaction into a better decision for the next month.' },
+    { headline: 'Your AI-powered budgeting assistant.', detail: 'Spot overspending early and get practical actions before it hurts.' }
+  ];
 
-  private fb =
-    inject(FormBuilder);
+  readonly idleTips = [
+    'Tip: Review recurring expenses once a month to find quiet savings.',
+    'Insight: Budgets work best when savings transfers happen automatically.',
+    'Productivity: Add notes to unusual transactions so reports stay clear.'
+  ];
 
-  private auth =
-    inject(AuthService);
+  loading = signal(false);
+  redirecting = signal(false);
+  error = signal(this.route.snapshot.queryParamMap.get('expired') ? 'Your session expired. Please login again.' : '');
+  showPassword = signal(false);
+  quoteIndex = signal(0);
+  idleTipIndex = signal(0);
+  idle = signal(false);
 
-  private router =
-    inject(Router);
+  form = this.fb.nonNullable.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', Validators.required],
+    rememberMe: [true]
+  });
 
-  private route =
-    inject(ActivatedRoute);
+  private quoteTimer?: number;
+  private tipTimer?: number;
+  private idleTimer?: number;
+  private readonly resetIdle = () => this.restartIdleTimer();
 
-  // =========================
-  // STATE
-  // =========================
+  ngOnInit(): void {
+    this.quoteTimer = window.setInterval(() => {
+      this.quoteIndex.update(value => (value + 1) % this.quotes.length);
+    }, 4200);
 
-  loading =
-    signal(false);
+    this.tipTimer = window.setInterval(() => {
+      this.idleTipIndex.update(value => (value + 1) % this.idleTips.length);
+    }, 5200);
 
-  error =
-    signal(
-
-      this.route
-        .snapshot
-        .queryParamMap
-        .get('expired')
-
-        ? 'Your session expired. Please login again.'
-
-        : ''
-    );
-
-  showPassword =
-    signal(false);
-
-  // =========================
-  // FORM
-  // =========================
-
-  form =
-    this.fb.nonNullable.group({
-
-      email: [
-        'b@gmail.com',
-        [
-          Validators.required,
-          Validators.email
-        ]
-      ],
-
-      password: [
-        '12345678',
-        Validators.required
-      ],
-
-      rememberMe: [true]
+    ['mousemove', 'keydown', 'click', 'touchstart'].forEach(eventName => {
+      window.addEventListener(eventName, this.resetIdle, { passive: true });
     });
 
-  // =========================
-  // TOGGLE PASSWORD
-  // =========================
-
-  togglePassword(): void {
-
-    this.showPassword.update(
-      value => !value
-    );
+    this.restartIdleTimer();
   }
 
-  // =========================
-  // LOGIN
-  // =========================
+  ngOnDestroy(): void {
+    window.clearInterval(this.quoteTimer);
+    window.clearInterval(this.tipTimer);
+    window.clearTimeout(this.idleTimer);
+    ['mousemove', 'keydown', 'click', 'touchstart'].forEach(eventName => {
+      window.removeEventListener(eventName, this.resetIdle);
+    });
+  }
+
+  activeQuote() {
+    return this.quotes[this.quoteIndex()];
+  }
+
+  activeTip(): string {
+    return this.idleTips[this.idleTipIndex()];
+  }
+
+  togglePassword(): void {
+    this.showPassword.update(value => !value);
+  }
 
   submit(): void {
-
-    // INVALID FORM
-
-    if (this.form.invalid) {
-
-      this.form.markAllAsTouched();
-
+    if (this.loading()) {
       return;
     }
 
-    // LOADING
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.error.set('Please complete all required fields.');
+      this.toast.warning('Please enter a valid email and password.');
+      return;
+    }
 
     this.loading.set(true);
-
     this.error.set('');
 
-    const value =
-      this.form.getRawValue();
+    const value = this.form.getRawValue();
 
-    // LOGIN REQUEST
-
-    this.auth.login({
-
-      email: value.email,
-
-      password: value.password
-
-    }).subscribe({
-
-      // SUCCESS
-
+    this.auth.login({ email: value.email, password: value.password }).subscribe({
       next: () => {
-
-        this.loading.set(false);
-
-        // REDIRECT TO DASHBOARD
-
-        this.router.navigate([
-          '/app/dashboard'
-        ]);
+        this.redirecting.set(true);
+        this.toast.success('Welcome back. Your dashboard is ready.');
+        window.setTimeout(() => {
+          this.loading.set(false);
+          this.router.navigate(['/app/dashboard']);
+        }, 700);
       },
-
-      // ERROR
-
       error: error => {
-
-        this.error.set(
-
-          error.error?.message ||
-
-          'Login failed. Check your credentials and try again.'
-        );
-
+        this.error.set(error.error?.message || 'Login failed. Check your credentials and try again.');
+        this.toast.error(this.error());
         this.loading.set(false);
       }
     });
+  }
+
+  private restartIdleTimer(): void {
+    this.idle.set(false);
+    window.clearTimeout(this.idleTimer);
+    this.idleTimer = window.setTimeout(() => this.idle.set(true), 9000);
   }
 }

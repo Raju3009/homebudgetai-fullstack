@@ -1,350 +1,123 @@
-<section class="auth-page premium-page">
-
-  <div class="auth-visual">
-
+<section class="auth-page premium-page register-premium">
+  <div class="auth-visual register-visual">
+    <div class="register-grid-bg"></div>
     <div class="auth-copy">
-
-      <span class="badge success">
-        Launch your finance OS
-      </span>
-
-      <h1>
-        Build better financial habits with AI
-      </h1>
-
-      <p>
-        Create your secure workspace
-        and manage your finances smarter.
-      </p>
-
+      <span class="badge success">Launch your finance OS</span>
+      <h1>Create a smarter budgeting workspace.</h1>
+      <p>Set your workspace, choose your preferred currency, and start with secure AI-assisted financial habits.</p>
       <div class="feature-pills">
-
-        <span>AI Insights</span>
-
-        <span>Password Security</span>
-
-        <span>Fast Analytics</span>
-
+        <span>Real-time validation</span>
+        <span>Password strength</span>
+        <span>Workspace ready</span>
       </div>
-
+      <div class="launch-card">
+        <strong>Workspace setup</strong>
+        <div class="setup-row"><span>Profile</span><i></i></div>
+        <div class="setup-row"><span>Security</span><i></i></div>
+        <div class="setup-row"><span>Budget goal</span><i></i></div>
+      </div>
     </div>
-
   </div>
 
   <div class="auth-card-wrap">
-
-    <form
-      class="auth-card"
-      [formGroup]="form"
-      (ngSubmit)="submit()"
-    >
-
-      <!-- HEADER -->
-
-      <div>
-
-        <span class="badge">
-          Step {{ step() }} of 2
-        </span>
-
-        <h2>
-          Create Account
-        </h2>
-
-        <p>
-
-          {{
-            step() === 1
-            ? 'Tell us about yourself.'
-            : 'Secure your account.'
-          }}
-
-        </p>
-
+    <form class="auth-card register-card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="auth-header">
+        <span class="badge">Create account</span>
+        <h2>Create Workspace</h2>
+        <p>All fields marked in the form are required for a clean setup.</p>
       </div>
 
-      <!-- PROGRESS -->
-
-      <div class="progress-line">
-
-        <span
-          [style.width.%]="step() === 1 ? 50 : 100"
-        ></span>
-
+      <div class="success-animation" *ngIf="success()">
+        <span>OK</span>
+        <strong>Account created successfully</strong>
+        <small>Redirecting to your dashboard...</small>
       </div>
 
-      <!-- STEP 1 -->
-
-      <ng-container
-        *ngIf="step() === 1; else securityStep"
-      >
-
+      <div class="form-row">
         <label>
-
           Full Name
-
-          <input
-            type="text"
-            formControlName="fullName"
-            placeholder="Enter full name"
-          >
-
+          <input type="text" formControlName="fullName" autocomplete="name" placeholder="Katkuri Raju">
+          <small class="field-error" *ngIf="form.controls.fullName.touched && form.controls.fullName.invalid">Please complete all required fields</small>
         </label>
-
         <label>
-
-          Email Address
-
-          <input
-            type="email"
-            formControlName="email"
-            placeholder="Enter email"
-          >
-
+          Workspace Name
+          <input type="text" formControlName="workspaceName" placeholder="Raju Finance Workspace">
+          <small class="field-error" *ngIf="form.controls.workspaceName.touched && form.controls.workspaceName.invalid">Please enter workspace name</small>
         </label>
-
-        <button
-          type="button"
-          class="btn-primary"
-          (click)="next()"
-        >
-          Continue
-        </button>
-
-      </ng-container>
-
-      <!-- STEP 2 -->
-
-      <ng-template #securityStep>
-
-        <!-- PASSWORD -->
-
-        <label>
-
-          Password
-
-          <div class="password-box">
-
-            <input
-              [type]="showPassword() ? 'text' : 'password'"
-              formControlName="password"
-              placeholder="Enter password"
-            >
-
-            <button
-              type="button"
-              class="btn-secondary"
-              (click)="togglePassword()"
-            >
-
-              {{
-                showPassword()
-                ? 'Hide'
-                : 'Show'
-              }}
-
-            </button>
-
-          </div>
-
-        </label>
-
-        <!-- PASSWORD STRENGTH -->
-
-        <div class="strength-wrap">
-
-          <div class="strength-bar">
-
-            <span
-              [style.width.%]="strength() * 25"
-
-              [class.weak]="strength() <= 1"
-
-              [class.fair]="strength() === 2"
-
-              [class.good]="strength() === 3"
-
-              [class.strong]="strength() >= 4"
-
-            ></span>
-
-          </div>
-
-          <small>
-
-            Password strength:
-
-            <strong>
-
-              {{ strengthLabel() }}
-
-            </strong>
-
-          </small>
-
-          <small
-            class="error"
-            *ngIf="
-              form.controls.password.value &&
-              form.controls.password.value.length < 8
-            "
-          >
-
-            Enter strong password
-            (minimum 8 characters)
-
-          </small>
-
-        </div>
-
-        <!-- CONFIRM PASSWORD -->
-
-        <label>
-
-          Confirm Password
-
-          <div class="password-box">
-
-            <input
-              [type]="showConfirmPassword() ? 'text' : 'password'"
-              formControlName="confirmPassword"
-              placeholder="Confirm password"
-            >
-
-            <button
-              type="button"
-              class="btn-secondary"
-              (click)="toggleConfirmPassword()"
-            >
-
-              {{
-                showConfirmPassword()
-                ? 'Hide'
-                : 'Show'
-              }}
-
-            </button>
-
-          </div>
-
-        </label>
-
-        <!-- SETTINGS -->
-
-        <div class="form-row">
-
-          <label>
-
-            Currency
-
-            <select formControlName="currency">
-
-              <option>USD</option>
-
-              <option>INR</option>
-
-              <option>EUR</option>
-
-              <option>GBP</option>
-
-            </select>
-
-          </label>
-
-          <label>
-
-            Monthly Goal
-
-            <input
-              type="number"
-              formControlName="monthlyGoal"
-            >
-
-          </label>
-
-        </div>
-
-        <!-- REMEMBER -->
-
-        <label class="inline-check">
-
-          <input
-            type="checkbox"
-            formControlName="rememberMe"
-          >
-
-          Keep me signed in
-
-        </label>
-
-        <!-- ERRORS -->
-
-        <p
-          class="error"
-          *ngIf="
-            form.hasError('mismatch') &&
-            form.touched
-          "
-        >
-
-          Passwords do not match
-
-        </p>
-
-        <p
-          class="error"
-          *ngIf="error()"
-        >
-
-          {{ error() }}
-
-        </p>
-
-        <!-- BUTTONS -->
-
-        <div class="auth-link-row">
-
-          <button
-            type="button"
-            class="btn-secondary"
-            (click)="step.set(1)"
-          >
-            Back
-          </button>
-
-          <button
-            type="submit"
-            class="btn-primary"
-          >
-
-            {{
-              loading()
-              ? 'Creating...'
-              : 'Create Workspace'
-            }}
-
-          </button>
-
-        </div>
-
-      </ng-template>
-
-      <!-- LOGIN -->
-
-      <div class="auth-link-row">
-
-        <span>
-          Already have an account?
-        </span>
-
-        <a routerLink="/login">
-          Login
-        </a>
-
       </div>
 
+      <label>
+        Email Address
+        <input type="email" formControlName="email" autocomplete="email" placeholder="you@example.com">
+        <small class="field-error" *ngIf="form.controls.email.touched && form.controls.email.invalid">
+          {{ form.controls.email.hasError('required') ? 'Please enter email' : 'Please enter a valid email address' }}
+        </small>
+      </label>
+
+      <label>
+        Password
+        <div class="password-box">
+          <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" autocomplete="new-password" placeholder="Create a secure password">
+          <button type="button" class="btn-secondary" (click)="togglePassword()">{{ showPassword() ? 'Hide' : 'Show' }}</button>
+        </div>
+        <small class="field-error" *ngIf="form.controls.password.touched && form.controls.password.invalid">Please enter your password</small>
+      </label>
+
+      <div class="strength-wrap" [class.weak]="strengthLabel() === 'Weak'" [class.medium]="strengthLabel() === 'Medium'" [class.strong]="strengthLabel() === 'Strong'">
+        <div class="strength-bar"><span [style.width.%]="strengthPercent()"></span></div>
+        <small>Password strength: <strong>{{ strengthLabel() }}</strong></small>
+        <ul>
+          <li [class.done]="hasMinLength()">8+ characters</li>
+          <li [class.done]="hasUppercase()">Uppercase</li>
+          <li [class.done]="hasLowercase()">Lowercase</li>
+          <li [class.done]="hasNumber()">Number</li>
+          <li [class.done]="hasSpecialCharacter()">Special character</li>
+        </ul>
+      </div>
+
+      <label>
+        Confirm Password
+        <div class="password-box">
+          <input [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword" autocomplete="new-password" placeholder="Confirm password">
+          <button type="button" class="btn-secondary" (click)="toggleConfirmPassword()">{{ showConfirmPassword() ? 'Hide' : 'Show' }}</button>
+        </div>
+      </label>
+      <small class="field-error" *ngIf="form.hasError('mismatch') && form.touched">Passwords do not match</small>
+
+      <div class="form-row">
+        <label>
+          Currency
+          <select formControlName="currency">
+            <option value="INR">INR - Indian Rupee</option>
+            <option value="USD">USD - US Dollar</option>
+            <option value="EUR">EUR - Euro</option>
+            <option value="GBP">GBP - British Pound</option>
+          </select>
+        </label>
+        <label>
+          Monthly Savings Goal
+          <input type="number" formControlName="monthlyGoal" min="1">
+        </label>
+      </div>
+
+      <label class="inline-check">
+        <input type="checkbox" formControlName="notifications">
+        <span>Send monthly insights and budget alerts</span>
+      </label>
+
+      <div class="error-box warning" *ngIf="missingMessage()">{{ missingMessage() }}</div>
+      <div class="error-box" *ngIf="error()">{{ error() }}</div>
+
+      <button type="submit" class="btn-primary register-btn" [disabled]="loading()">
+        <span class="button-spinner" *ngIf="loading()"></span>
+        <span>{{ loading() ? 'Creating Workspace...' : 'Create Workspace' }}</span>
+      </button>
+
+      <div class="auth-link-row footer-row">
+        <span>Already have an account?</span>
+        <a routerLink="/login">Login</a>
+      </div>
     </form>
-
   </div>
-
 </section>
+

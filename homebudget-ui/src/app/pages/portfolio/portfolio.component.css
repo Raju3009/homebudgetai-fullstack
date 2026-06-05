@@ -1,4 +1,4 @@
-﻿:host { display: block; }
+:host { display: block; }
 
 .portfolio-shell {
   --portfolio-bg: #08110f;
@@ -54,6 +54,7 @@
 @keyframes floatPreview { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 @keyframes portraitOrbit { 0% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-14px) rotate(1.5deg); } 100% { transform: translateY(0) rotate(-1.5deg); } }
 @keyframes dotGlow { 0%, 100% { opacity: 0.55; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-4px); } }
+@keyframes roleRotate { 0%, 30% { opacity: 1; transform: translateY(0); } 33%, 100% { opacity: 0; transform: translateY(10px); } }
 .section-reveal { animation: revealUp 0.72s ease both; }
 
 .portfolio-nav {
@@ -171,9 +172,12 @@
 }
 
 .hero-copy h1, .portfolio-section h2, .featured-project h3 { margin: 0; letter-spacing: 0; color: var(--portfolio-text); }
-.hero-copy h1 { margin-top: 1rem; max-width: 820px; font-size: clamp(3.4rem, 9vw, 7.2rem); line-height: 0.9; background: linear-gradient(90deg, #ffffff, var(--portfolio-brand) 45%, #fed7aa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero-copy h1 { margin-top: 1rem; max-width: 820px; min-height: auto; font-size: clamp(3.4rem, 9vw, 7.2rem); line-height: 0.9; background: linear-gradient(90deg, #ffffff, var(--portfolio-brand) 45%, #fed7aa); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .light-mode .hero-copy h1 { background: linear-gradient(90deg, #111827, #0f766e 46%, #b45309); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.typing-line { width: fit-content; margin: 0.9rem 0; color: var(--portfolio-brand); font-size: clamp(1.15rem, 3vw, 1.9rem); font-weight: 900; border-right: 3px solid var(--portfolio-brand); padding-right: 0.5rem; animation: typePulse 0.9s steps(1) infinite; }
+.typing-line { position: relative; width: min(100%, 420px); min-height: 2.4rem; margin: 0.9rem 0; color: var(--portfolio-brand); font-size: clamp(1.15rem, 3vw, 1.9rem); font-weight: 900; overflow: hidden; }
+.typing-line span { position: absolute; inset: 0 auto auto 0; opacity: 0; border-right: 3px solid var(--portfolio-brand); padding-right: 0.5rem; white-space: nowrap; animation: roleRotate 9s steps(1, end) infinite, typePulse 0.9s steps(1) infinite; }
+.typing-line span:nth-child(2) { animation-delay: 3s; }
+.typing-line span:nth-child(3) { animation-delay: 6s; }
 .hero-subtitle, .portfolio-section p, .project-card p, .timeline-item p, .info-card p, .portfolio-footer p { color: var(--portfolio-muted); line-height: 1.7; }
 .hero-subtitle { max-width: 720px; font-size: 1.1rem; font-weight: 700; }
 .hero-meta { margin-top: 1rem; }
@@ -318,4 +322,6 @@ pre { margin: 0; white-space: pre-wrap; color: var(--portfolio-text); font-size:
   .preview-cards { grid-template-columns: 1fr; }
   .preview-cards .wide { grid-column: auto; }
 }
+
+
 
