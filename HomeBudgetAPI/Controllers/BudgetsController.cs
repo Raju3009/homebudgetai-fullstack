@@ -22,7 +22,13 @@ public class BudgetsController : ControllerBase
         var userId = UserId;
         var budgets = await _db.Budgets.Where(x => x.UserId == userId).OrderByDescending(x => x.Month).ThenBy(x => x.Category).ToListAsync();
         var start = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
-        var spent = await _db.Transactions.Where(x => x.UserId == userId && x.Type == TransactionType.Expense && x.Date >= start).GroupBy(x => x.Category).Select(x => new { Category = x.Key, Total = x.Sum(v => v.Amount) }).ToDictionaryAsync(x => x.Category, x => x.Total);
+        var spendingRows = await _db.Transactions
+            .Where(x => x.UserId == userId && x.Type == TransactionType.Expense && x.Date >= start)
+            .Select(x => new { x.Category, x.Amount })
+            .ToListAsync();
+        var spent = spendingRows
+            .GroupBy(x => x.Category)
+            .ToDictionary(x => x.Key, x => x.Sum(v => v.Amount));
         return budgets.Select(x => ToResponse(x, spent.TryGetValue(x.Category, out var total) ? total : 0)).ToList();
     }
 

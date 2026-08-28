@@ -2,15 +2,16 @@
 
 .login-premium { background: #061311; }
 .login-visual { isolation: isolate; background: #061311; }
+.login-premium, .login-visual::before { animation: none; }
 .login-bg-video, .login-video-shade { position: absolute; inset: 0; width: 100%; height: 100%; }
 .login-bg-video { object-fit: cover; opacity: 0.62; filter: saturate(1.12) contrast(1.08); }
 .login-video-shade { z-index: 0; background: radial-gradient(circle at 20% 18%, rgba(45, 212, 191, 0.34), transparent 34%), radial-gradient(circle at 80% 72%, rgba(245, 158, 11, 0.24), transparent 30%), linear-gradient(90deg, rgba(6, 19, 17, 0.94), rgba(6, 19, 17, 0.58)); }
 .login-copy { position: relative; z-index: 1; }
 .login-copy h1 { min-height: 2.1em; display: flex; align-items: end; font-size: clamp(3rem, 7vw, 6.2rem); line-height: 0.92; }
-.typing-text { max-width: 100%; white-space: normal; color: transparent; background: linear-gradient(90deg, #ffffff, #5eead4 52%, #fbbf24); -webkit-background-clip: text; background-clip: text; overflow: hidden; border-right: 4px solid #5eead4; animation: typingReveal 3.8s steps(32, end) infinite, caret 0.75s step-end infinite; }
+.typing-text { max-width: 100%; white-space: normal; color: transparent; background: linear-gradient(90deg, #ffffff, #5eead4 52%, #fbbf24); -webkit-background-clip: text; background-clip: text; overflow: visible; border-right: 0; animation: none; }
 .login-copy p { max-width: 600px; color: rgba(255, 255, 255, 0.78); }
 
-.floating-chip { position: absolute; z-index: 1; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 999px; padding: 0.65rem 0.9rem; color: #fff; background: rgba(6, 19, 17, 0.56); box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22); backdrop-filter: blur(14px); font-weight: 800; animation: floatChip 5.5s ease-in-out infinite; }
+.floating-chip { position: absolute; z-index: 1; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 999px; padding: 0.65rem 0.9rem; color: #fff; background: rgba(6, 19, 17, 0.56); box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22); backdrop-filter: blur(14px); font-weight: 800; animation: none; }
 .chip-one { top: 14%; right: 13%; }
 .chip-two { bottom: 21%; left: 9%; animation-delay: 1s; }
 .chip-three { right: 8%; bottom: 34%; animation-delay: 2s; }
@@ -23,7 +24,7 @@
 .error-box { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.22); color: #b91c1c; padding: 0.85rem 1rem; border-radius: 14px; font-size: 0.92rem; font-weight: 700; }
 .footer-row { margin-top: 0.35rem; }
 
-.login-preview-card { width: min(100%, 420px); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 24px; padding: 1rem; background: rgba(6, 19, 17, 0.62); box-shadow: 0 28px 80px rgba(0, 0, 0, 0.34); backdrop-filter: blur(18px); animation: loginFloat 5s ease-in-out infinite; }
+.login-preview-card { width: min(100%, 420px); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 24px; padding: 1rem; background: rgba(6, 19, 17, 0.62); box-shadow: 0 28px 80px rgba(0, 0, 0, 0.34); backdrop-filter: blur(18px); animation: none; }
 .preview-dots { display: flex; gap: 0.4rem; margin-bottom: 1rem; }
 .preview-dots i { width: 11px; height: 11px; border-radius: 999px; background: #fb7185; }
 .preview-dots i:nth-child(2) { background: #f59e0b; }

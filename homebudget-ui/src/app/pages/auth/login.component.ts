@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
@@ -12,7 +12,7 @@ import { ToastService } from '../../shared/toast.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginComponent {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
@@ -25,19 +25,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     { headline: 'Your AI-powered budgeting assistant.', detail: 'Spot overspending early and get practical actions before it hurts.' }
   ];
 
-  readonly idleTips = [
-    'Tip: Review recurring expenses once a month to find quiet savings.',
-    'Insight: Budgets work best when savings transfers happen automatically.',
-    'Productivity: Add notes to unusual transactions so reports stay clear.'
-  ];
-
   loading = signal(false);
   redirecting = signal(false);
   error = signal(this.route.snapshot.queryParamMap.get('expired') ? 'Your session expired. Please login again.' : '');
   showPassword = signal(false);
   quoteIndex = signal(0);
-  idleTipIndex = signal(0);
-  idle = signal(false);
 
   form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -45,42 +37,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     rememberMe: [true]
   });
 
-  private quoteTimer?: number;
-  private tipTimer?: number;
-  private idleTimer?: number;
-  private readonly resetIdle = () => this.restartIdleTimer();
-
-  ngOnInit(): void {
-    this.quoteTimer = window.setInterval(() => {
-      this.quoteIndex.update(value => (value + 1) % this.quotes.length);
-    }, 4200);
-
-    this.tipTimer = window.setInterval(() => {
-      this.idleTipIndex.update(value => (value + 1) % this.idleTips.length);
-    }, 5200);
-
-    ['mousemove', 'keydown', 'click', 'touchstart'].forEach(eventName => {
-      window.addEventListener(eventName, this.resetIdle, { passive: true });
-    });
-
-    this.restartIdleTimer();
-  }
-
-  ngOnDestroy(): void {
-    window.clearInterval(this.quoteTimer);
-    window.clearInterval(this.tipTimer);
-    window.clearTimeout(this.idleTimer);
-    ['mousemove', 'keydown', 'click', 'touchstart'].forEach(eventName => {
-      window.removeEventListener(eventName, this.resetIdle);
-    });
-  }
-
   activeQuote() {
     return this.quotes[this.quoteIndex()];
-  }
-
-  activeTip(): string {
-    return this.idleTips[this.idleTipIndex()];
   }
 
   togglePassword(): void {
@@ -119,11 +77,5 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.loading.set(false);
       }
     });
-  }
-
-  private restartIdleTimer(): void {
-    this.idle.set(false);
-    window.clearTimeout(this.idleTimer);
-    this.idleTimer = window.setTimeout(() => this.idle.set(true), 9000);
   }
 }

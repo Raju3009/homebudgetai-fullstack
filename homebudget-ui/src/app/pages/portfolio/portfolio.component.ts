@@ -80,7 +80,7 @@ export class PortfolioComponent {
   name: 'Katkuri Raju',
   role: 'Full Stack Developer',
   stack: ['ASP.NET Core', 'Angular', 'SQL Server'],
-  focus: 'Secure REST APIs and responsive SaaS UI',
+  focus: 'Secure REST APIs, local SQLite, and responsive SaaS UI',
   project: 'HomeBudgetAI'
 };`;
   readonly navLinks = [
@@ -91,17 +91,10 @@ export class PortfolioComponent {
     { label: 'Contact', href: '#contact' }
   ];
 
-  readonly stats = [
-    { value: '1', label: 'Production-style full-stack app' },
-    { value: '20+', label: 'API workflows implemented' },
-    { value: '2025', label: 'AI and ML graduate' },
-    { value: '7.5', label: 'B.Tech CGPA' }
-  ];
-
   readonly projectMetrics = [
     { label: 'Frontend', value: 'Angular 21' },
     { label: 'Backend', value: 'ASP.NET Core' },
-    { label: 'Database', value: 'SQL Server' },
+    { label: 'Database', value: 'SQLite local' },
     { label: 'Security', value: 'JWT Auth' }
   ];
 
@@ -157,7 +150,7 @@ export class PortfolioComponent {
       category: 'fullstack' as const,
       summary: 'A production-style finance management application built with Angular, ASP.NET Core Web API, SQL Server, JWT security, dashboards, and deployment-ready architecture.',
       links: {
-        live: 'https://raju3009.github.io/homebudgetai-fullstack/',
+        live: '/login',
         github: 'https://github.com/Raju3009/homebudgetai-fullstack'
       },
       badges: ['ASP.NET Core', 'Angular', 'SQL Server', 'EF Core', 'JWT', 'Swagger', 'REST APIs', 'Docker'],
@@ -188,7 +181,7 @@ export class PortfolioComponent {
       category: 'frontend' as const,
       summary: 'Responsive Angular interface with protected routes, reusable page patterns, animated cards, analytics sections, and mobile-first improvements.',
       links: {
-        live: 'https://raju3009.github.io/homebudgetai-fullstack/',
+        live: '/login',
         github: 'https://github.com/Raju3009/homebudgetai-fullstack'
       },
       badges: ['Angular', 'TypeScript', 'CSS', 'Bootstrap', 'Responsive UI'],

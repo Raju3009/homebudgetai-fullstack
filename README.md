@@ -36,24 +36,28 @@ graph TD
 
 - Frontend: Angular 21 standalone components, Tailwind CSS, Bootstrap utilities, RxJS, Chart.js, lucide-angular, jspdf, html2canvas.
 - Backend: ASP.NET Core .NET 8 Web API, EF Core, JWT Bearer auth, rate limiting, Swagger.
-- Databases: SQL Server locally, PostgreSQL-ready for Render.
+- Databases: SQLite for quick local development, SQL Server migration support for fuller local/staged environments, PostgreSQL-ready deployment config for Render.
 - Deployment: Netlify frontend, Render backend, GitHub Actions-ready repository layout.
 
 ## Local Setup
 
 ```powershell
-cd D:\project\homebudgetai-fullstack\homebudget-ui
+cd D:\HomeBudgetAI\homebudget-ui
 npm ci
-npm run build -- --configuration production
 npm start
 ```
 
 ```powershell
-cd D:\project\homebudgetai-fullstack
+cd D:\HomeBudgetAI
  dotnet restore .\HomeBudgetAPI\HomeBudgetAPI.csproj
- dotnet build .\HomeBudgetAPI\HomeBudgetAPI.csproj -c Release
  dotnet run --project .\HomeBudgetAPI\HomeBudgetAPI.csproj
 ```
+
+Local URLs:
+
+- Frontend: `http://localhost:4200`
+- API: `http://localhost:5033`
+- Swagger: `http://localhost:5033/swagger`
 
 Default demo login:
 
@@ -64,7 +68,7 @@ Default demo login:
 
 Copy `.env.example` and configure the API/database values for your environment. Required backend values:
 
-- `DatabaseProvider`: `SqlServer`, `PostgreSQL`, or `Postgres`
+- `DatabaseProvider`: `Sqlite` for local development, or `SqlServer` for SQL Server-backed runs
 - `ConnectionStrings__DefaultConnection`
 - `Jwt__Key`
 - `Jwt__Issuer`

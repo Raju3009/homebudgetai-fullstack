@@ -6,12 +6,43 @@ using HomeBudgetAPI.Middleware;
 using HomeBudgetAPI.Repositories;
 using HomeBudgetAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// =========================
+// LOGGING
+// =========================
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
+// =========================
+// DATA PROTECTION
+// =========================
+
+if (builder.Environment.IsDevelopment())
+{
+  var keysPath =
+      Path.Combine(
+          builder.Environment.ContentRootPath,
+          "App_Data",
+          "DataProtectionKeys"
+      );
+
+  Directory.CreateDirectory(keysPath);
+
+  builder.Services
+      .AddDataProtection()
+      .PersistKeysToFileSystem(
+          new DirectoryInfo(keysPath)
+      );
+}
 
 // =========================
 // CONTROLLERS
@@ -73,6 +104,10 @@ builder.Services.AddSwaggerGen(options =>
 var connectionString =
     builder.Configuration.GetConnectionString("DefaultConnection");
 
+var databaseProvider =
+    builder.Configuration["DatabaseProvider"]
+    ?? "Sqlite";
+
 if (string.IsNullOrWhiteSpace(connectionString))
 {
   throw new InvalidOperationException(
@@ -82,16 +117,24 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
+  if (databaseProvider.Equals(
+          "Sqlite",
+          StringComparison.OrdinalIgnoreCase))
+  {
+    options.UseSqlite(connectionString);
+    return;
+  }
+
   options.UseSqlServer(
-      connectionString,
-      sqlServerOptions =>
-      {
-        sqlServerOptions.EnableRetryOnFailure(
-              maxRetryCount: 5,
-              maxRetryDelay: TimeSpan.FromSeconds(30),
-              errorNumbersToAdd: null
-          );
-      });
+    connectionString,
+    sqlServerOptions =>
+    {
+      sqlServerOptions.EnableRetryOnFailure(
+          maxRetryCount: 5,
+          maxRetryDelay: TimeSpan.FromSeconds(30),
+          errorNumbersToAdd: null
+      );
+    });
 });
 
 // =========================
@@ -100,15 +143,21 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddCors(options =>
 {
+  var allowedOrigins =
+      builder.Configuration
+          .GetSection("Cors:AllowedOrigins")
+          .Get<string[]>()
+      ?? new[]
+      {
+        "http://localhost:4200",
+        "http://127.0.0.1:4200"
+      };
+
   options.AddPolicy("AllowAngular",
       policy =>
       {
         policy
-              .WithOrigins(
-    "http://localhost:4200",
-    "https://homebudget-ui.netlify.app",
-    "https://wondrous-khapse-cc5b19.netlify.app"
-)
+              .WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -245,7 +294,7 @@ app.UseSwagger();
 
 app.UseSwaggerUI();
 
-if (!app.Environment.IsProduction())
+if (builder.Configuration.GetValue<bool>("UseHttpsRedirection"))
 {
   app.UseHttpsRedirection();
 }
@@ -274,7 +323,29 @@ try
       scope.ServiceProvider
           .GetRequiredService<AppDbContext>();
 
-  await db.Database.MigrateAsync();
+  if (databaseProvider.Equals(
+          "Sqlite",
+          StringComparison.OrdinalIgnoreCase))
+  {
+    await db.Database.EnsureCreatedAsync();
+  }
+  else
+  {
+    await db.Database.MigrateAsync();
+  }
+
+  var shouldSeedDemoData =
+      app.Environment.IsDevelopment()
+      || builder.Configuration.GetValue<bool>("SeedDemoData");
+
+  if (shouldSeedDemoData)
+  {
+    var passwords =
+        scope.ServiceProvider
+            .GetRequiredService<IPasswordService>();
+
+    await SeedData.ApplyAsync(db, passwords);
+  }
 }
 catch (Exception ex)
 {

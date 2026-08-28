@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "serve:ssr:homebudget-ui": "node dist/homebudget-ui/server/server.mjs"
+    "ng": "npm --prefix homebudget-ui run ng",
+    "start": "npm --prefix homebudget-ui start",
+    "build": "npm --prefix homebudget-ui run build",
+    "watch": "npm --prefix homebudget-ui run watch",
+    "test": "npm --prefix homebudget-ui test",
+    "serve:ssr:homebudget-ui": "npm --prefix homebudget-ui run serve:ssr:homebudget-ui"
   },
   "private": true,
   "packageManager": "npm@11.6.0",

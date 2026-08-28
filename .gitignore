@@ -6,6 +6,9 @@ dist/
 # .NET
 bin/
 obj/
+HomeBudgetAPI/App_Data/
+HomeBudgetAPI/*.db
+HomeBudgetAPI/*.db-*
 
 # Visual Studio
 .vs/
