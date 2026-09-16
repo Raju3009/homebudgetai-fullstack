@@ -1,132 +1,170 @@
 # HomeBudgetAI
 
-![Angular](https://img.shields.io/badge/Angular-21-DD0031?logo=angular&logoColor=white)
-![.NET](https://img.shields.io/badge/.NET-8-512BD4?logo=dotnet&logoColor=white)
-![Tailwind](https://img.shields.io/badge/TailwindCSS-3-38BDF8?logo=tailwindcss&logoColor=white)
-![EF Core](https://img.shields.io/badge/EF%20Core-8-512BD4)
-![License](https://img.shields.io/badge/license-MIT-green)
+A full-stack household finance application built with Angular and ASP.NET Core Web API.
 
-HomeBudgetAI is a premium fintech SaaS portfolio application for household finance intelligence. It pairs an Angular 21 standalone frontend with an ASP.NET Core .NET 8 API, JWT authentication, EF Core, SQL Server/PostgreSQL support, animated Chart.js dashboards, PDF/CSV reporting, budgets, goals, settings, notifications, and polished responsive UX.
+HomeBudgetAI helps users manage transactions, budgets, savings goals, reports, and financial insights through a responsive web application.
 
-## Highlights
+## Overview
 
-- Public SaaS landing page with hero, feature, analytics, testimonial, pricing, FAQ, and footer sections.
-- Premium auth flows: login, multi-step registration, forgot password, reset password, validation, demo credentials, and protected routes.
-- App workspace with collapsible sidebar, sticky topbar, global-search style UI, dark/light mode, notification center, profile menu, and mobile bottom nav.
-- Dashboard with animated counters, income/expense charts, savings trend, category analytics, heatmap, quick actions, recent transactions, and AI insight cards.
-- Transactions with search, filters, sorting, pagination, create/edit/delete, CSV export, loading skeletons, and empty states.
-- Budgets, goals, reports, activity, settings, and profile pages connected to backend APIs.
-- Backend features: JWT auth, refresh-token-ready sessions, role policies, rate limiting, global exception middleware, repository/service boundaries, EF migrations, demo seed data, and Swagger.
+The project combines a modern Angular frontend with a .NET 8 Web API backend and Entity Framework Core. It includes authentication, financial tracking, reporting, dashboards, and database support for local and deployed environments.
+
+## Key Features
+
+- User registration and login with JWT authentication
+- Protected application routes
+- Transaction create, edit, delete, search, filtering, sorting, pagination, and CSV export
+- Budget management
+- Savings goal tracking
+- Financial reports and analytics
+- Dashboard charts and category insights
+- Notifications, profile, and settings pages
+- Swagger API documentation
+- Responsive UI with light/dark mode
+- Docker and deployment configuration
 
 ## Architecture
 
-```mermaid
-graph TD
-  A[Angular 21 homebudget-ui] --> B[JWT Auth Interceptor]
-  B --> C[ASP.NET Core Web API]
-  C --> D[Controllers]
-  D --> E[Services and Repositories]
-  E --> F[EF Core DbContext]
-  F --> G[(SQL Server or PostgreSQL)]
-  A --> H[Netlify]
-  C --> I[Render]
+```text
+Angular Frontend
+      |
+      | HTTP / JWT
+      v
+ASP.NET Core Web API
+      |
+      v
+Services / Repositories
+      |
+      v
+Entity Framework Core
+      |
+      v
+SQLite / SQL Server / PostgreSQL
 ```
 
-## Tech Stack
+## Technology Stack
 
-- Frontend: Angular 21 standalone components, Tailwind CSS, Bootstrap utilities, RxJS, Chart.js, lucide-angular, jspdf, html2canvas.
-- Backend: ASP.NET Core .NET 8 Web API, EF Core, JWT Bearer auth, rate limiting, Swagger.
-- Databases: SQLite for quick local development, SQL Server migration support for fuller local/staged environments, PostgreSQL-ready deployment config for Render.
-- Deployment: Netlify frontend, Render backend, GitHub Actions-ready repository layout.
+### Frontend
 
-## Local Setup
+- Angular 21
+- TypeScript
+- RxJS
+- Tailwind CSS
+- Bootstrap utilities
+- Chart.js
+- lucide-angular
 
-```powershell
-cd D:\HomeBudgetAI\homebudget-ui
+### Backend
+
+- C#
+- .NET 8
+- ASP.NET Core Web API
+- Entity Framework Core
+- JWT Bearer Authentication
+- Swagger / OpenAPI
+- Rate limiting
+
+### Database
+
+- SQLite for local development
+- SQL Server support
+- PostgreSQL deployment configuration
+
+### Tools & Deployment
+
+- Git & GitHub
+- Docker
+- Netlify
+- Render
+- Visual Studio / VS Code
+
+## Project Structure
+
+```text
+homebudgetai-fullstack/
+├── HomeBudgetAPI/       # ASP.NET Core Web API
+├── homebudget-ui/       # Angular frontend
+├── .github/             # GitHub configuration
+├── homebudgetai-fullstack.sln
+├── .env.example
+├── .gitignore
+├── netlify.toml
+├── CONTRIBUTING.md
+├── LICENSE
+└── README.md
+```
+
+## Getting Started
+
+### Prerequisites
+
+- .NET 8 SDK
+- Node.js and npm
+- Git
+- A supported database configuration
+
+### Backend
+
+```bash
+cd HomeBudgetAPI
+dotnet restore
+dotnet run
+```
+
+Swagger is available at the API's `/swagger` route when the application is running.
+
+### Frontend
+
+```bash
+cd homebudget-ui
 npm ci
 npm start
 ```
 
-```powershell
-cd D:\HomeBudgetAI
- dotnet restore .\HomeBudgetAPI\HomeBudgetAPI.csproj
- dotnet run --project .\HomeBudgetAPI\HomeBudgetAPI.csproj
-```
+The Angular development server normally runs at `http://localhost:4200`.
 
-Local URLs:
+## Configuration
 
-- Frontend: `http://localhost:4200`
-- API: `http://localhost:5033`
-- Swagger: `http://localhost:5033/swagger`
+Use `.env.example` as the template for environment-specific configuration. Keep real secrets, JWT keys, passwords, and production connection strings out of Git.
 
-Default demo login:
+Typical configuration includes:
 
-- Email: `demo@homebudget.ai`
-- Password: `Demo@12345`
+- Database provider
+- Database connection string
+- JWT key, issuer, and audience
+- Allowed CORS origins
+- Demo-data configuration
 
-## Environment Variables
+## API
 
-Copy `.env.example` and configure the API/database values for your environment. Required backend values:
+The backend exposes REST endpoints for authentication, transactions, budgets, goals, reports, notifications, settings, and profile management.
 
-- `DatabaseProvider`: `Sqlite` for local development, or `SqlServer` for SQL Server-backed runs
-- `ConnectionStrings__DefaultConnection`
-- `Jwt__Key`
-- `Jwt__Issuer`
-- `Jwt__Audience`
-- `Cors__AllowedOrigins__0`
-- `SeedDemoData`
+Use Swagger while running the API to explore the current endpoint definitions and request/response models.
 
-## API Overview
+## Live Links
 
-Swagger is available at `/swagger` when the API is running.
-
-Primary endpoints:
-
-- `POST /api/Auth/register`, `POST /api/Auth/login`, `POST /api/Auth/refresh`, `GET /api/Auth/me`
-- `GET/POST/PUT/DELETE /api/Transactions`
-- `GET/POST/PUT/DELETE /api/Budgets`
-- `GET/POST/PUT /api/Goals`
-- `GET /api/Reports/summary`, `GET /api/Reports/export`
-- `GET /api/Notifications`, `POST /api/Notifications/{id}/read`
-- `GET/PUT /api/Settings`
-- `GET/PUT /api/Profile`, `POST /api/Profile/change-password`
-
-## Deployment
-
-### Netlify
-
-`netlify.toml` builds from `homebudget-ui`:
-
-```toml
-[build]
-  base = "homebudget-ui"
-  command = "npm ci && npm run build -- --configuration production"
-  publish = "dist/homebudget-ui/browser"
-```
-
-### Render
-
-`render.yaml` deploys `HomeBudgetAPI` with Docker, PostgreSQL provider, JWT environment values, and `/api/health` health checks.
+- **Application:** https://wondrous-khapse-cc5b19.netlify.app
+- **Swagger API:** https://homebudgetai-fullstack-2.onrender.com/swagger
 
 ## Screenshots
 
-Add production screenshots after deployment:
+Screenshots can be added here to demonstrate the main user experience, including:
 
 - Landing page
-- Login/register
+- Authentication
 - Dashboard
 - Transactions
-- Budgets
+- Budgets and goals
 - Reports
-- Mobile workspace
+- Mobile layout
 
-## Contributing
+## Development Notes
 
-1. Create a feature branch.
-2. Keep frontend work in `homebudget-ui` and backend work in `HomeBudgetAPI`.
-3. Run Angular production build and .NET Release build before opening a PR.
-4. Include screenshots for UI changes and notes for API/database changes.
+- Keep frontend changes inside `homebudget-ui`.
+- Keep API changes inside `HomeBudgetAPI`.
+- Do not commit generated folders such as `node_modules`, `dist`, `bin`, or `obj`.
+- Do not commit `.env` files or real credentials.
+- Run the frontend production build and .NET build before publishing significant changes.
 
 ## License
 
-MIT. See `LICENSE` if present, or add the standard MIT license text before publishing as an open-source project.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
