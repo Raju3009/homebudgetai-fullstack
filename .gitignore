@@ -1,4 +1,4 @@
-﻿# Angular
+# Angular
 node_modules/
 dist/
 .angular/
@@ -6,12 +6,10 @@ dist/
 # .NET
 bin/
 obj/
+.vs/
 HomeBudgetAPI/App_Data/
 HomeBudgetAPI/*.db
 HomeBudgetAPI/*.db-*
-
-# Visual Studio
-.vs/
 
 # VS Code
 .vscode/
@@ -20,5 +18,11 @@ HomeBudgetAPI/*.db-*
 *.log
 api-smoke.pid
 
-# Environment
+# Environment and secrets
 .env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
