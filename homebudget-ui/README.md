@@ -1,20 +1,16 @@
-# Katkuri Raju Portfolio and HomeBudgetAI Frontend
+# HomeBudgetAI Frontend
 
-This Angular application now serves as a professional developer portfolio for **Katkuri Raju** and keeps the HomeBudgetAI finance application available behind the protected app routes.
+This Angular application serves the HomeBudgetAI personal finance product. The default `/` route loads the product landing page, while the developer portfolio remains available under `/portfolio` if needed for project showcases.
 
-## Portfolio Overview
+## HomeBudgetAI Overview
 
-The default `/` route is a premium, recruiter-focused full-stack developer portfolio built with Angular standalone components. It highlights:
+The default `/` route is the HomeBudgetAI marketing and product landing experience. It highlights:
 
-- Hero section with resume, GitHub, LinkedIn, and contact actions.
-- About section written for fresher full-stack developer roles.
-- Skills grouped by frontend, backend, database, and tools.
-- Featured HomeBudgetAI project with live demo, GitHub link, tech badges, architecture highlights, and screenshot placeholders.
-- Project filtering for full-stack, backend, and frontend work.
-- Experience and learning journey timeline.
-- Education and certification sections from the resume.
-- Contact form that opens an email draft to `rajkatkuri05@gmail.com`.
-- Dark/light mode toggle, glassmorphism cards, smooth animations, responsive mobile layouts, and SEO metadata.
+- Premium fintech-style landing page for a personal finance command center.
+- Budget, spending, analytics, and AI finance messaging.
+- Secure login and registration entry points for the authenticated app.
+- Protected app routes for dashboard, transactions, budgets, reports, activity, settings, and profile.
+- Responsive UI, dark mode support, and production-ready SaaS styling.
 
 ## Main Project Featured
 
@@ -47,11 +43,11 @@ Highlighted features:
 
 ## Important Routes
 
-- `/` - Katkuri Raju developer portfolio
+- `/` - HomeBudgetAI landing page
+- `/portfolio` - Developer portfolio (preserved for reference)
 - `/login` - HomeBudgetAI login
 - `/register` - HomeBudgetAI registration
 - `/app/dashboard` - Protected HomeBudgetAI app dashboard
-- `/resume/Katkuri_Raju_Resume.pdf` - Resume download asset
 
 ## Local Development
 

@@ -5,11 +5,21 @@ import { authGuard } from './core/auth-guard';
 export const routes: Routes = [
 
   // =========================
-  // LANDING
+  // HOMEBUDGETAI LANDING
   // =========================
 
   {
     path: '',
+
+    loadComponent: () =>
+
+      import('./pages/landing/landing.component')
+        .then(m => m.LandingComponent)
+  },
+
+  // PRESERVE THE PORTFOLIO AS A SEPARATE ROUTE INSTEAD OF SERVING IT AT THE ROOT
+  {
+    path: 'portfolio',
 
     loadComponent: () =>
 
