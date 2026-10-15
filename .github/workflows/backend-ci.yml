@@ -5,11 +5,15 @@ on:
     branches: [ main ]
     paths:
       - 'HomeBudgetAPI/**'
+      - 'HomeBudgetAPI.Tests/**'
+      - 'homebudgetai-fullstack.sln'
       - '.github/workflows/backend-ci.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'HomeBudgetAPI/**'
+      - 'HomeBudgetAPI.Tests/**'
+      - 'homebudgetai-fullstack.sln'
       - '.github/workflows/backend-ci.yml'
   workflow_dispatch:
 
@@ -26,10 +30,13 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore
-        run: dotnet restore HomeBudgetAPI/HomeBudgetAPI.csproj
+        run: dotnet restore homebudgetai-fullstack.sln
 
       - name: Build
-        run: dotnet build HomeBudgetAPI/HomeBudgetAPI.csproj -c Release --no-restore
+        run: dotnet build homebudgetai-fullstack.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test homebudgetai-fullstack.sln -c Release --no-build
 
       - name: Docker build
         working-directory: HomeBudgetAPI

@@ -1,45 +1,21 @@
 {
-  "name": "homebudget-ui",
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "ng": "npm --prefix homebudget-ui run ng",
-    "start": "npm --prefix homebudget-ui start",
-    "build": "npm --prefix homebudget-ui run build",
-    "watch": "npm --prefix homebudget-ui run watch",
-    "test": "npm --prefix homebudget-ui test",
-    "serve:ssr:homebudget-ui": "npm --prefix homebudget-ui run serve:ssr:homebudget-ui"
-  },
+  "name": "homebudgetai-fullstack",
+  "version": "1.0.0",
   "private": true,
-  "packageManager": "npm@11.6.0",
-  "dependencies": {
-    "@angular/common": "^21.2.0",
-    "@angular/compiler": "^21.2.0",
-    "@angular/core": "^21.2.0",
-    "@angular/forms": "^21.2.0",
-    "@angular/platform-browser": "^21.2.0",
-    "@angular/platform-server": "^21.2.0",
-    "@angular/router": "^21.2.0",
-    "@angular/ssr": "^21.2.7",
-    "bootstrap": "^5.3.8",
-    "chart.js": "^4.5.1",
-    "express": "^5.1.0",
-    "rxjs": "~7.8.0",
-    "tslib": "^2.3.0"
+  "type": "module",
+  "engines": {
+    "node": ">=20.19.0"
   },
-  "devDependencies": {
-    "@angular/build": "^21.2.7",
-    "@angular/cli": "^21.2.7",
-    "@angular/compiler-cli": "^21.2.0",
-    "@types/express": "^5.0.1",
-    "@types/jasmine": "^6.0.0",
-    "@types/node": "^20.17.19",
-    "autoprefixer": "^10.5.0",
-    "jsdom": "^28.0.0",
-    "postcss": "^8.5.13",
-    "prettier": "^3.8.1",
-    "tailwindcss": "^3.4.19",
-    "typescript": "~5.9.2",
-    "vitest": "^4.0.8"
+  "packageManager": "npm@11.6.0",
+  "scripts": {
+    "dev": "npm --prefix frontend-react run dev",
+    "start": "npm --prefix frontend-react run dev",
+    "build": "npm --prefix frontend-react run build",
+    "preview": "npm --prefix frontend-react run preview",
+    "lint": "npm --prefix frontend-react run lint",
+    "test": "npm --prefix frontend-react run test",
+    "legacy:dev": "npm --prefix homebudget-ui start",
+    "legacy:build": "npm --prefix homebudget-ui run build",
+    "legacy:test": "npm --prefix homebudget-ui test"
   }
 }
