@@ -30,12 +30,12 @@ public class BudgetsController : ControllerBase
             .Select(x => new { x.Date, x.Category, x.Amount })
             .ToListAsync();
         var spentByMonthAndCategory = spendingRows
-            .GroupBy(x => (x.Date.Year, x.Date.Month, x.Category))
+            .GroupBy(x => (x.Date.Year, x.Date.Month, Category: x.Category.ToUpperInvariant()))
             .ToDictionary(x => x.Key, x => x.Sum(v => v.Amount));
 
         return budgets.Select(budget =>
         {
-            var key = (budget.Month.Year, budget.Month.Month, budget.Category);
+            var key = (budget.Month.Year, budget.Month.Month, Category: budget.Category.ToUpperInvariant());
             return ToResponse(budget, spentByMonthAndCategory.TryGetValue(key, out var total) ? total : 0);
         }).ToList();
     }
@@ -44,7 +44,9 @@ public class BudgetsController : ControllerBase
     public async Task<ActionResult<BudgetResponse>> Create(BudgetRequest request)
     {
         if (request.LimitAmount <= 0) return BadRequest(new { message = "Budget limit must be greater than zero." });
-        var budget = new Budget { Name = request.Name.Trim(), Category = request.Category.Trim(), LimitAmount = request.LimitAmount, Month = FirstOfMonth(request.Month), AlertThreshold = Math.Clamp(request.AlertThreshold, 1, 100), IsActive = request.IsActive, UserId = UserId };
+        if (request.Month == default) return BadRequest(new { message = "A valid budget month is required." });
+        if (await HasMatchingBudget(request, null)) return Conflict(new { message = "A budget already exists for this category and month." });
+        var budget = new Budget { Name = request.Name.Trim(), Category = request.Category.Trim(), LimitAmount = request.LimitAmount, Month = FirstOfMonth(request.Month), AlertThreshold = request.AlertThreshold, IsActive = request.IsActive, UserId = UserId };
         _db.Budgets.Add(budget);
         await _db.SaveChangesAsync();
         return Ok(ToResponse(budget, 0));
@@ -53,13 +55,16 @@ public class BudgetsController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult<BudgetResponse>> Update(int id, BudgetRequest request)
     {
+        if (request.LimitAmount <= 0) return BadRequest(new { message = "Budget limit must be greater than zero." });
+        if (request.Month == default) return BadRequest(new { message = "A valid budget month is required." });
         var budget = await _db.Budgets.FirstOrDefaultAsync(x => x.Id == id && x.UserId == UserId);
         if (budget is null) return NotFound();
+        if (await HasMatchingBudget(request, id)) return Conflict(new { message = "A budget already exists for this category and month." });
         budget.Name = request.Name.Trim();
         budget.Category = request.Category.Trim();
         budget.LimitAmount = request.LimitAmount;
         budget.Month = FirstOfMonth(request.Month);
-        budget.AlertThreshold = Math.Clamp(request.AlertThreshold, 1, 100);
+        budget.AlertThreshold = request.AlertThreshold;
         budget.IsActive = request.IsActive;
         await _db.SaveChangesAsync();
         return Ok(ToResponse(budget, 0));
@@ -76,6 +81,19 @@ public class BudgetsController : ControllerBase
     }
 
     private int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    private Task<bool> HasMatchingBudget(BudgetRequest request, int? exceptId)
+    {
+        var month = FirstOfMonth(request.Month);
+        var nextMonth = month.AddMonths(1);
+        var category = request.Category.Trim().ToUpperInvariant();
+        var matches = _db.Budgets.Where(x => x.UserId == UserId
+            && x.Month >= month
+            && x.Month < nextMonth
+            && x.Category.ToUpper() == category);
+        if (exceptId.HasValue) matches = matches.Where(x => x.Id != exceptId.Value);
+        return matches.AnyAsync();
+    }
+
     private static DateTime FirstOfMonth(DateTime date) => new(date.Year, date.Month, 1, 0, 0, 0, DateTimeKind.Utc);
     private static BudgetResponse ToResponse(Budget x, decimal spent) => new(x.Id, x.Name, x.Category, x.LimitAmount, spent, x.Month, x.AlertThreshold, x.IsActive);
 }

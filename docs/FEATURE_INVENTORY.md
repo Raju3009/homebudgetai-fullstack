@@ -7,8 +7,8 @@ This inventory describes the supported React frontend in frontend-react/. Implem
 | / landing | Product overview and links to registration/login. | Route smoke returned HTTP 200; visual browser check was unavailable |
 | /portfolio | Portfolio content, local profile/resume assets, theme behavior, and contact email action. | Route and assets returned HTTP 200; interactions not browser-tested |
 | /login | API-backed authentication, password visibility, session handling, and protected-route redirect. | Frontend auth tests and API auth integration checks |
-| /register | Registration through the existing auth API. | API registration integration checks; full browser flow not tested |
-| /forgot-password, /reset-password | API password-reset request and token-based reset form. Email delivery is not configured. | API reset checks; full browser flow not tested |
+| /register | Registration through the existing auth API, with client-side name/email/password checks and duplicate-submit protection. | Registration component tests and API registration integration; local browser render checked, form-to-live-API flow not tested |
+| /forgot-password, /reset-password | Forgot-password page explains that recovery is unavailable until email delivery is configured; reset route remains for valid previously issued tokens. | API returns identical generic 503 responses without leaking tokens or account existence; full recovery flow cannot be exercised until mail delivery exists |
 | /app/dashboard | API-backed balance, income/expense summaries, charts, suggestions, and recent transactions. | Dashboard API and route smoke checks; chart rendering not browser-tested |
 | /app/transactions | Transaction CRUD, search, filters, sorting, pagination, and CSV export. | API CRUD/filter/export checks; full browser workflow not tested |
 | /app/expenses | Expense-filtered transaction workspace using the existing transaction API. | Route and shared transaction API checks |

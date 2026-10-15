@@ -9,25 +9,25 @@ Base path: `/api`. Controllers use ASP.NET Core routing and default camel-case J
 | POST | `/Auth/register` | Anonymous | `{ fullName, email, password }` -> `AuthResponse` with token, refreshToken, user fields and expiry. Duplicate email returns 409; password must be at least 8 chars. |
 | POST | `/Auth/login` | Anonymous | `{ email, password }` -> `AuthResponse`; invalid credentials return 401. |
 | POST | `/Auth/refresh` | Anonymous | `{ refreshToken }` -> new `AuthResponse`; old token is revoked. |
-| POST | `/Auth/forgot-password` | Anonymous | `{ email }` -> message; for a known account, the demo implementation also returns `resetToken` in the body. No email provider is configured. |
-| POST | `/Auth/reset-password` | Anonymous | `{ email, token, newPassword }` -> message; token expires in 30 minutes. |
+| POST | `/Auth/forgot-password` | Anonymous | `{ email }` -> generic 503 message. Email delivery is not configured; no reset token or account-existence signal is returned. |
+| POST | `/Auth/reset-password` | Anonymous | `{ email, token, newPassword }` -> message if a valid, unexpired stored token exists. The application does not currently issue reset tokens because email delivery is unavailable. |
 | GET | `/Auth/me` | Bearer | Current `ProfileResponse`. |
 | GET | `/Dashboard` | Bearer | `DashboardSummary`: income, expenses, balance, savings rate, category totals, monthly totals, six recent transactions, suggestions. |
 | GET | `/Transactions` | Bearer | `q`, `category`, `type`, `from`, `to`, `page`, `pageSize` -> `PagedResponse<TransactionResponse>`. Page size is clamped to 5–100. |
 | POST | `/Transactions` | Bearer | `{ title, category, amount, type, date, notes }` -> created transaction; title/category required and amount > 0. |
 | PUT | `/Transactions/{id}` | Bearer | Same transaction request -> updated row; only current user's row can be changed. |
 | DELETE | `/Transactions/{id}` | Bearer | Current user's row -> 204; missing/foreign row -> 404. |
-| GET | `/Transactions/export` | Bearer | Same filters, CSV attachment; repository call currently requests at most 100 rows. |
+| GET | `/Transactions/export` | Bearer | Same filters, CSV attachment containing all matching rows; text cells are quoted and formula-like values are neutralized. |
 | GET | `/Budgets` | Bearer | Current user's budgets, with expense total for each budget's own calendar month and category. |
-| POST | `/Budgets` | Bearer | `{ name, category, limitAmount, month, alertThreshold, isActive }` -> budget; amount must be > 0. |
-| PUT | `/Budgets/{id}` | Bearer | Same request -> current user's updated budget. |
+| POST | `/Budgets` | Bearer | `{ name, category, limitAmount, month, alertThreshold, isActive }` -> budget; amount must be > 0, threshold 1–100, and duplicate category/month returns 409. |
+| PUT | `/Budgets/{id}` | Bearer | Same validation and duplicate handling -> current user's updated budget. |
 | DELETE | `/Budgets/{id}` | Bearer | Current user's budget -> 204. |
 | GET | `/Goals` | Bearer | Current user's goals ordered by due date. |
-| POST | `/Goals` | Bearer | `{ name, targetAmount, currentAmount, dueDate, color }` -> created goal. |
-| PUT | `/Goals/{id}` | Bearer | Same request -> updated current user's goal. There is no delete route. |
+| POST | `/Goals` | Bearer | `{ name, targetAmount, currentAmount, dueDate, color }` -> created goal; target must be positive and current amount nonnegative. |
+| PUT | `/Goals/{id}` | Bearer | Same validation -> updated current user's goal. There is no delete route. |
 | GET | `/Reports/summary` | Bearer | Query `period` (`monthly` or `yearly`), `month` (`YYYY-MM`), `year` -> `ReportSummary`. Other period values follow the monthly branch. |
 | GET | `/Reports/export` | Bearer | Same query -> CSV attachment. |
-| GET | `/Notifications` | Bearer | Current user's latest 40 `NotificationResponse` rows. Current implementation inserts sample defaults when none exist. |
+| GET | `/Notifications` | Bearer | Current user's latest 40 `NotificationResponse` rows; no placeholder notifications are fabricated. |
 | POST | `/Notifications/{id}/read` | Bearer | Marks current user's notification read -> 204. |
 | GET | `/Settings` | Bearer | Current `UserSettingResponse`; creates defaults when missing. |
 | PUT | `/Settings` | Bearer | `{ currency, language, theme, emailNotifications, pushNotifications, monthlyDigest }` -> saved preferences. |
@@ -72,8 +72,8 @@ Base path: `/api`. Controllers use ASP.NET Core routing and default camel-case J
 ## Security and contract findings
 
 - User-owned transaction, budget, goal, notification, profile, and settings queries scope to the authenticated user ID.
-- `POST /Auth/forgot-password` exposes a reset token in its demo response for known accounts; no production email delivery exists.
-- `appsettings.json` no longer contains a JWT signing value. Configure `Jwt:Key` through .NET user secrets or deployment environment settings; never copy it into React variables or examples.
+- `POST /Auth/forgot-password` returns the same generic 503 response for all valid email addresses until email delivery is configured; it does not expose reset tokens.
+- `Jwt:Key` must be configured with at least 32 UTF-8 bytes, and `Jwt:Issuer` and `Jwt:Audience` must both be non-empty. Configure these through .NET user secrets or deployment environment settings; never copy the key into React variables or examples.
 - Exception middleware returns a generic 500 response with a trace ID while logging details server-side. Database initialization failures now stop startup.
 - JWT lifetimes: access token 12 hours, refresh token 14 days. The React client does not call the refresh endpoint; it handles access-token expiry by clearing the session and returning to login.
 - Password hashes use PBKDF2-SHA256 with 100,000 iterations. Refresh tokens are stored hashed in the database.

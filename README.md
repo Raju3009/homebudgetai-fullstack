@@ -66,7 +66,7 @@ The root .env.example and frontend-react/.env.example contain non-secret example
 | ConnectionStrings__DefaultConnection | Provider-specific connection string |
 | Jwt__Key | Private signing key; use user secrets locally and a secret environment setting in deployment |
 | Jwt__Issuer, Jwt__Audience | JWT validation values |
-| Cors__AllowedOrigins__0 | First allowed frontend origin |
+| Cors__AllowedOrigins__0, Cors__AllowedOrigins__1 | Exact allowed frontend origins (HTTPS in production) |
 | SeedDemoData | Explicitly enable seed data outside development |
 
 ## Checks
@@ -87,7 +87,7 @@ Netlify builds and publishes the React app from frontend-react/. GitHub Pages us
 
 ## Known limitations
 
-- Password reset is a demo flow: the API returns a token for known users and has no email delivery provider.
+- Password recovery is unavailable until an email delivery provider is configured; the API returns a generic error without exposing reset tokens or account existence.
 - Access tokens and user data remain in browser local storage to match the existing bearer-token API.
 - The two-factor control, budget-period selector, report-generated AI recommendations, and static profile activity are not presented as working features because the API does not support them.
 - Savings goals support create/read/update; the API has no delete route.

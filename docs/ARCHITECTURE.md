@@ -55,6 +55,6 @@ The root package.json delegates frontend development, build, lint, and test comm
 ## Security limits
 
 - Browser-stored bearer tokens can be read by injected scripts.
-- Forgot password returns a reset token in the API response and has no email delivery provider.
+- Forgot password returns a generic 503 until an email delivery provider is configured; no reset token is returned.
 - The two-factor control has no backend implementation.
 - PostgreSQL provider selection is implemented, but deployed connectivity and schema compatibility require environment-specific verification.

@@ -243,6 +243,23 @@ var jwtKey =
     ?? throw new InvalidOperationException(
         "Jwt:Key is not configured."
     );
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtAudience = builder.Configuration["Jwt:Audience"];
+
+if (Encoding.UTF8.GetByteCount(jwtKey) < 32)
+{
+  throw new InvalidOperationException(
+      "Jwt:Key must contain at least 32 bytes."
+  );
+}
+
+if (string.IsNullOrWhiteSpace(jwtIssuer)
+    || string.IsNullOrWhiteSpace(jwtAudience))
+{
+  throw new InvalidOperationException(
+      "Jwt:Issuer and Jwt:Audience must be configured."
+  );
+}
 
 builder.Services
     .AddAuthentication(
@@ -258,11 +275,9 @@ builder.Services
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
 
-            ValidIssuer =
-                  builder.Configuration["Jwt:Issuer"],
+            ValidIssuer = jwtIssuer,
 
-            ValidAudience =
-                  builder.Configuration["Jwt:Audience"],
+            ValidAudience = jwtAudience,
 
             IssuerSigningKey =
                   new SymmetricSecurityKey(

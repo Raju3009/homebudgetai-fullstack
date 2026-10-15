@@ -12,7 +12,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "test": "vitest run",
+    "test": "vitest run && vitest run scripts/validate-production-api-url.test.js",
     "test:watch": "vitest"
   },
   "dependencies": {

@@ -31,10 +31,12 @@ export default function DashboardPage() {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [supplementalError, setSupplementalError] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
+    setSupplementalError('');
     try {
       const [summaryResult, budgetsResult, goalsResult] = await Promise.allSettled([
         financeApi.dashboard(),
@@ -45,6 +47,10 @@ export default function DashboardPage() {
       setSummary(summaryResult.value.data);
       setBudgets(budgetsResult.status === 'fulfilled' ? budgetsResult.value.data || [] : []);
       setGoals(goalsResult.status === 'fulfilled' ? goalsResult.value.data || [] : []);
+      const supplementalFailures = [];
+      if (budgetsResult.status === 'rejected') supplementalFailures.push(`Budgets: ${apiErrorMessage(budgetsResult.reason, 'could not be loaded')}`);
+      if (goalsResult.status === 'rejected') supplementalFailures.push(`Savings goals: ${apiErrorMessage(goalsResult.reason, 'could not be loaded')}`);
+      setSupplementalError(supplementalFailures.join(' '));
     } catch (requestError) {
       setError(apiErrorMessage(requestError, 'Dashboard data could not be loaded.'));
     } finally {
@@ -81,6 +87,8 @@ export default function DashboardPage() {
         description="Your cash flow and spending overview, using activity recorded in your account."
         actions={<Link className="btn-primary" to="/app/transactions"><Plus size={17} /> Add transaction</Link>}
       />
+
+      {supplementalError && <div className="inline-error" role="alert">{supplementalError} Overview totals are available, but this section may be incomplete. <button className="btn-secondary" type="button" onClick={load}>Retry</button></div>}
 
       <section className="summary-grid" aria-label="Financial summary">
         <article className="metric summary-card balance-card">

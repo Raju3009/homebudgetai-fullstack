@@ -22,6 +22,10 @@ public class GoalsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<GoalResponse>> Create(GoalRequest request)
     {
+        if (string.IsNullOrWhiteSpace(request.Name)) return BadRequest(new { message = "Goal name is required." });
+        if (request.TargetAmount <= 0) return BadRequest(new { message = "Target amount must be greater than zero." });
+        if (request.CurrentAmount < 0) return BadRequest(new { message = "Current savings cannot be negative." });
+        if (request.DueDate == default) return BadRequest(new { message = "A valid goal date is required." });
         var goal = new FinancialGoal { Name = request.Name.Trim(), TargetAmount = request.TargetAmount, CurrentAmount = request.CurrentAmount, DueDate = request.DueDate, Color = request.Color, UserId = UserId };
         _db.FinancialGoals.Add(goal);
         await _db.SaveChangesAsync();
@@ -31,6 +35,10 @@ public class GoalsController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult<GoalResponse>> Update(int id, GoalRequest request)
     {
+        if (string.IsNullOrWhiteSpace(request.Name)) return BadRequest(new { message = "Goal name is required." });
+        if (request.TargetAmount <= 0) return BadRequest(new { message = "Target amount must be greater than zero." });
+        if (request.CurrentAmount < 0) return BadRequest(new { message = "Current savings cannot be negative." });
+        if (request.DueDate == default) return BadRequest(new { message = "A valid goal date is required." });
         var goal = await _db.FinancialGoals.FirstOrDefaultAsync(x => x.Id == id && x.UserId == UserId);
         if (goal is null) return NotFound();
         goal.Name = request.Name.Trim(); goal.TargetAmount = request.TargetAmount; goal.CurrentAmount = request.CurrentAmount; goal.DueDate = request.DueDate; goal.Color = request.Color;

@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using HomeBudgetAPI.Data;
+using HomeBudgetAPI.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -129,6 +130,42 @@ public sealed class ApiWorkflowTests
     }
 
     [Fact]
+    public async Task Transaction_export_includes_all_rows_and_neutralizes_formula_fields()
+    {
+        using var factory = new ApiFactory();
+        using var client = factory.CreateClient();
+        var user = await Register(client, "export@example.com");
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", user.Token);
+
+        using (var scope = factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var dbUser = await db.Users.SingleAsync(x => x.Email == user.Email);
+            db.Transactions.AddRange(Enumerable.Range(0, 105).Select(index => new BudgetTransaction
+            {
+                Title = index == 0 ? "=1+1" : $"Transaction {index}",
+                Category = index == 0 ? "Food,Home" : "Food",
+                Amount = index + 1,
+                Type = TransactionType.Expense,
+                Date = DateTime.UtcNow.AddDays(-index),
+                Notes = index == 0 ? "+SUM(1,1)" : null,
+                UserId = dbUser.Id
+            }));
+            await db.SaveChangesAsync();
+        }
+
+        using var response = await client.GetAsync("/api/Transactions/export?type=Expense");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var csv = await response.Content.ReadAsStringAsync();
+        var rows = csv.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+        Assert.Equal(106, rows.Length);
+        Assert.Contains("\"Food,Home\"", csv);
+        Assert.Contains("\"'=1+1\"", csv);
+        Assert.Contains("\"'+SUM(1,1)\"", csv);
+        Assert.Contains(rows, row => row.Contains("\"Transaction 104\",105", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public async Task Budget_spent_amount_matches_the_budget_month()
     {
         using var factory = new ApiFactory();
@@ -141,12 +178,23 @@ public sealed class ApiWorkflowTests
         await AddExpense(client, "Groceries last month", 40m, priorMonth.AddDays(5));
         await AddExpense(client, "Groceries this month", 90m, currentMonth.AddDays(5));
         await CreateBudget(client, "Last month", priorMonth, 300m);
-        await CreateBudget(client, "This month", currentMonth, 400m);
+        await CreateBudget(client, "This month", currentMonth, 400m, "food");
 
         var budgets = await client.GetFromJsonAsync<List<BudgetPayload>>("/api/Budgets");
         Assert.NotNull(budgets);
         Assert.Equal(40m, budgets.Single(x => x.Name == "Last month").SpentAmount);
         Assert.Equal(90m, budgets.Single(x => x.Name == "This month").SpentAmount);
+
+        using var duplicate = await client.PostAsJsonAsync("/api/Budgets", new
+        {
+            name = "Duplicate food budget",
+            category = "FOOD",
+            limitAmount = 500m,
+            month = currentMonth,
+            alertThreshold = 80,
+            isActive = true
+        });
+        Assert.Equal(HttpStatusCode.Conflict, duplicate.StatusCode);
     }
 
     [Fact]
@@ -156,6 +204,16 @@ public sealed class ApiWorkflowTests
         using var client = factory.CreateClient();
         var user = await Register(client, "goal@example.com");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", user.Token);
+
+        using var invalidGoal = await client.PostAsJsonAsync("/api/Goals", new
+        {
+            name = "Invalid goal",
+            targetAmount = 0m,
+            currentAmount = 0m,
+            dueDate = DateTime.UtcNow.AddMonths(4),
+            color = "#10b981"
+        });
+        Assert.Equal(HttpStatusCode.BadRequest, invalidGoal.StatusCode);
 
         using var created = await client.PostAsJsonAsync("/api/Goals", new
         {
@@ -185,27 +243,23 @@ public sealed class ApiWorkflowTests
     }
 
     [Fact]
-    public async Task Demo_password_reset_token_resets_the_password_and_allows_login()
+    public async Task Password_recovery_does_not_disclose_tokens_or_account_existence()
     {
         using var factory = new ApiFactory();
         using var client = factory.CreateClient();
         await Register(client, "reset@example.com");
 
-        using var forgot = await client.PostAsJsonAsync("/api/Auth/forgot-password", new { email = "reset@example.com" });
-        Assert.Equal(HttpStatusCode.OK, forgot.StatusCode);
-        var resetDetails = await forgot.Content.ReadFromJsonAsync<ForgotPasswordPayload>();
-        Assert.False(string.IsNullOrWhiteSpace(resetDetails?.ResetToken));
+        using var knownAccount = await client.PostAsJsonAsync("/api/Auth/forgot-password", new { email = "reset@example.com" });
+        using var unknownAccount = await client.PostAsJsonAsync("/api/Auth/forgot-password", new { email = "unknown@example.com" });
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, knownAccount.StatusCode);
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, unknownAccount.StatusCode);
+        var knownBody = await knownAccount.Content.ReadAsStringAsync();
+        var unknownBody = await unknownAccount.Content.ReadAsStringAsync();
+        Assert.Equal(knownBody, unknownBody);
+        Assert.DoesNotContain("resetToken", knownBody, StringComparison.OrdinalIgnoreCase);
 
-        using var reset = await client.PostAsJsonAsync("/api/Auth/reset-password", new
-        {
-            email = "reset@example.com",
-            token = resetDetails!.ResetToken,
-            newPassword = "UpdatedPassword2!"
-        });
-        Assert.Equal(HttpStatusCode.OK, reset.StatusCode);
-
-        using var login = await client.PostAsJsonAsync("/api/Auth/login", new { email = "reset@example.com", password = "UpdatedPassword2!" });
-        Assert.Equal(HttpStatusCode.OK, login.StatusCode);
+        using var invalidEmail = await client.PostAsJsonAsync("/api/Auth/forgot-password", new { email = "invalid-email" });
+        Assert.Equal(HttpStatusCode.BadRequest, invalidEmail.StatusCode);
     }
 
     [Fact]
@@ -308,6 +362,8 @@ public sealed class ApiWorkflowTests
             newPassword = "ReplacementPassword2!"
         });
         Assert.Equal(HttpStatusCode.OK, changePassword.StatusCode);
+        using var revokedRefresh = await client.PostAsJsonAsync("/api/Auth/refresh", new { refreshToken = user.RefreshToken });
+        Assert.Equal(HttpStatusCode.Unauthorized, revokedRefresh.StatusCode);
         using var newLogin = await client.PostAsJsonAsync("/api/Auth/login", new { email = user.Email, password = "ReplacementPassword2!" });
         Assert.Equal(HttpStatusCode.OK, newLogin.StatusCode);
 
@@ -341,12 +397,12 @@ public sealed class ApiWorkflowTests
         response.EnsureSuccessStatusCode();
     }
 
-    private static async Task CreateBudget(HttpClient client, string name, DateTime month, decimal limitAmount)
+    private static async Task CreateBudget(HttpClient client, string name, DateTime month, decimal limitAmount, string category = "Food")
     {
         using var response = await client.PostAsJsonAsync("/api/Budgets", new
         {
             name,
-            category = "Food",
+            category,
             limitAmount,
             month,
             alertThreshold = 80,
@@ -364,7 +420,6 @@ public sealed class ApiWorkflowTests
     private sealed record NotificationPayload(int Id, string Title, string Message, string Type, bool IsRead, DateTime CreatedAt);
     private sealed record SettingsPayload(string Currency, string Language, string Theme, bool EmailNotifications, bool PushNotifications, bool MonthlyDigest);
     private sealed record ProfilePayload(int Id, string FullName, string Email, string Role, string? AvatarUrl);
-    private sealed record ForgotPasswordPayload(string Message, string? ResetToken);
 
     private sealed class ApiFactory : WebApplicationFactory<Program>
     {
@@ -373,21 +428,14 @@ public sealed class ApiWorkflowTests
         public ApiFactory()
         {
             _connection.Open();
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production");
-            Environment.SetEnvironmentVariable("DatabaseProvider", "Sqlite");
-            Environment.SetEnvironmentVariable("ConnectionStrings__DefaultConnection", "Data Source=:memory:");
-            Environment.SetEnvironmentVariable("Jwt__Key", "integration-tests-only-signing-key-with-more-than-32-bytes");
-            Environment.SetEnvironmentVariable("Jwt__Issuer", "HomeBudgetAI.Tests");
-            Environment.SetEnvironmentVariable("Jwt__Audience", "HomeBudgetAI.Tests");
-            Environment.SetEnvironmentVariable("Cors__AllowedOrigins__0", NetlifyOrigin);
-            Environment.SetEnvironmentVariable("Cors__AllowedOrigins__1", GitHubPagesOrigin);
-            Environment.SetEnvironmentVariable("SeedDemoData", "false");
-            Environment.SetEnvironmentVariable("UseHttpsRedirection", "false");
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("Production");
+            builder.UseSetting("Jwt:Key", "integration-tests-only-signing-key-with-more-than-32-bytes");
+            builder.UseSetting("Jwt:Issuer", "HomeBudgetAI.Tests");
+            builder.UseSetting("Jwt:Audience", "HomeBudgetAI.Tests");
             builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["DatabaseProvider"] = "Sqlite",

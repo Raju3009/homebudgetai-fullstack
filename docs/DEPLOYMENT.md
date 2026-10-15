@@ -8,7 +8,7 @@ The Vite application lives in `frontend-react/`.
 
 - **Production API:** `https://homebudgetai-fullstack-2.onrender.com/api` (Render health endpoint verified at `/api/health`).
 - **React frontend origins currently served:** `https://wondrous-khapse-cc5b19.netlify.app` and `https://raju3009.github.io` (the GitHub Pages app path is `/homebudgetai-fullstack/`).
-- **Vercel:** `vercel.json` builds the React app. A prior live check on 2026-10-15 found `https://homebudgetai-fullstack.vercel.app` serving a legacy Angular deployment. This is historical external-host state; no Angular application source or build configuration is retained in this repository. The origin is not in the API CORS allowlist until a React deployment is verified.
+- **Vercel:** `vercel.json` builds the React app. A live check on 2026-10-15 found `https://homebudgetai-fullstack.vercel.app` serving a React document and bundles, but the bundle did not expose the intended Render API URL. Its usable API configuration is unverified, so the origin is not in the API CORS allowlist.
 
 - **Netlify:** `netlify.toml` sets `frontend-react` as the base, runs `npm ci && npm run build`, publishes `dist`, and rewrites client routes to `index.html`.
 - **GitHub Pages:** `.github/workflows/frontend-pages.yml` builds with base `/homebudgetai-fullstack/`, copies the app entry point to `404.html` for client-route refreshes, and deploys only on pushes to `main` or a manual workflow dispatch.
@@ -20,9 +20,9 @@ Render's `Cors__AllowedOrigins__0` and `Cors__AllowedOrigins__1` are the exact N
 
 ### Live deployment status checked on 2026-10-15
 
-- Render `/api/health` responds with HTTP 200, but its live OPTIONS responses currently omit `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods`, and `Access-Control-Allow-Headers`. The CORS repair in this branch has not been deployed to Render.
-- The live Netlify and GitHub Pages React bundles currently contain `http://localhost:5033/api`. They need new builds from this branch before browser API calls can use Render. The production build guard now rejects a missing or incorrect API URL.
-- The Vercel alias was observed serving the legacy UI at the time of this check. It is not part of the React origin allowlist; re-check the host after deployment before adding it.
+- Render `/api/health` responds with HTTP 200. An OPTIONS request from each configured frontend origin for `POST` with `Authorization, Content-Type` returned HTTP 204 but omitted `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods`, and `Access-Control-Allow-Headers`. The CORS repair in this branch has not been deployed to Render.
+- The live Netlify and GitHub Pages React bundles currently contain `http://localhost:5033/api`. They need new builds from this branch before browser API calls can use Render. The production build guard rejects a missing or incorrect API URL.
+- The Vercel alias serves React assets, but its API target has not been verified. It is not part of the React origin allowlist; add it only after configuring and verifying the deployment.
 - Recheck the actual deployed frontend bundles and API response headers after the host settings are applied and deployments complete. A successful health response alone does not verify browser CORS.
 
 ## API and database
