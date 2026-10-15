@@ -107,6 +107,15 @@ var connectionString =
 var databaseProvider =
     builder.Configuration["DatabaseProvider"]
     ?? "Sqlite";
+var isSqlite = databaseProvider.Equals(
+    "Sqlite",
+    StringComparison.OrdinalIgnoreCase);
+var isPostgreSql = databaseProvider.Equals(
+        "PostgreSQL",
+        StringComparison.OrdinalIgnoreCase)
+    || databaseProvider.Equals(
+        "Postgres",
+        StringComparison.OrdinalIgnoreCase);
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
@@ -117,24 +126,38 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-  if (databaseProvider.Equals(
-          "Sqlite",
-          StringComparison.OrdinalIgnoreCase))
+  if (isSqlite)
   {
     options.UseSqlite(connectionString);
     return;
   }
 
-  options.UseSqlServer(
-    connectionString,
-    sqlServerOptions =>
-    {
-      sqlServerOptions.EnableRetryOnFailure(
+  if (isPostgreSql)
+  {
+    options.UseNpgsql(
+        connectionString,
+        postgresOptions => postgresOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorCodesToAdd: null
+        ));
+    return;
+  }
+
+  if (databaseProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase)
+      || databaseProvider.Equals("SQL Server", StringComparison.OrdinalIgnoreCase))
+  {
+    options.UseSqlServer(
+      connectionString,
+      sqlServerOptions => sqlServerOptions.EnableRetryOnFailure(
           maxRetryCount: 5,
           maxRetryDelay: TimeSpan.FromSeconds(30),
-          errorNumbersToAdd: null
-      );
-    });
+          errorNumbersToAdd: null));
+    return;
+  }
+
+  throw new InvalidOperationException(
+      $"Unsupported DatabaseProvider '{databaseProvider}'. Use Sqlite, PostgreSQL, or SqlServer.");
 });
 
 // =========================
@@ -147,20 +170,17 @@ builder.Services.AddCors(options =>
       builder.Configuration
           .GetSection("Cors:AllowedOrigins")
           .Get<string[]>()
-      ?? new[]
-      {
-        "http://localhost:4200",
-        "http://127.0.0.1:4200"
-      };
+      ?? (builder.Environment.IsDevelopment()
+          ? new[] { "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4200", "http://127.0.0.1:4200" }
+          : Array.Empty<string>());
 
-  options.AddPolicy("AllowAngular",
+  options.AddPolicy("AllowFrontend",
       policy =>
       {
         policy
               .WithOrigins(allowedOrigins)
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowAnyMethod();
       });
 });
 
@@ -299,7 +319,7 @@ if (builder.Configuration.GetValue<bool>("UseHttpsRedirection"))
   app.UseHttpsRedirection();
 }
 
-app.UseCors("AllowAngular");
+app.UseCors("AllowFrontend");
 
 app.UseRateLimiter();
 
@@ -323,10 +343,10 @@ try
       scope.ServiceProvider
           .GetRequiredService<AppDbContext>();
 
-  if (databaseProvider.Equals(
-          "Sqlite",
-          StringComparison.OrdinalIgnoreCase))
+  if (isSqlite || isPostgreSql)
   {
+    // SQLite and PostgreSQL are initialized without running the SQL Server-shaped
+    // migration set. EnsureCreated never drops or alters an existing database.
     await db.Database.EnsureCreatedAsync();
   }
   else
@@ -349,9 +369,8 @@ try
 }
 catch (Exception ex)
 {
-  Console.WriteLine(
-      $"Database Migration Error: {ex.Message}"
-  );
+  app.Logger.LogCritical(ex, "Database initialization failed.");
+  throw;
 }
 
 // =========================

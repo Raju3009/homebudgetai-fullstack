@@ -21,15 +21,23 @@ public class BudgetsController : ControllerBase
     {
         var userId = UserId;
         var budgets = await _db.Budgets.Where(x => x.UserId == userId).OrderByDescending(x => x.Month).ThenBy(x => x.Category).ToListAsync();
-        var start = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+        if (budgets.Count == 0) return Array.Empty<BudgetResponse>();
+
+        var firstMonth = budgets.Min(x => new DateTime(x.Month.Year, x.Month.Month, 1, 0, 0, 0, DateTimeKind.Utc));
+        var afterLastMonth = budgets.Max(x => new DateTime(x.Month.Year, x.Month.Month, 1, 0, 0, 0, DateTimeKind.Utc)).AddMonths(1);
         var spendingRows = await _db.Transactions
-            .Where(x => x.UserId == userId && x.Type == TransactionType.Expense && x.Date >= start)
-            .Select(x => new { x.Category, x.Amount })
+            .Where(x => x.UserId == userId && x.Type == TransactionType.Expense && x.Date >= firstMonth && x.Date < afterLastMonth)
+            .Select(x => new { x.Date, x.Category, x.Amount })
             .ToListAsync();
-        var spent = spendingRows
-            .GroupBy(x => x.Category)
+        var spentByMonthAndCategory = spendingRows
+            .GroupBy(x => (x.Date.Year, x.Date.Month, x.Category))
             .ToDictionary(x => x.Key, x => x.Sum(v => v.Amount));
-        return budgets.Select(x => ToResponse(x, spent.TryGetValue(x.Category, out var total) ? total : 0)).ToList();
+
+        return budgets.Select(budget =>
+        {
+            var key = (budget.Month.Year, budget.Month.Month, budget.Category);
+            return ToResponse(budget, spentByMonthAndCategory.TryGetValue(key, out var total) ? total : 0);
+        }).ToList();
     }
 
     [HttpPost]

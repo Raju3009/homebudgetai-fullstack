@@ -33,8 +33,7 @@ namespace HomeBudgetAPI.Middleware
         var response = new
         {
           statusCode = context.Response.StatusCode,
-          message = ex.Message,
-          details = ex.InnerException?.Message,
+          message = "An unexpected error occurred. Please try again.",
           traceId = context.TraceIdentifier
         };
 
