@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ArrowDownToLine, ArrowUpDown, Plus, Search, Trash2 } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { transactionsApi } from '../api/transactions';
 import { apiErrorMessage } from '../api/client';
 import { EmptyState } from '../components/PageState';
+import PageHeader from '../components/PageHeader';
 import { formatCurrency, formatDate, dateInputValue, dateOnlyToUtc } from '../utils/format';
 import { useToast } from '../context/ToastContext';
 
@@ -27,7 +29,7 @@ export default function TransactionWorkspace({ expenseOnly = false }) {
   const [sort, setSort] = useState({ key: 'date', direction: 'desc' });
 
   useEffect(() => {
-    // Keep the search form synchronized with navigation from the app header.
+    // Keep the filter form in sync with search submitted from the app header.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDraft((current) => ({ ...current, q: routeQuery }));
     setFilters((current) => ({ ...current, q: routeQuery }));
@@ -48,7 +50,7 @@ export default function TransactionWorkspace({ expenseOnly = false }) {
       setPage(Number(data.page) || requestedPage);
     } catch (requestError) {
       if (signal?.aborted || requestError.code === 'ERR_CANCELED') return;
-      setError(apiErrorMessage(requestError, `Unable to load ${expenseOnly ? 'expenses' : 'transactions'}.`));
+      setError(apiErrorMessage(requestError, 'Unable to load account activity.'));
     } finally {
       if (!signal?.aborted) setLoading(false);
     }
@@ -56,7 +58,7 @@ export default function TransactionWorkspace({ expenseOnly = false }) {
 
   useEffect(() => {
     const controller = new AbortController();
-    // The effect starts an abortable external data request; the loader owns its state.
+    // The effect starts an abortable external request; the loader owns its loading state.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     load(page, controller.signal);
     return () => controller.abort();
@@ -149,35 +151,57 @@ export default function TransactionWorkspace({ expenseOnly = false }) {
   }
 
   const title = expenseOnly ? 'Expenses' : 'Transactions';
+  const description = expenseOnly
+    ? 'Review and manage expense records with category and date filters.'
+    : 'Search, organize, and update income and expense activity.';
 
   return (
-    <section className="workspace premium-page">
-      <form className="panel editor" onSubmit={save}>
-        <div className="section-head"><div><h2>{editingId ? `Edit ${expenseOnly ? 'expense' : 'transaction'}` : `Add ${expenseOnly ? 'expense' : 'transaction'}`}</h2><p>Record an income or expense in your account.</p></div><span className="badge">Secure form</span></div>
-        <label>Title<input name="title" required maxLength={160} value={form.title} onChange={updateForm} placeholder="Groceries, salary, rent" /></label>
-        <label>Category<input name="category" required maxLength={80} list="transaction-categories" value={form.category} onChange={updateForm} placeholder="Food" /><datalist id="transaction-categories">{categoryChoices.map((category) => <option value={category} key={category} />)}</datalist></label>
-        <div className="form-row"><label>Amount<input name="amount" type="number" required min="0.01" step="0.01" value={form.amount} onChange={updateForm} /></label>{!expenseOnly && <label>Type<select name="type" value={form.type} onChange={updateForm}><option value="Expense">Expense</option><option value="Income">Income</option></select></label>}</div>
-        <label>Date<input name="date" type="date" required value={form.date} onChange={updateForm} /></label>
-        <label>Notes<textarea name="notes" maxLength={500} value={form.notes} onChange={updateForm} placeholder="Optional note" /></label>
-        {error && <div className="error-box" role="alert">{error}</div>}
-        <div className="actions"><button className="btn-primary" type="submit" disabled={saving}>{saving ? 'Saving…' : editingId ? 'Update' : 'Add'} {expenseOnly ? 'expense' : 'transaction'}</button><button className="btn-secondary" type="button" onClick={resetForm}>Clear</button></div>
-      </form>
+    <section className="transaction-workspace premium-page">
+      <PageHeader
+        eyebrow="Money management"
+        title={title}
+        description={description}
+        actions={<button className="btn-secondary" type="button" onClick={exportCsv}><ArrowDownToLine size={16} /> Export CSV</button>}
+      />
 
-      <section className="panel table-panel">
-        <div className="section-head"><div><h2>{title}</h2><p>Search, filter, sort, paginate, and export.</p></div><button type="button" className="btn-primary" onClick={exportCsv}>Export CSV</button></div>
-        <form className="filters transaction-filters" onSubmit={applyFilters}>
-          <input name="q" aria-label="Search transactions" placeholder="Search" value={draft.q} onChange={updateDraft} />
-          <input name="category" aria-label="Filter by category" placeholder="Category" value={draft.category} onChange={updateDraft} />
-          {!expenseOnly && <select name="type" aria-label="Filter by type" value={draft.type} onChange={updateDraft}><option value="">All types</option><option value="Expense">Expense</option><option value="Income">Income</option></select>}
-          <label className="date-filter">From<input name="from" type="date" value={draft.from} onChange={updateDraft} /></label><label className="date-filter">To<input name="to" type="date" value={draft.to} onChange={updateDraft} /></label>
-          <button className="btn-secondary" type="submit">Filter</button>
+      <div className="workspace">
+        <form className="panel editor transaction-editor" onSubmit={save}>
+          <div className="section-head"><div><span className="section-kicker"><Plus size={15} /> Record activity</span><h2>{editingId ? 'Edit record' : 'New ' + (expenseOnly ? 'expense' : 'transaction')}</h2><p>Changes are saved to your account.</p></div></div>
+          <label>Description<input name="title" required maxLength={160} value={form.title} onChange={updateForm} placeholder="Groceries, salary, rent" /></label>
+          <label>Category<input name="category" required maxLength={80} list="transaction-categories" value={form.category} onChange={updateForm} placeholder="Food" /><datalist id="transaction-categories">{categoryChoices.map((category) => <option value={category} key={category} />)}</datalist></label>
+          <div className="form-row"><label>Amount<input name="amount" type="number" required min="0.01" step="0.01" value={form.amount} onChange={updateForm} placeholder="0.00" /></label>{!expenseOnly && <label>Type<select name="type" value={form.type} onChange={updateForm}><option value="Expense">Expense</option><option value="Income">Income</option></select></label>}</div>
+          <label>Date<input name="date" type="date" required value={form.date} onChange={updateForm} /></label>
+          <label>Notes <span className="optional-label">Optional</span><textarea name="notes" maxLength={500} value={form.notes} onChange={updateForm} placeholder="Add a note for this record" /></label>
+          {error && <div className="error-box" role="alert">{error}</div>}
+          <div className="actions"><button className="btn-primary" type="submit" disabled={saving}>{saving ? 'Saving…' : editingId ? 'Save changes' : <><Plus size={16} /> Add {expenseOnly ? 'expense' : 'transaction'}</>}</button><button className="btn-secondary" type="button" onClick={resetForm}>Clear</button></div>
         </form>
-        {error && <div className="inline-error" role="alert">{error}<button className="btn-secondary" type="button" onClick={() => load(page)}>Retry</button></div>}
-        {loading ? <div className="panel skeleton table-skeleton" role="status" aria-label={`Loading ${title.toLowerCase()}`} /> : rows.length === 0 ? <EmptyState>No {expenseOnly ? 'expenses' : 'transactions'} match this view. Add a row to start tracking.</EmptyState> : (
-          <div className="table-wrap"><table><thead><tr><th><button type="button" className="table-sort" onClick={() => toggleSort('date')}>Date</button></th><th><button type="button" className="table-sort" onClick={() => toggleSort('title')}>Title</button></th><th>Category</th><th>Type</th><th><button type="button" className="table-sort" onClick={() => toggleSort('amount')}>Amount</button></th><th>Actions</th></tr></thead><tbody>{sortedRows.map((row) => <tr key={row.id}><td>{formatDate(row.date)}</td><td><strong>{row.title}</strong>{row.notes && <small>{row.notes}</small>}</td><td>{row.category}</td><td><span className={`badge ${row.type === 'Income' ? 'income' : 'expense'}`}>{row.type}</span></td><td className={row.type === 'Income' ? 'success' : 'error'}>{formatCurrency(row.amount)}</td><td><div className="row-actions"><button className="btn-secondary" type="button" onClick={() => beginEdit(row)}>Edit</button><button className="btn-ghost error" type="button" onClick={() => remove(row.id)}>Delete</button></div></td></tr>)}</tbody></table></div>
-        )}
-        <div className="pager"><span>{totalItems} results · Page {page} of {totalPages}</span><div><button className="btn-secondary" type="button" disabled={page <= 1 || loading} onClick={() => setPage((current) => current - 1)}>Previous</button><button className="btn-secondary" type="button" disabled={page >= totalPages || loading} onClick={() => setPage((current) => current + 1)}>Next</button></div></div>
-      </section>
+
+        <section className="panel table-panel">
+          <div className="section-head"><div><h2>Account activity</h2><p>{totalItems} {expenseOnly ? 'expense' : 'transaction'} records</p></div></div>
+          <form className="filters transaction-filters" onSubmit={applyFilters}>
+            <label className="search-field"><Search size={16} /><input name="q" aria-label="Search transactions" placeholder="Search descriptions" value={draft.q} onChange={updateDraft} /></label>
+            <input name="category" aria-label="Filter by category" placeholder="Category" value={draft.category} onChange={updateDraft} />
+            {!expenseOnly && <select name="type" aria-label="Filter by type" value={draft.type} onChange={updateDraft}><option value="">All types</option><option value="Expense">Expense</option><option value="Income">Income</option></select>}
+            <label className="date-filter">From<input name="from" type="date" value={draft.from} onChange={updateDraft} /></label>
+            <label className="date-filter">To<input name="to" type="date" value={draft.to} onChange={updateDraft} /></label>
+            <button className="btn-secondary" type="submit">Apply filters</button>
+          </form>
+          {error && <div className="inline-error" role="alert">{error}<button className="btn-secondary" type="button" onClick={() => load(page)}>Retry</button></div>}
+          {loading ? <div className="table-skeleton" role="status" aria-label={'Loading ' + title.toLowerCase()} /> : rows.length === 0 ? <EmptyState>No {expenseOnly ? 'expenses' : 'transactions'} match these filters.</EmptyState> : (
+            <div className="table-wrap"><table className="transaction-table"><thead><tr><th><button type="button" className="table-sort" onClick={() => toggleSort('date')}>Date <ArrowUpDown size={13} /></button></th><th><button type="button" className="table-sort" onClick={() => toggleSort('title')}>Description <ArrowUpDown size={13} /></button></th><th>Category</th><th>Type</th><th><button type="button" className="table-sort" onClick={() => toggleSort('amount')}>Amount <ArrowUpDown size={13} /></button></th><th>Actions</th></tr></thead><tbody>{sortedRows.map((row) => (
+              <tr key={row.id}>
+                <td data-label="Date">{formatDate(row.date)}</td>
+                <td data-label="Description"><strong>{row.title}</strong>{row.notes && <small>{row.notes}</small>}</td>
+                <td data-label="Category"><span className="category-pill">{row.category}</span></td>
+                <td data-label="Type"><span className={'badge ' + (row.type === 'Income' ? 'income' : 'expense')}>{row.type}</span></td>
+                <td data-label="Amount" className={'transaction-amount ' + (row.type === 'Income' ? 'success' : 'expense-text')}>{row.type === 'Income' ? '+' : '−'}{formatCurrency(row.amount)}</td>
+                <td data-label="Actions"><div className="row-actions"><button className="btn-secondary" type="button" onClick={() => beginEdit(row)}>Edit</button><button className="btn-ghost danger-link" type="button" onClick={() => remove(row.id)} aria-label={'Delete ' + row.title}><Trash2 size={15} /><span>Delete</span></button></div></td>
+              </tr>
+            ))}</tbody></table></div>
+          )}
+          <div className="pager"><span>{totalItems} results <span aria-hidden="true">·</span> Page {page} of {totalPages}</span><div><button className="btn-secondary" type="button" disabled={page <= 1 || loading} onClick={() => setPage((current) => current - 1)}>Previous</button><button className="btn-secondary" type="button" disabled={page >= totalPages || loading} onClick={() => setPage((current) => current + 1)}>Next</button></div></div>
+        </section>
+      </div>
     </section>
   );
 }

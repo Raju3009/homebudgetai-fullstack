@@ -13,9 +13,6 @@
     "build": "npm --prefix frontend-react run build",
     "preview": "npm --prefix frontend-react run preview",
     "lint": "npm --prefix frontend-react run lint",
-    "test": "npm --prefix frontend-react run test",
-    "legacy:dev": "npm --prefix homebudget-ui start",
-    "legacy:build": "npm --prefix homebudget-ui run build",
-    "legacy:test": "npm --prefix homebudget-ui test"
+    "test": "npm --prefix frontend-react run test"
   }
 }

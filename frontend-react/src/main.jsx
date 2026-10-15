@@ -8,6 +8,7 @@ import './index.css';
 import './pages/auth.css';
 import './pages/portfolio.css';
 import './pages/react-overrides.css';
+import './design-system.css';
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>

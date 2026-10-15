@@ -171,7 +171,7 @@ builder.Services.AddCors(options =>
           .GetSection("Cors:AllowedOrigins")
           .Get<string[]>()
       ?? (builder.Environment.IsDevelopment()
-          ? new[] { "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4200", "http://127.0.0.1:4200" }
+          ? new[] { "http://localhost:5173", "http://127.0.0.1:5173" }
           : Array.Empty<string>());
 
   options.AddPolicy("AllowFrontend",

@@ -4,7 +4,7 @@
 
 - Removed the committed JWT signing value from `HomeBudgetAPI/appsettings.json`. Use .NET user secrets locally and deployment secrets in hosted environments.
 - Exception responses now contain a generic message and trace ID; details remain in server logs.
-- CORS uses configured explicit origins and does not enable credentialed wildcard access. Development defaults include localhost Vite and legacy Angular origins; set exact HTTPS origins for production.
+- CORS uses configured explicit origins and does not enable credentialed wildcard access. Development defaults include the localhost Vite origins; set exact HTTPS origins for production.
 - API startup now fails when database initialization fails instead of serving requests against an uninitialized store.
 - React API requests attach bearer tokens only to the configured API origin, and a 401 clears the session. A 403 remains an authorization error.
 

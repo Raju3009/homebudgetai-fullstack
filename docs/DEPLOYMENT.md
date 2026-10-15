@@ -7,7 +7,7 @@ The Vite application lives in `frontend-react/`.
 - **Netlify:** `netlify.toml` sets `frontend-react` as the base, runs `npm ci && npm run build`, publishes `dist`, and rewrites client routes to `index.html`.
 - **GitHub Pages:** `.github/workflows/frontend-pages.yml` builds with base `/homebudgetai-fullstack/`, copies the app entry point to `404.html` for client-route refreshes, and deploys only on pushes to `main` or a manual workflow dispatch.
 
-Before enabling a frontend deployment, set `VITE_API_BASE_URL` in the host to the HTTPS production API base, including `/api`. Vite embeds this public value in the bundle. It must not contain credentials or private keys. Confirm the selected host's domain and SPA rewrite behavior after deployment.
+Before enabling a frontend deployment, set `VITE_API_BASE_URL` in the host to the HTTPS production API base, including `/api`. GitHub Pages reads it from the repository Actions variable with that name; GitHub Pages and Netlify both stop if it is missing or invalid. Netlify and Vercel need the same variable in their project settings. Vite embeds this public value in the bundle. It must not contain credentials or private keys. Confirm the selected host's domain and SPA rewrite behavior after deployment.
 
 ## API and database
 

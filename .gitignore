@@ -1,7 +1,6 @@
-# Angular
+# Node.js
 node_modules/
 dist/
-.angular/
 coverage/
 
 # .NET
@@ -27,3 +26,5 @@ api-smoke.pid
 # OS files
 .DS_Store
 Thumbs.db
+
+# HomeBudgetAI configuration

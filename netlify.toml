@@ -1,6 +1,6 @@
 [build]
   base = "frontend-react"
-  command = "npm ci && npm run build"
+  command = "node scripts/validate-production-api-url.mjs && npm ci && npm run build"
   publish = "dist"
 
 [[redirects]]

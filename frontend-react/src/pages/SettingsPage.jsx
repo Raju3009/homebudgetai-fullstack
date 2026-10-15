@@ -3,6 +3,7 @@ import { accountApi } from '../api/account';
 import { authApi } from '../api/auth';
 import { apiErrorMessage } from '../api/client';
 import PasswordChangeForm from '../components/PasswordChangeForm';
+import PageHeader from '../components/PageHeader';
 import { PageError, PageLoading } from '../components/PageState';
 import { useToast } from '../context/ToastContext';
 
@@ -98,8 +99,8 @@ export default function SettingsPage() {
   if (error && !profile.email) return <PageError message={error} onRetry={load} />;
 
   return (
-    <section className="premium-page settings-page">
-      <div className="settings-hero panel full"><div><span className="badge">Workspace controls</span><h2>Settings</h2><p>Manage your account profile, display preferences, notifications, and local workspace name.</p></div></div>
+    <section className="premium-page settings-page"><PageHeader eyebrow="Account" title="Settings" description="Manage your display preferences, notifications, and workspace details." />
+
       {error && <div className="panel full inline-error" role="alert">{error}</div>}
       <div className="settings-layout">
         <form className="panel settings-section" onSubmit={saveProfile}><div className="section-head"><div><h2>Profile</h2><p>Name, email, and avatar.</p></div><span className="avatar-preview">{profile.fullName.slice(0, 2).toUpperCase() || 'HB'}</span></div><div className="form-grid"><label>Name<input required maxLength={120} value={profile.fullName} onChange={(event) => setProfile((current) => ({ ...current, fullName: event.target.value }))} /></label><label>Email<input type="email" value={profile.email} readOnly /></label><label>Avatar URL<input type="url" maxLength={512} value={profile.avatarUrl} onChange={(event) => setProfile((current) => ({ ...current, avatarUrl: event.target.value }))} /></label></div><div className="settings-actions"><button className="btn-primary" type="submit" disabled={savingProfile}>{savingProfile ? 'Saving…' : 'Save profile'}</button></div></form>

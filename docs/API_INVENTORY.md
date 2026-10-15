@@ -75,5 +75,5 @@ Base path: `/api`. Controllers use ASP.NET Core routing and default camel-case J
 - `POST /Auth/forgot-password` exposes a reset token in its demo response for known accounts; no production email delivery exists.
 - `appsettings.json` no longer contains a JWT signing value. Configure `Jwt:Key` through .NET user secrets or deployment environment settings; never copy it into React variables or examples.
 - Exception middleware returns a generic 500 response with a trace ID while logging details server-side. Database initialization failures now stop startup.
-- JWT lifetimes: access token 12 hours, refresh token 14 days. Frontend Angular currently does not call `/Auth/refresh`; React should handle expiry by logging out/redirecting unless a tested refresh flow is deliberately added.
+- JWT lifetimes: access token 12 hours, refresh token 14 days. The React client does not call the refresh endpoint; it handles access-token expiry by clearing the session and returning to login.
 - Password hashes use PBKDF2-SHA256 with 100,000 iterations. Refresh tokens are stored hashed in the database.
