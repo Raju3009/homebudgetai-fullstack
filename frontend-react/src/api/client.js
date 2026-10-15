@@ -1,8 +1,13 @@
 import axios from 'axios';
 
 const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+const resolvedBaseUrl = configuredBaseUrl || (import.meta.env.DEV ? 'http://localhost:5033/api' : undefined);
 
-export const apiBaseUrl = (configuredBaseUrl || 'http://localhost:5033/api').replace(/\/$/, '');
+if (!resolvedBaseUrl) {
+  throw new Error('VITE_API_BASE_URL must be set to the production API URL before building the React app.');
+}
+
+export const apiBaseUrl = resolvedBaseUrl.replace(/\/$/, '');
 
 const apiClient = axios.create({
   baseURL: apiBaseUrl,

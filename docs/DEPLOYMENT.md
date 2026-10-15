@@ -4,11 +4,26 @@
 
 The Vite application lives in `frontend-react/`.
 
+## Verified deployment endpoints
+
+- **Production API:** `https://homebudgetai-fullstack-2.onrender.com/api` (Render health endpoint verified at `/api/health`).
+- **React frontend origins currently served:** `https://wondrous-khapse-cc5b19.netlify.app` and `https://raju3009.github.io` (the GitHub Pages app path is `/homebudgetai-fullstack/`).
+- **Vercel:** `https://homebudgetai-fullstack.vercel.app` currently serves the older Angular app, and the React cleanup pull request's Vercel preview failed. It is not included in the API CORS allowlist until it serves the React build.
+
 - **Netlify:** `netlify.toml` sets `frontend-react` as the base, runs `npm ci && npm run build`, publishes `dist`, and rewrites client routes to `index.html`.
 - **GitHub Pages:** `.github/workflows/frontend-pages.yml` builds with base `/homebudgetai-fullstack/`, copies the app entry point to `404.html` for client-route refreshes, and deploys only on pushes to `main` or a manual workflow dispatch.
 - **Vercel:** `vercel.json` installs from the React lockfile, validates the production API URL, builds `frontend-react/`, publishes its `dist/`, and rewrites client routes. Set the Vercel project Root Directory to the repository root (`.`) so this config is used.
 
-Before enabling a frontend deployment, set `VITE_API_BASE_URL` in the host to the HTTPS production API base, including `/api`. GitHub Pages reads it from the repository Actions variable with that name; GitHub Pages, Netlify, and Vercel stop if it is missing or invalid. Netlify and Vercel need the same variable in their project settings. Vite embeds this public value in the bundle. It must not contain credentials or private keys. Confirm the selected host's domain and SPA rewrite behavior after deployment.
+Set `VITE_API_BASE_URL` to exactly `https://homebudgetai-fullstack-2.onrender.com/api` in each selected frontend host. Netlify gets this public value from `netlify.toml`. GitHub Pages reads the repository Actions variable `VITE_API_BASE_URL`; configure that variable in the repository settings. If React is enabled on Vercel later, configure the same project environment variable there. The production build guard rejects a missing or different API URL. Vite embeds this public value in the bundle; it must not contain credentials or private keys.
+
+Render's `Cors__AllowedOrigins__0` and `Cors__AllowedOrigins__1` are the exact Netlify and GitHub Pages origins listed above. CORS allows only GET, POST, PUT, and DELETE, with Accept, Authorization, and Content-Type headers. The app sends JWTs in the Authorization header and does not use cookie credentials. Vercel must only be added after its React deployment is verified; do not use wildcard origins.
+
+### Live deployment status checked on 2026-10-15
+
+- Render `/api/health` responds with HTTP 200, but its live OPTIONS responses currently omit `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods`, and `Access-Control-Allow-Headers`. The CORS repair in this branch has not been deployed to Render.
+- The live Netlify and GitHub Pages React bundles currently contain `http://localhost:5033/api`. They need new builds from this branch before browser API calls can use Render. The production build guard now rejects a missing or incorrect API URL.
+- The live Vercel alias still serves the Angular app. It is not part of the React origin allowlist.
+- Recheck the actual deployed frontend bundles and API response headers after the host settings are applied and deployments complete. A successful health response alone does not verify browser CORS.
 
 ## API and database
 

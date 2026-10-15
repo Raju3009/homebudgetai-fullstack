@@ -19,4 +19,6 @@
       - key: Jwt__Audience
         value: HomeBudgetAI.Users
       - key: Cors__AllowedOrigins__0
-        sync: false
+        value: https://wondrous-khapse-cc5b19.netlify.app
+      - key: Cors__AllowedOrigins__1
+        value: https://raju3009.github.io

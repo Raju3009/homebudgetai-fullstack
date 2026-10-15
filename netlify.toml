@@ -3,6 +3,9 @@
   command = "node scripts/validate-production-api-url.mjs && npm ci && npm run build"
   publish = "dist"
 
+[build.environment]
+  VITE_API_BASE_URL = "https://homebudgetai-fullstack-2.onrender.com/api"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

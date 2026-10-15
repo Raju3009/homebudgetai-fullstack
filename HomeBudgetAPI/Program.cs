@@ -166,21 +166,52 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddCors(options =>
 {
-  var allowedOrigins =
+  var configuredOrigins =
       builder.Configuration
           .GetSection("Cors:AllowedOrigins")
-          .Get<string[]>()
-      ?? (builder.Environment.IsDevelopment()
-          ? new[] { "http://localhost:5173", "http://127.0.0.1:5173" }
-          : Array.Empty<string>());
+          .Get<string[]>();
+
+  var allowedOrigins =
+      (configuredOrigins is { Length: > 0 }
+          ? configuredOrigins
+          : builder.Environment.IsDevelopment()
+              ? new[] { "http://localhost:5173", "http://127.0.0.1:5173" }
+              : Array.Empty<string>())
+          .Where(origin => !string.IsNullOrWhiteSpace(origin))
+          .Select(origin => origin.Trim())
+          .Distinct(StringComparer.OrdinalIgnoreCase)
+          .ToArray();
+
+  foreach (var origin in allowedOrigins)
+  {
+    if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri)
+        || origin == "*"
+        || uri.UserInfo.Length > 0
+        || !string.Equals(
+            origin,
+            uri.GetLeftPart(UriPartial.Authority),
+            StringComparison.OrdinalIgnoreCase)
+        || (!builder.Environment.IsDevelopment()
+            && uri.Scheme != Uri.UriSchemeHttps))
+    {
+      throw new InvalidOperationException(
+          "Cors:AllowedOrigins must contain exact origins without paths; production origins must use HTTPS.");
+    }
+  }
+
+  if (!builder.Environment.IsDevelopment() && allowedOrigins.Length == 0)
+  {
+    throw new InvalidOperationException(
+        "Cors:AllowedOrigins must contain at least one trusted HTTPS frontend origin in production.");
+  }
 
   options.AddPolicy("AllowFrontend",
       policy =>
       {
         policy
               .WithOrigins(allowedOrigins)
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+              .WithMethods("GET", "POST", "PUT", "DELETE")
+              .WithHeaders("Accept", "Authorization", "Content-Type");
       });
 });
 
@@ -318,6 +349,8 @@ if (builder.Configuration.GetValue<bool>("UseHttpsRedirection"))
 {
   app.UseHttpsRedirection();
 }
+
+app.UseRouting();
 
 app.UseCors("AllowFrontend");
 

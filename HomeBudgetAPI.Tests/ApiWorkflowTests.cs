@@ -16,18 +16,60 @@ namespace HomeBudgetAPI.Tests;
 
 public sealed class ApiWorkflowTests
 {
+    private const string NetlifyOrigin = "https://wondrous-khapse-cc5b19.netlify.app";
+    private const string GitHubPagesOrigin = "https://raju3009.github.io";
+    private const string UnapprovedOrigin = "https://unapproved.example";
+
+    [Fact]
+    public async Task Cors_preflight_allows_only_configured_origins_methods_and_headers()
+    {
+        using var factory = new ApiFactory();
+        using var client = factory.CreateClient();
+
+        foreach (var origin in new[] { NetlifyOrigin, GitHubPagesOrigin })
+        {
+            foreach (var method in new[] { "GET", "POST", "PUT", "DELETE" })
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Options, "/api/Transactions");
+                request.Headers.Add("Origin", origin);
+                request.Headers.Add("Access-Control-Request-Method", method);
+                request.Headers.Add("Access-Control-Request-Headers", "authorization,content-type");
+
+                using var response = await client.SendAsync(request);
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+                Assert.Equal(origin, response.Headers.GetValues("Access-Control-Allow-Origin").Single());
+                Assert.Contains(method, string.Join(',', response.Headers.GetValues("Access-Control-Allow-Methods")), StringComparison.OrdinalIgnoreCase);
+
+                var allowedHeaders = string.Join(',', response.Headers.GetValues("Access-Control-Allow-Headers"));
+                Assert.Contains("authorization", allowedHeaders, StringComparison.OrdinalIgnoreCase);
+                Assert.Contains("content-type", allowedHeaders, StringComparison.OrdinalIgnoreCase);
+                Assert.False(response.Headers.Contains("Access-Control-Allow-Credentials"));
+            }
+        }
+
+        using var rejectedRequest = new HttpRequestMessage(HttpMethod.Options, "/api/Transactions");
+        rejectedRequest.Headers.Add("Origin", UnapprovedOrigin);
+        rejectedRequest.Headers.Add("Access-Control-Request-Method", "GET");
+        rejectedRequest.Headers.Add("Access-Control-Request-Headers", "authorization");
+
+        using var rejectedResponse = await client.SendAsync(rejectedRequest);
+        Assert.Equal(HttpStatusCode.NoContent, rejectedResponse.StatusCode);
+        Assert.False(rejectedResponse.Headers.Contains("Access-Control-Allow-Origin"));
+        Assert.False(rejectedResponse.Headers.Contains("Access-Control-Allow-Methods"));
+        Assert.False(rejectedResponse.Headers.Contains("Access-Control-Allow-Headers"));
+    }
+
     [Fact]
     public async Task Transactions_are_user_scoped_and_reject_invalid_amounts()
     {
         using var factory = new ApiFactory();
         using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("Origin", NetlifyOrigin);
         using var unauthenticated = await client.GetAsync("/api/Transactions");
         Assert.Equal(HttpStatusCode.Unauthorized, unauthenticated.StatusCode);
-        using var corsRequest = new HttpRequestMessage(HttpMethod.Get, "/api/Health");
-        corsRequest.Headers.Add("Origin", "http://localhost:5173");
-        using var corsResponse = await client.SendAsync(corsRequest);
+        using var corsResponse = await client.GetAsync("/api/Health");
         Assert.Equal(HttpStatusCode.OK, corsResponse.StatusCode);
-        Assert.Equal("http://localhost:5173", corsResponse.Headers.GetValues("Access-Control-Allow-Origin").Single());
+        Assert.Equal(NetlifyOrigin, corsResponse.Headers.GetValues("Access-Control-Allow-Origin").Single());
 
         var firstUser = await Register(client, "first@example.com");
         using var loginResponse = await client.PostAsJsonAsync("/api/Auth/login", new
@@ -61,13 +103,16 @@ public sealed class ApiWorkflowTests
             notes = "Monthly payment"
         });
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        Assert.Equal(NetlifyOrigin, created.Headers.GetValues("Access-Control-Allow-Origin").Single());
         var transaction = await created.Content.ReadFromJsonAsync<TransactionPayload>();
         Assert.NotNull(transaction);
 
         var secondUser = await Register(client, "second@example.com");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", secondUser.Token);
 
-        var list = await client.GetFromJsonAsync<PagedTransactions>("/api/Transactions?page=1&pageSize=10");
+        using var listResponse = await client.GetAsync("/api/Transactions?page=1&pageSize=10");
+        Assert.Equal(NetlifyOrigin, listResponse.Headers.GetValues("Access-Control-Allow-Origin").Single());
+        var list = await listResponse.Content.ReadFromJsonAsync<PagedTransactions>();
         Assert.NotNull(list);
         Assert.Empty(list.Items);
 
@@ -334,7 +379,8 @@ public sealed class ApiWorkflowTests
             Environment.SetEnvironmentVariable("Jwt__Key", "integration-tests-only-signing-key-with-more-than-32-bytes");
             Environment.SetEnvironmentVariable("Jwt__Issuer", "HomeBudgetAI.Tests");
             Environment.SetEnvironmentVariable("Jwt__Audience", "HomeBudgetAI.Tests");
-        Environment.SetEnvironmentVariable("Cors__AllowedOrigins__0", "http://localhost:5173");
+            Environment.SetEnvironmentVariable("Cors__AllowedOrigins__0", NetlifyOrigin);
+            Environment.SetEnvironmentVariable("Cors__AllowedOrigins__1", GitHubPagesOrigin);
             Environment.SetEnvironmentVariable("SeedDemoData", "false");
             Environment.SetEnvironmentVariable("UseHttpsRedirection", "false");
         }
@@ -349,7 +395,8 @@ public sealed class ApiWorkflowTests
                 ["Jwt:Key"] = "integration-tests-only-signing-key-with-more-than-32-bytes",
                 ["Jwt:Issuer"] = "HomeBudgetAI.Tests",
                 ["Jwt:Audience"] = "HomeBudgetAI.Tests",
-                ["Cors:AllowedOrigins:0"] = "http://localhost:5173",
+                ["Cors:AllowedOrigins:0"] = NetlifyOrigin,
+                ["Cors:AllowedOrigins:1"] = GitHubPagesOrigin,
                 ["SeedDemoData"] = "false",
                 ["UseHttpsRedirection"] = "false"
             }));
