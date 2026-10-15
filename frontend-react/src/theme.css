@@ -1,0 +1,246 @@
+/* A calm, professional finance palette: ink, cobalt and restrained violet. */
+:root,
+[data-theme='light'],
+.light-mode {
+  color-scheme: light;
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --panel: #ffffff;
+  --panel-strong: #f8f9fd;
+  --text: #172238;
+  --muted: #66738a;
+  --line: #e2e8f1;
+  --brand: #29439e;
+  --brand-2: #5872e6;
+  --brand-soft: #eef2ff;
+  --success: #367e9f;
+  --cyan: #16849d;
+  --pink: #8b62c8;
+  --warning: #ad7017;
+  --danger: #c54a58;
+  --info: #3972c4;
+  --chart-income: #4c74d5;
+  --chart-expense: #d9686d;
+  --chart-savings: #8c66c6;
+  --chart-grid: #e4e9f2;
+  --shadow: 0 14px 38px rgba(28, 39, 66, 0.08);
+  --soft-shadow: 0 3px 12px rgba(28, 39, 66, 0.055);
+}
+
+[data-theme='dark'],
+.dark-mode {
+  color-scheme: dark;
+  --bg: #0b1220;
+  --surface: #111b2e;
+  --panel: #111b2e;
+  --panel-strong: #17243a;
+  --text: #edf2fd;
+  --muted: #9aa9bf;
+  --line: #2a3850;
+  --brand: #91a6ff;
+  --brand-2: #7893f4;
+  --brand-soft: #25355b;
+  --success: #69c8a4;
+  --cyan: #68bbd0;
+  --pink: #c09af0;
+  --warning: #e5b86b;
+  --danger: #f08b94;
+  --info: #8ab7f1;
+  --chart-income: #80a8f4;
+  --chart-expense: #f08b94;
+  --chart-savings: #c09af0;
+  --chart-grid: #29364b;
+  --shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+  --soft-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+body {
+  background:
+    radial-gradient(circle at 10% 0%, rgba(88, 114, 230, 0.08), transparent 30%),
+    radial-gradient(circle at 96% 4%, rgba(139, 98, 200, 0.07), transparent 28%),
+    linear-gradient(135deg, #fafbfe 0%, var(--bg) 54%, #f0f3fa 100%);
+}
+
+body:has(.dark-mode) { background: #0b1220; }
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(88, 114, 230, 0.62);
+  box-shadow: 0 0 0 4px rgba(88, 114, 230, 0.14);
+}
+
+:focus-visible { outline-color: rgba(88, 114, 230, 0.55); }
+
+.btn-primary {
+  color: #fff;
+  background: linear-gradient(135deg, #29439e, #5872e6);
+  box-shadow: 0 8px 20px rgba(53, 78, 173, 0.18);
+}
+
+.btn-primary:hover {
+  color: #fff;
+  background: linear-gradient(135deg, #22377f, #4962cf);
+  box-shadow: 0 10px 24px rgba(53, 78, 173, 0.24);
+}
+
+.btn-primary::after { content: none; }
+.btn-secondary:hover, .icon-button:hover { color: var(--brand); background: var(--brand-soft); border-color: #c8d2f3; }
+.btn-ghost:hover { color: var(--text); background: rgba(88, 114, 230, 0.08); }
+.badge { color: #344b9d; background: #eef2ff; border-color: #dfe5fb; }
+.badge.income, .badge.success { color: #31579f; background: #edf2ff; border-color: #d9e2fa; }
+.section-kicker, .page-eyebrow, .text-link { color: var(--brand-2); }
+.section-kicker, .page-eyebrow { letter-spacing: 0.065em; }
+.metric-card::before { background: linear-gradient(90deg, var(--brand), var(--brand-2), var(--pink)); }
+.progress-line span { background: linear-gradient(90deg, var(--brand), var(--brand-2)); }
+.status-spinner { border-color: rgba(88, 114, 230, 0.2); border-top-color: var(--brand-2); }
+
+/* Login and registration use a quiet navy backdrop with a clear white form. */
+.auth-page, .login-premium, .register-premium { color: #fff; background: #10182c; }
+.auth-visual, .login-visual, .register-visual {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(88, 114, 230, 0.3), transparent 34%),
+    radial-gradient(circle at 82% 84%, rgba(139, 98, 200, 0.2), transparent 32%),
+    linear-gradient(135deg, #10182c, #1e2e5a 58%, #342b59);
+}
+.auth-visual::before, .login-visual::before, .register-visual::before { content: none; animation: none; }
+.login-bg-video { opacity: 0.2; filter: saturate(0.45) brightness(0.72); }
+.login-video-shade {
+  background:
+    radial-gradient(circle at 20% 18%, rgba(88, 114, 230, 0.3), transparent 34%),
+    radial-gradient(circle at 80% 76%, rgba(139, 98, 200, 0.2), transparent 32%),
+    linear-gradient(90deg, rgba(11, 18, 32, 0.96), rgba(18, 28, 52, 0.78));
+}
+.auth-card-wrap, .login-card-wrap { background: #f4f6fb; }
+.auth-card, .login-card {
+  color: #172238;
+  background: #fff;
+  border: 1px solid #e2e8f1;
+  box-shadow: 0 24px 64px rgba(15, 25, 48, 0.18);
+  backdrop-filter: none;
+}
+.auth-card a { color: #3e5ac4; }
+.auth-card a:hover { color: #263d9e; }
+.auth-card .badge { color: #344b9d; background: #eef2ff; border-color: #dfe5fb; }
+.login-copy > .badge { color: #e4eaff; background: rgba(255, 255, 255, 0.1); border-color: rgba(190, 203, 255, 0.22); }
+.login-copy h1 { min-height: 0; }
+.login-copy p { color: rgba(242, 245, 255, 0.76); }
+.typing-text { background-image: linear-gradient(90deg, #fff, #aebeff 54%, #e7c28b); }
+.feature-pills span { border-color: rgba(201, 211, 255, 0.2); color: rgba(242, 245, 255, 0.86); background: rgba(255, 255, 255, 0.08); }
+.login-preview-card, .launch-card { border-color: rgba(201, 211, 255, 0.2); background: rgba(18, 28, 52, 0.72); }
+.login-preview-card strong { color: #f4f6ff; }
+.preview-bars i, .setup-row i { background: linear-gradient(180deg, #7893f4, #9a78d3); }
+.idle-tip { color: #e8edff; background: rgba(18, 28, 52, 0.78); border-color: rgba(160, 178, 255, 0.24); animation: none; }
+.idle-tip strong { color: #aebeff; }
+
+/* Application chrome and marketing pages share the same blue-based identity. */
+.sidebar { background: #10182c; border-color: rgba(205, 215, 255, 0.12); }
+.brand-mark { background: linear-gradient(135deg, #4c66d0, #8b62c8); box-shadow: 0 10px 28px rgba(67, 89, 187, 0.28); }
+.avatar { background: linear-gradient(135deg, #4c66d0, #8b62c8); }
+.sidebar nav a:hover, .sidebar nav a.active, .sidebar-action:hover { background: rgba(139, 160, 255, 0.16); }
+.landing-page { color: #fff; background: #0b1220; }
+.landing-nav { background: rgba(13, 21, 39, 0.88); border-color: rgba(201, 211, 255, 0.15); }
+.landing-hero::before { background: radial-gradient(circle at 25% 30%, rgba(88, 114, 230, 0.24), transparent 38%), radial-gradient(circle at 75% 72%, rgba(139, 98, 200, 0.18), transparent 34%); animation: none; }
+.landing-section { color: #172238; background: #f7f8fc; }
+.landing-section.dark { color: #edf2fd; background: #111b2e; }
+.income-card .metric-icon { color: #3558bc; background: #eef2ff; }
+.savings-card .metric-icon { color: #7852b8; background: #f2edfb; }
+.action-card:hover { border-color: rgba(88, 114, 230, 0.28); box-shadow: 0 18px 44px rgba(46, 65, 128, 0.12); }
+.premium-ai-panel { background: linear-gradient(135deg, #1b2b59, #34305f); }
+.premium-ai-panel .suggestion-title { color: #c5ceff; }
+.budget-card::before, .budget-progress span { background: var(--brand-2); }
+.activity-title span { color: #344b9d; background: #eef2ff; }
+.settings-hero, .reports-hero { background: linear-gradient(135deg, rgba(88, 114, 230, 0.1), rgba(139, 98, 200, 0.07)), var(--surface); }
+.workspace-card { background: linear-gradient(135deg, rgba(139, 98, 200, 0.08), rgba(88, 114, 230, 0.08)), var(--surface); }
+
+.dark-mode .sidebar { background: #0d1729; border-color: #26344c; }
+.dark-mode .topbar { background: rgba(17, 27, 46, 0.96); }
+.dark-mode .search-box, .dark-mode .search-box input, .dark-mode .transaction-filters .search-field { background: #0d1729; }
+.dark-mode .btn-secondary, .dark-mode .icon-button { color: var(--text); background: #17243a; border-color: #33435e; }
+.dark-mode .btn-secondary:hover, .dark-mode .icon-button:hover { background: #223153; border-color: #526697; }
+.dark-mode .empty-state, .dark-mode .goal-form, .dark-mode .insight-card, .dark-mode .report-block, .dark-mode .toggle-row { color: var(--muted); background: #111b2e; border-color: var(--line); }
+.dark-mode .activity-card { background: rgba(17, 27, 46, 0.9); }
+.dark-mode .activity-card.unread { background: linear-gradient(135deg, rgba(88, 114, 230, 0.18), rgba(139, 98, 200, 0.1)), #111b2e; }
+
+/* Replace older hard-coded green accents in dashboard and finance components. */
+.welcome-panel {
+  background: linear-gradient(135deg, rgba(88, 114, 230, 0.12), rgba(139, 98, 200, 0.09)), var(--surface);
+}
+.dark-mode .welcome-stats article, .dark-mode .health-grid article,
+.dark-mode .toggle-row, .dark-mode .activity-card { background: rgba(17, 27, 46, 0.76); }
+.metric-icon { box-shadow: 0 12px 30px rgba(53, 78, 173, 0.16); }
+.remaining-card .metric-icon { background: linear-gradient(135deg, #5872e6, #8b62c8); }
+.suggestion:hover, .action-card:hover { border-color: rgba(88, 114, 230, 0.28); }
+.suggestion-title, .activity-title span { color: #344b9d; }
+.suggestion-icon { background: linear-gradient(135deg, #29439e, #5872e6); box-shadow: 0 8px 20px rgba(53, 78, 173, 0.2); }
+.dark-mode .suggestion-title, .premium-ai-panel .suggestion-title { color: #c5ceff; }
+.dark-mode .suggestion p { color: #e3eaff; }
+.budget-health, .settings-hero, .reports-hero {
+  background: linear-gradient(135deg, rgba(88, 114, 230, 0.1), rgba(139, 98, 200, 0.07)), var(--surface);
+}
+.premium-ai-panel { background: linear-gradient(135deg, #17264e, #29294f); }
+.premium-ai-panel::after {
+  background: radial-gradient(circle at 20% 0%, rgba(88, 114, 230, 0.24), transparent 36%),
+    linear-gradient(180deg, rgba(16, 24, 44, 0.48), rgba(16, 24, 44, 0.9));
+}
+.workspace-card { background: linear-gradient(135deg, rgba(139, 98, 200, 0.08), rgba(88, 114, 230, 0.08)), var(--surface); }
+.budget-card::before, .budget-progress span { background: linear-gradient(90deg, #29439e, #5872e6); }
+.budget-card.warning::before, .budget-card.warning .budget-progress span { background: #ad7017; }
+.budget-card.exceeded::before, .budget-card.exceeded .budget-progress span { background: #c54a58; }
+.budget-status { color: #31579f; background: #edf2ff; }
+.activity-title span { background: #eef2ff; }
+.toast-card.success { border-left-color: #5872e6; }
+.dark-mode .toast-card button { background: #253452; }
+.dark-mode .budget-status { color: #c5ceff; background: #25355b; }
+.dark-mode .premium-ai-panel { background: linear-gradient(135deg, #17264e, #29294f); }
+
+/* The portfolio has its own dark/light switch, so give both modes the new palette. */
+.portfolio-shell {
+  --portfolio-bg: #0b1220;
+  --portfolio-surface: rgba(17, 27, 46, 0.88);
+  --portfolio-card: rgba(255, 255, 255, 0.07);
+  --portfolio-text: #edf2fd;
+  --portfolio-muted: #a4b0c5;
+  --portfolio-line: rgba(220, 229, 247, 0.14);
+  --portfolio-brand: #91a6ff;
+  --portfolio-blue: #68a8f5;
+  --portfolio-amber: #e7bd78;
+  --portfolio-rose: #ee91a5;
+  --portfolio-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
+  color: var(--portfolio-text);
+  background:
+    radial-gradient(ellipse at 12% 4%, rgba(88, 114, 230, 0.2), transparent 32%),
+    radial-gradient(ellipse at 92% 18%, rgba(139, 98, 200, 0.14), transparent 30%),
+    linear-gradient(180deg, #0b1220 0%, #101a2e 100%);
+}
+.portfolio-shell.light-mode {
+  --portfolio-bg: #f4f6fb;
+  --portfolio-surface: rgba(255, 255, 255, 0.9);
+  --portfolio-card: rgba(255, 255, 255, 0.82);
+  --portfolio-text: #172238;
+  --portfolio-muted: #66738a;
+  --portfolio-line: rgba(33, 48, 79, 0.12);
+  --portfolio-brand: #3e5ac4;
+  --portfolio-blue: #5872e6;
+  --portfolio-amber: #ad7017;
+  --portfolio-rose: #c54a70;
+  --portfolio-shadow: 0 20px 60px rgba(28, 39, 66, 0.12);
+  color: var(--portfolio-text);
+  background:
+    radial-gradient(ellipse at 12% 4%, rgba(88, 114, 230, 0.12), transparent 32%),
+    radial-gradient(ellipse at 92% 18%, rgba(139, 98, 200, 0.08), transparent 30%),
+    linear-gradient(180deg, #fbfcff 0%, #f1f4fb 100%);
+}
+.portfolio-shell .btn-primary, .portfolio-shell .filter-tabs button.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--portfolio-brand), var(--portfolio-blue));
+  box-shadow: 0 12px 30px rgba(73, 95, 186, 0.22);
+}
+.portfolio-shell .btn-secondary:hover, .portfolio-shell .theme-toggle:hover { border-color: rgba(129, 152, 255, 0.48); background: rgba(129, 152, 255, 0.12); }
+.portfolio-shell.light-mode .hero-copy h1 { background-image: linear-gradient(90deg, #172238, var(--portfolio-brand) 48%, var(--portfolio-amber)); }
+.portfolio-shell .profile-dots span, .portfolio-shell .terminal-dots span { background: var(--portfolio-brand); box-shadow: 0 0 22px rgba(129, 152, 255, 0.58); }
+.portfolio-shell .contact-form input:focus, .portfolio-shell .contact-form textarea:focus { border-color: rgba(88, 114, 230, 0.72); box-shadow: 0 0 0 4px rgba(88, 114, 230, 0.15); }
+
+@media (max-width: 860px) {
+  .auth-visual { min-height: 34vh; }
+}
