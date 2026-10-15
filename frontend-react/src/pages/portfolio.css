@@ -317,6 +317,3 @@ pre { margin: 0; white-space: pre-wrap; color: var(--portfolio-text); font-size:
   .preview-cards { grid-template-columns: 1fr; }
   .preview-cards .wide { grid-column: auto; }
 }
-
-
-
