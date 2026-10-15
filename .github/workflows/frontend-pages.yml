@@ -4,7 +4,9 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'homebudget-ui/**'
+      - 'frontend-react/**'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/frontend-pages.yml'
   workflow_dispatch:
 
@@ -27,20 +29,24 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
-          cache-dependency-path: homebudget-ui/package-lock.json
+          cache-dependency-path: frontend-react/package-lock.json
 
       - name: Use pinned npm
         run: npm install -g npm@11.6.0
 
       - name: Install dependencies
-        working-directory: homebudget-ui
+        working-directory: frontend-react
         run: npm ci
 
-      - name: Build Angular app
-        working-directory: homebudget-ui
-        run: npm run build -- --configuration production --base-href /homebudgetai-fullstack/
+      - name: Build React app
+        working-directory: frontend-react
+        run: npm run build -- --base=/homebudgetai-fullstack/
+
+      - name: Add GitHub Pages SPA fallback
+        working-directory: frontend-react
+        run: cp dist/index.html dist/404.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -48,7 +54,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: homebudget-ui/dist/homebudget-ui/browser
+          path: frontend-react/dist
 
   deploy:
     environment:
