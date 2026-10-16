@@ -6,7 +6,6 @@ on:
     paths:
       - 'frontend-react/**'
       - 'package.json'
-      - 'package-lock.json'
       - '.github/workflows/frontend-pages.yml'
   workflow_dispatch:
 
