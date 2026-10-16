@@ -4,28 +4,29 @@ Thanks for helping improve HomeBudgetAI. Keep changes focused, production-minded
 
 ## Workflow
 
-1. Create a feature branch from `main`.
-2. Keep Angular work in `homebudget-ui` and API work in `HomeBudgetAPI`.
-3. Run the relevant verification commands before opening a PR.
-4. Include screenshots or short screen recordings for UI changes.
-5. Document API, schema, or environment changes in `README.md` and `.env.example`.
+1. Create a feature branch from the current default branch.
+2. Keep React frontend work in frontend-react/ and API work in HomeBudgetAPI/.
+3. Run relevant checks before opening a pull request.
+4. Include screenshots or short recordings for UI changes.
+5. Document API, schema, or environment changes in README.md and .env.example.
 
-## Verification
+## Frontend verification
 
-```powershell
-cd homebudget-ui
-npm ci
-npm run build -- --configuration production
-```
+    cd frontend-react
+    npm ci
+    npm run lint
+    npm test
+    npm run build
 
-```powershell
-dotnet restore HomeBudgetAPI/HomeBudgetAPI.csproj
-dotnet build HomeBudgetAPI/HomeBudgetAPI.csproj -c Release --no-restore
-```
+## Backend verification
 
-## Design Standards
+    dotnet restore homebudgetai-fullstack.sln
+    dotnet build homebudgetai-fullstack.sln -c Release
+    dotnet test homebudgetai-fullstack.sln -c Release
+
+## Design standards
 
 - Prefer reusable UI patterns and the shared design system.
 - Keep pages responsive across desktop, tablet, and mobile.
 - Respect reduced-motion preferences.
-- Avoid unrelated refactors in feature PRs.
+- Avoid unrelated refactors in feature pull requests.

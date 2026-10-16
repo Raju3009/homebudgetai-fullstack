@@ -8,6 +8,7 @@ namespace HomeBudgetAPI.Repositories;
 public interface ITransactionRepository
 {
     Task<PagedResponse<TransactionResponse>> SearchAsync(int userId, string? query, string? category, TransactionType? type, DateTime? from, DateTime? to, int page, int pageSize);
+    Task<List<TransactionResponse>> ListForExportAsync(int userId, string? query, string? category, TransactionType? type, DateTime? from, DateTime? to);
     Task<List<BudgetTransaction>> ListForDashboardAsync(int userId);
     Task<BudgetTransaction?> GetAsync(int userId, int id);
     Task<BudgetTransaction> AddAsync(BudgetTransaction transaction);
@@ -25,6 +26,33 @@ public class TransactionRepository : ITransactionRepository
     {
         page = Math.Max(page, 1);
         pageSize = Math.Clamp(pageSize, 5, 100);
+        var items = FilteredItems(userId, query, category, type, from, to);
+
+        var total = await items.CountAsync();
+        var data = await items.OrderByDescending(x => x.Date).ThenByDescending(x => x.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(x => new TransactionResponse(x.Id, x.Title, x.Category, x.Amount, x.Type, x.Date, x.Notes))
+            .ToListAsync();
+
+        return new PagedResponse<TransactionResponse>(data, page, pageSize, total, (int)Math.Ceiling(total / (double)pageSize));
+    }
+
+    public Task<List<TransactionResponse>> ListForExportAsync(int userId, string? query, string? category, TransactionType? type, DateTime? from, DateTime? to) =>
+        FilteredItems(userId, query, category, type, from, to)
+            .OrderByDescending(x => x.Date)
+            .ThenByDescending(x => x.Id)
+            .Select(x => new TransactionResponse(x.Id, x.Title, x.Category, x.Amount, x.Type, x.Date, x.Notes))
+            .ToListAsync();
+
+    public Task<List<BudgetTransaction>> ListForDashboardAsync(int userId) =>
+        _db.Transactions.AsNoTracking().Where(x => x.UserId == userId).OrderByDescending(x => x.Date).ToListAsync();
+
+    public Task<BudgetTransaction?> GetAsync(int userId, int id) =>
+        _db.Transactions.FirstOrDefaultAsync(x => x.UserId == userId && x.Id == id);
+
+    private IQueryable<BudgetTransaction> FilteredItems(int userId, string? query, string? category, TransactionType? type, DateTime? from, DateTime? to)
+    {
         var items = _db.Transactions.AsNoTracking().Where(x => x.UserId == userId);
 
         if (!string.IsNullOrWhiteSpace(query))
@@ -37,22 +65,8 @@ public class TransactionRepository : ITransactionRepository
         if (type.HasValue) items = items.Where(x => x.Type == type.Value);
         if (from.HasValue) items = items.Where(x => x.Date >= DateTime.SpecifyKind(from.Value.Date, DateTimeKind.Utc));
         if (to.HasValue) items = items.Where(x => x.Date < DateTime.SpecifyKind(to.Value.Date.AddDays(1), DateTimeKind.Utc));
-
-        var total = await items.CountAsync();
-        var data = await items.OrderByDescending(x => x.Date).ThenByDescending(x => x.Id)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .Select(x => new TransactionResponse(x.Id, x.Title, x.Category, x.Amount, x.Type, x.Date, x.Notes))
-            .ToListAsync();
-
-        return new PagedResponse<TransactionResponse>(data, page, pageSize, total, (int)Math.Ceiling(total / (double)pageSize));
+        return items;
     }
-
-    public Task<List<BudgetTransaction>> ListForDashboardAsync(int userId) =>
-        _db.Transactions.AsNoTracking().Where(x => x.UserId == userId).OrderByDescending(x => x.Date).ToListAsync();
-
-    public Task<BudgetTransaction?> GetAsync(int userId, int id) =>
-        _db.Transactions.FirstOrDefaultAsync(x => x.UserId == userId && x.Id == id);
 
     public async Task<BudgetTransaction> AddAsync(BudgetTransaction transaction)
     {

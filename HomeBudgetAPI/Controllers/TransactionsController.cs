@@ -1,8 +1,10 @@
 ﻿using System.Security.Claims;
 using System.Text;
+using System.Globalization;
 using HomeBudgetAPI.DTOs;
 using HomeBudgetAPI.Models;
 using HomeBudgetAPI.Repositories;
+using HomeBudgetAPI.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,12 +23,20 @@ public class TransactionsController : ControllerBase
     public Task<PagedResponse<TransactionResponse>> Search([FromQuery] string? q, [FromQuery] string? category, [FromQuery] TransactionType? type, [FromQuery] DateTime? from, [FromQuery] DateTime? to, [FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
         _transactions.SearchAsync(UserId, q, category, type, from, to, page, pageSize);
 
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<TransactionResponse>> GetById(int id)
+    {
+        var item = await _transactions.GetAsync(UserId, id);
+        return item is null ? NotFound() : Ok(ToResponse(item));
+    }
+
     [HttpPost]
     public async Task<ActionResult<TransactionResponse>> Add(TransactionRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Title)) return BadRequest(new { message = "Title is required." });
         if (string.IsNullOrWhiteSpace(request.Category)) return BadRequest(new { message = "Category is required." });
         if (request.Amount <= 0) return BadRequest(new { message = "Amount must be greater than zero." });
+        if (request.Date == default) return BadRequest(new { message = "A valid transaction date is required." });
         var item = await _transactions.AddAsync(new BudgetTransaction
         {
             Title = request.Title.Trim(),
@@ -37,7 +47,7 @@ public class TransactionsController : ControllerBase
             Notes = request.Notes,
             UserId = UserId
         });
-        return CreatedAtAction(nameof(Search), new { id = item.Id }, ToResponse(item));
+        return CreatedAtAction(nameof(GetById), new { id = item.Id }, ToResponse(item));
     }
 
     [HttpPut("{id:int}")]
@@ -46,6 +56,7 @@ public class TransactionsController : ControllerBase
         if (string.IsNullOrWhiteSpace(request.Title)) return BadRequest(new { message = "Title is required." });
         if (string.IsNullOrWhiteSpace(request.Category)) return BadRequest(new { message = "Category is required." });
         if (request.Amount <= 0) return BadRequest(new { message = "Amount must be greater than zero." });
+        if (request.Date == default) return BadRequest(new { message = "A valid transaction date is required." });
         var item = await _transactions.GetAsync(UserId, id);
         if (item is null) return NotFound();
         item.Title = request.Title.Trim();
@@ -71,16 +82,15 @@ public class TransactionsController : ControllerBase
     [HttpGet("export")]
     public async Task<FileContentResult> Export([FromQuery] string? q, [FromQuery] string? category, [FromQuery] TransactionType? type, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
     {
-        var data = await _transactions.SearchAsync(UserId, q, category, type, from, to, 1, 100);
+        var data = await _transactions.ListForExportAsync(UserId, q, category, type, from, to);
         var csv = new StringBuilder("Date,Type,Category,Title,Amount,Notes\n");
-        foreach (var item in data.Items)
+        foreach (var item in data)
         {
-            csv.AppendLine($"{item.Date:yyyy-MM-dd},{item.Type},{Escape(item.Category)},{Escape(item.Title)},{item.Amount},{Escape(item.Notes ?? string.Empty)}");
+            csv.AppendLine($"{item.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)},{item.Type},{CsvField.Escape(item.Category)},{CsvField.Escape(item.Title)},{item.Amount.ToString(CultureInfo.InvariantCulture)},{CsvField.Escape(item.Notes ?? string.Empty)}");
         }
         return File(Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", "homebudget-transactions.csv");
     }
 
     private int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
     private static TransactionResponse ToResponse(BudgetTransaction x) => new(x.Id, x.Title, x.Category, x.Amount, x.Type, x.Date, x.Notes);
-    private static string Escape(string value) => $"\"{value.Replace("\"", "\"\"")}\"";
 }

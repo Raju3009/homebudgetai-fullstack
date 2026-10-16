@@ -26,8 +26,16 @@ public class ProfileController : ControllerBase
     public async Task<ActionResult<ProfileResponse>> Update(UpdateProfileRequest request)
     {
         var user = await CurrentUser();
+        var avatarUrl = request.AvatarUrl?.Trim();
+        if (!string.IsNullOrEmpty(avatarUrl)
+            && (!Uri.TryCreate(avatarUrl, UriKind.Absolute, out var uri)
+                || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)))
+        {
+            return BadRequest(new { message = "Avatar URL must use HTTP or HTTPS." });
+        }
+
         user.FullName = request.FullName.Trim();
-        user.AvatarUrl = request.AvatarUrl;
+        user.AvatarUrl = string.IsNullOrEmpty(avatarUrl) ? null : avatarUrl;
         await _db.SaveChangesAsync();
         return Ok(new ProfileResponse(user.Id, user.FullName, user.Email, user.Role, user.AvatarUrl));
     }
@@ -39,6 +47,11 @@ public class ProfileController : ControllerBase
         if (!_passwords.Verify(request.CurrentPassword, user.PasswordHash)) return BadRequest(new { message = "Current password is incorrect." });
         if (request.NewPassword.Length < 8) return BadRequest(new { message = "Password must be at least 8 characters." });
         user.PasswordHash = _passwords.Hash(request.NewPassword);
+        var activeTokens = await _db.RefreshTokens
+            .Where(x => x.UserId == user.Id && x.RevokedAt == null)
+            .ToListAsync();
+        var now = DateTime.UtcNow;
+        foreach (var token in activeTokens) token.RevokedAt = now;
         await _db.SaveChangesAsync();
         return Ok(new { message = "Password changed." });
     }

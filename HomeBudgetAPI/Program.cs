@@ -166,21 +166,52 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddCors(options =>
 {
-  var allowedOrigins =
+  var configuredOrigins =
       builder.Configuration
           .GetSection("Cors:AllowedOrigins")
-          .Get<string[]>()
-      ?? (builder.Environment.IsDevelopment()
-          ? new[] { "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4200", "http://127.0.0.1:4200" }
-          : Array.Empty<string>());
+          .Get<string[]>();
+
+  var allowedOrigins =
+      (configuredOrigins is { Length: > 0 }
+          ? configuredOrigins
+          : builder.Environment.IsDevelopment()
+              ? new[] { "http://localhost:5173", "http://127.0.0.1:5173" }
+              : Array.Empty<string>())
+          .Where(origin => !string.IsNullOrWhiteSpace(origin))
+          .Select(origin => origin.Trim())
+          .Distinct(StringComparer.OrdinalIgnoreCase)
+          .ToArray();
+
+  foreach (var origin in allowedOrigins)
+  {
+    if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri)
+        || origin == "*"
+        || uri.UserInfo.Length > 0
+        || !string.Equals(
+            origin,
+            uri.GetLeftPart(UriPartial.Authority),
+            StringComparison.OrdinalIgnoreCase)
+        || (!builder.Environment.IsDevelopment()
+            && uri.Scheme != Uri.UriSchemeHttps))
+    {
+      throw new InvalidOperationException(
+          "Cors:AllowedOrigins must contain exact origins without paths; production origins must use HTTPS.");
+    }
+  }
+
+  if (!builder.Environment.IsDevelopment() && allowedOrigins.Length == 0)
+  {
+    throw new InvalidOperationException(
+        "Cors:AllowedOrigins must contain at least one trusted HTTPS frontend origin in production.");
+  }
 
   options.AddPolicy("AllowFrontend",
       policy =>
       {
         policy
               .WithOrigins(allowedOrigins)
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+              .WithMethods("GET", "POST", "PUT", "DELETE")
+              .WithHeaders("Accept", "Authorization", "Content-Type");
       });
 });
 
@@ -212,6 +243,23 @@ var jwtKey =
     ?? throw new InvalidOperationException(
         "Jwt:Key is not configured."
     );
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtAudience = builder.Configuration["Jwt:Audience"];
+
+if (Encoding.UTF8.GetByteCount(jwtKey) < 32)
+{
+  throw new InvalidOperationException(
+      "Jwt:Key must contain at least 32 bytes."
+  );
+}
+
+if (string.IsNullOrWhiteSpace(jwtIssuer)
+    || string.IsNullOrWhiteSpace(jwtAudience))
+{
+  throw new InvalidOperationException(
+      "Jwt:Issuer and Jwt:Audience must be configured."
+  );
+}
 
 builder.Services
     .AddAuthentication(
@@ -227,11 +275,9 @@ builder.Services
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
 
-            ValidIssuer =
-                  builder.Configuration["Jwt:Issuer"],
+            ValidIssuer = jwtIssuer,
 
-            ValidAudience =
-                  builder.Configuration["Jwt:Audience"],
+            ValidAudience = jwtAudience,
 
             IssuerSigningKey =
                   new SymmetricSecurityKey(
@@ -319,6 +365,8 @@ if (builder.Configuration.GetValue<bool>("UseHttpsRedirection"))
   app.UseHttpsRedirection();
 }
 
+app.UseRouting();
+
 app.UseCors("AllowFrontend");
 
 app.UseRateLimiter();
@@ -354,17 +402,22 @@ try
     await db.Database.MigrateAsync();
   }
 
-  var shouldSeedDemoData =
-      app.Environment.IsDevelopment()
-      || builder.Configuration.GetValue<bool>("SeedDemoData");
+  var shouldSeedDemoData = builder.Configuration.GetValue<bool>("SeedDemoData");
 
   if (shouldSeedDemoData)
   {
+    var demoPassword = builder.Configuration["SeedDemoPassword"];
+    if (string.IsNullOrWhiteSpace(demoPassword) || demoPassword.Length < 12)
+    {
+      throw new InvalidOperationException(
+          "SeedDemoPassword must be configured with at least 12 characters when SeedDemoData is enabled.");
+    }
+
     var passwords =
         scope.ServiceProvider
             .GetRequiredService<IPasswordService>();
 
-    await SeedData.ApplyAsync(db, passwords);
+    await SeedData.ApplyAsync(db, passwords, demoPassword);
   }
 }
 catch (Exception ex)

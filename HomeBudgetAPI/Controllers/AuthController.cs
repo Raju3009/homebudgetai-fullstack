@@ -47,6 +47,10 @@ public class AuthController : ControllerBase
         var email = request.Email.Trim().ToLowerInvariant();
         var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == email);
         if (user is null || !_passwords.Verify(request.Password, user.PasswordHash)) return Unauthorized(new { message = "Invalid credentials." });
+        if (_passwords.NeedsRehash(user.PasswordHash))
+        {
+            user.PasswordHash = _passwords.Hash(request.Password);
+        }
         return Ok(await CreateAuthResponse(user));
     }
 
@@ -61,20 +65,13 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
-    {
-        var email = request.Email.Trim().ToLowerInvariant();
-        var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == email);
-        if (user is not null)
-        {
-            var token = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("=", "").Replace("+", "");
-            user.ResetTokenHash = _passwords.HashToken(token);
-            user.ResetTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);
-            await _db.SaveChangesAsync();
-            return Ok(new { message = "Reset token generated for demo delivery.", resetToken = token });
-        }
-        return Ok(new { message = "If this email exists, reset instructions will be sent." });
-    }
+    public IActionResult ForgotPassword(ForgotPasswordRequest request) =>
+        StatusCode(
+            StatusCodes.Status503ServiceUnavailable,
+            new
+            {
+                message = "Password recovery is unavailable because email delivery is not configured. Contact support for help."
+            });
 
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
@@ -86,6 +83,7 @@ public class AuthController : ControllerBase
         user.PasswordHash = _passwords.Hash(request.NewPassword);
         user.ResetTokenHash = null;
         user.ResetTokenExpiresAt = null;
+        await RevokeRefreshTokens(user.Id);
         await _db.SaveChangesAsync();
         return Ok(new { message = "Password reset successful." });
     }
@@ -105,6 +103,15 @@ public class AuthController : ControllerBase
         _db.RefreshTokens.Add(refresh.Entity);
         await _db.SaveChangesAsync();
         return new AuthResponse(auth.Token, user.Email, user.FullName, user.Role, auth.ExpiresAt, refresh.Token);
+    }
+
+    private async Task RevokeRefreshTokens(int userId)
+    {
+        var now = DateTime.UtcNow;
+        var activeTokens = await _db.RefreshTokens
+            .Where(x => x.UserId == userId && x.RevokedAt == null)
+            .ToListAsync();
+        foreach (var token in activeTokens) token.RevokedAt = now;
     }
 
     private async Task<User> CurrentUser()

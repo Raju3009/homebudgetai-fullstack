@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { financeApi } from '../api/finance';
 import { apiErrorMessage } from '../api/client';
 import { EmptyState, PageError, PageLoading } from '../components/PageState';
+import PageHeader from '../components/PageHeader';
 import { formatCurrency, formatDate } from '../utils/format';
 import { useToast } from '../context/ToastContext';
 
@@ -108,7 +109,8 @@ export default function ReportsPage() {
 
   return (
     <section className="premium-page reports-page page-grid">
-      <section className="panel full reports-hero"><div className="section-head"><div><h2>Financial report</h2><p>Explore your recorded activity and download a summary.</p></div><div className="actions"><button className="btn-secondary" type="button" onClick={() => load(filters)} disabled={loading}>Refresh insights</button><button className="btn-secondary" type="button" onClick={exportCsv} disabled={exporting}>CSV</button><button className="btn-primary" type="button" onClick={exportPdf} disabled={exporting || !report}>{exporting ? 'Preparing…' : 'PDF'}</button></div></div>
+      <PageHeader eyebrow="Insights" title="Reports" description="Explore your recorded activity and export a useful summary." />
+      <section className="panel full reports-hero"><div className="section-head"><div><h2>Report period</h2><p>Choose a month or year to review.</p></div><div className="actions"><button className="btn-secondary" type="button" onClick={() => load(filters)} disabled={loading}>Refresh insights</button><button className="btn-secondary" type="button" onClick={exportCsv} disabled={exporting}>CSV</button><button className="btn-primary" type="button" onClick={exportPdf} disabled={exporting || !report}>{exporting ? 'Preparing…' : 'PDF'}</button></div></div>
         <form className="filters reports-filters" onSubmit={applyFilters}><label>Period<select name="period" value={draft.period} onChange={updateDraft}><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></label>{draft.period === 'monthly' ? <label>Month<input name="month" type="month" required value={draft.month} onChange={updateDraft} /></label> : <label>Year<input name="year" type="number" min="2000" max="2100" required value={draft.year} onChange={updateDraft} /></label>}<button className="btn-secondary" type="submit" disabled={loading}>Apply</button></form>
       </section>
 

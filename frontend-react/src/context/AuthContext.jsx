@@ -35,7 +35,7 @@ function saveSession(response) {
     fullName: response.fullName,
     role: response.role,
   }));
-  // The current API has a refresh route, but the Angular client never used it.
+  // Keep the existing session behavior; refresh-token rotation is not implemented in this client.
   // Keep its unused refresh token out of browser storage until a refresh flow is implemented.
   window.localStorage.removeItem('refreshToken');
   return { id: response.id, email: response.email, fullName: response.fullName, role: response.role };

@@ -40,8 +40,16 @@ jobs:
         working-directory: frontend-react
         run: npm ci
 
+      - name: Validate production API URL
+        working-directory: frontend-react
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: node scripts/validate-production-api-url.mjs
+
       - name: Build React app
         working-directory: frontend-react
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
         run: npm run build -- --base=/homebudgetai-fullstack/
 
       - name: Add GitHub Pages SPA fallback
