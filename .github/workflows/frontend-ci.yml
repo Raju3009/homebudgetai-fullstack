@@ -6,14 +6,12 @@ on:
     paths:
       - 'frontend-react/**'
       - 'package.json'
-      - 'package-lock.json'
       - '.github/workflows/frontend-ci.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'frontend-react/**'
       - 'package.json'
-      - 'package-lock.json'
       - '.github/workflows/frontend-ci.yml'
   workflow_dispatch:
 
