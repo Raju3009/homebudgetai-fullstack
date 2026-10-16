@@ -124,6 +124,11 @@ if (string.IsNullOrWhiteSpace(connectionString))
   );
 }
 
+if (isPostgreSql)
+{
+  connectionString = NormalizePostgreSqlConnectionString(connectionString);
+}
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
   if (isSqlite)
@@ -431,5 +436,37 @@ catch (Exception ex)
 // =========================
 
 app.Run();
+
+
+static string NormalizePostgreSqlConnectionString(string connectionString)
+{
+  if (!Uri.TryCreate(connectionString, UriKind.Absolute, out var databaseUri)
+      || (!databaseUri.Scheme.Equals("postgres", StringComparison.OrdinalIgnoreCase)
+          && !databaseUri.Scheme.Equals("postgresql", StringComparison.OrdinalIgnoreCase)))
+  {
+    return connectionString;
+  }
+
+  var databaseName = Uri.UnescapeDataString(databaseUri.AbsolutePath.Trim('/'));
+  var credentials = databaseUri.UserInfo.Split(':', 2);
+  if (string.IsNullOrWhiteSpace(databaseUri.Host)
+      || string.IsNullOrWhiteSpace(databaseName)
+      || credentials.Length != 2)
+  {
+    throw new InvalidOperationException(
+        "PostgreSQL connection URL must include a host, database, username, and password.");
+  }
+
+  var connectionStringBuilder = new Npgsql.NpgsqlConnectionStringBuilder
+  {
+    Host = databaseUri.Host,
+    Port = databaseUri.Port > 0 ? databaseUri.Port : 5432,
+    Database = databaseName,
+    Username = Uri.UnescapeDataString(credentials[0]),
+    Password = Uri.UnescapeDataString(credentials[1])
+  };
+
+  return connectionStringBuilder.ConnectionString;
+}
 
 public partial class Program { }

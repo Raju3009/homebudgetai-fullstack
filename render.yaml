@@ -22,3 +22,35 @@
         value: https://wondrous-khapse-cc5b19.netlify.app
       - key: Cors__AllowedOrigins__1
         value: https://raju3009.github.io
+  - type: web
+    name: homebudgetai-fullstack-2
+    repo: https://github.com/Raju3009/homebudgetai-fullstack
+    branch: main
+    runtime: docker
+    rootDir: HomeBudgetAPI
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: singapore
+    healthCheckPath: /api/health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: DatabaseProvider
+        value: PostgreSQL
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: homebudgetai-demo-db
+          property: connectionString
+      - key: Jwt__Key
+        generateValue: true
+      - key: Jwt__Issuer
+        value: HomeBudgetAI
+      - key: Jwt__Audience
+        value: HomeBudgetAI.Users
+      - key: Cors__AllowedOrigins__0
+        value: https://wondrous-khapse-cc5b19.netlify.app
+      - key: Cors__AllowedOrigins__1
+        value: https://raju3009.github.io
+      - key: SeedDemoData
+        value: false
