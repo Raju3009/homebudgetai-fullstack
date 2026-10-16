@@ -27,14 +27,9 @@ Render's `Cors__AllowedOrigins__0` and `Cors__AllowedOrigins__1` are the exact N
 
 ## API and database
 
-Render's existing `render.yaml` requests PostgreSQL. Set the following in the API service environment:
+Render's `homebudgetai-fullstack-2` API service is configured for PostgreSQL in `render.yaml`. The Blueprint references the existing `homebudgetai-demo-db` instance for `ConnectionStrings__DefaultConnection` and keeps the exact Netlify and GitHub Pages origins in CORS. PostgreSQL connection URLs from Render are converted to Npgsql's key/value connection-string format at startup.
 
-- `DatabaseProvider=PostgreSQL`
-- `ConnectionStrings__DefaultConnection` from the managed database connection string
-- `Jwt__Key` as a long random secret
-- `Jwt__Issuer` and `Jwt__Audience` matching the values used to issue tokens
-- `Cors__AllowedOrigins__0` to the exact HTTPS frontend origin
-- `SeedDemoData=false` unless seeding has been deliberately reviewed
+The free demo database expires after 30 days and does not include backups. Use it only for demonstration data; move to a persistent database before storing real budgets.
 
 The application supports PostgreSQL provider selection, but its PostgreSQL schema initialization uses `EnsureCreatedAsync`, not the checked-in SQL Server migrations. `EnsureCreatedAsync` does not evolve an existing schema. Do not point a new provider at valuable data or attempt a schema migration without a verified backup and a separate compatibility plan. A successful build does not prove that hosted database credentials, schema, or network access work.
 
