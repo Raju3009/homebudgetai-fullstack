@@ -6,7 +6,7 @@ namespace HomeBudgetAPI.Data;
 
 public static class SeedData
 {
-    public static async Task ApplyAsync(AppDbContext db, IPasswordService passwords)
+    public static async Task ApplyAsync(AppDbContext db, IPasswordService passwords, string demoPassword)
     {
         if (await db.Users.AnyAsync()) return;
 
@@ -14,8 +14,8 @@ public static class SeedData
         {
             FullName = "Demo User",
             Email = "demo@homebudget.ai",
-            Role = "Admin",
-            PasswordHash = passwords.Hash("Demo@12345"),
+            Role = "User",
+            PasswordHash = passwords.Hash(demoPassword),
             Setting = new UserSetting { Currency = "USD", Language = "en", Theme = "system" }
         };
 

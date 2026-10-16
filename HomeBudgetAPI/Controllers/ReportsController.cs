@@ -22,7 +22,15 @@ public class ReportsController : ControllerBase
     public ReportsController(AppDbContext db, IInsightService insights) { _db = db; _insights = insights; }
 
     [HttpGet("summary")]
-    public async Task<ReportSummary> Summary([FromQuery] string period = "monthly", [FromQuery] string? month = null, [FromQuery] int? year = null)
+    public async Task<ActionResult<ReportSummary>> Summary([FromQuery] string period = "monthly", [FromQuery] string? month = null, [FromQuery] int? year = null)
+    {
+        if (!IsValidPeriod(period, month, year))
+            return BadRequest(new { message = "Use period=monthly with month=YYYY-MM, or period=yearly with a valid year." });
+
+        return Ok(await BuildSummary(period, month, year));
+    }
+
+    private async Task<ReportSummary> BuildSummary(string period, string? month, int? year)
     {
         var query = Scoped(period, month, year);
         var data = await query.OrderByDescending(x => x.Date).ToListAsync();
@@ -36,9 +44,12 @@ public class ReportsController : ControllerBase
     }
 
     [HttpGet("export")]
-    public async Task<FileContentResult> Export([FromQuery] string period = "monthly", [FromQuery] string? month = null, [FromQuery] int? year = null)
+    public async Task<IActionResult> Export([FromQuery] string period = "monthly", [FromQuery] string? month = null, [FromQuery] int? year = null)
     {
-        var report = await Summary(period, month, year);
+        if (!IsValidPeriod(period, month, year))
+            return BadRequest(new { message = "Use period=monthly with month=YYYY-MM, or period=yearly with a valid year." });
+
+        var report = await BuildSummary(period, month, year);
         var csv = new StringBuilder("Metric,Value\n");
         csv.AppendLine($"Income,{report.Income.ToString(CultureInfo.InvariantCulture)}"); csv.AppendLine($"Expenses,{report.Expenses.ToString(CultureInfo.InvariantCulture)}"); csv.AppendLine($"Balance,{report.Balance.ToString(CultureInfo.InvariantCulture)}"); csv.AppendLine($"SavingsRate,{report.SavingsRate.ToString(CultureInfo.InvariantCulture)}");
         csv.AppendLine("\nCategory,Total");
@@ -54,8 +65,25 @@ public class ReportsController : ControllerBase
             var selectedYear = year ?? DateTime.UtcNow.Year;
             return query.Where(x => x.Date.Year == selectedYear);
         }
-        var selectedMonth = DateTime.TryParse($"{month}-01", out var parsed) ? parsed : DateTime.UtcNow;
+        var selectedMonth = string.IsNullOrWhiteSpace(month)
+            ? DateTime.UtcNow
+            : DateTime.ParseExact($"{month}-01", "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None);
         return query.Where(x => x.Date.Year == selectedMonth.Year && x.Date.Month == selectedMonth.Month);
+    }
+
+    private static bool IsValidPeriod(string period, string? month, int? year)
+    {
+        if (string.IsNullOrWhiteSpace(period))
+            return false;
+
+        if (period.Equals("yearly", StringComparison.OrdinalIgnoreCase))
+            return year is null or (>= 1 and <= 9999);
+
+        if (!period.Equals("monthly", StringComparison.OrdinalIgnoreCase) || year.HasValue)
+            return false;
+
+        return string.IsNullOrWhiteSpace(month)
+            || DateTime.TryParseExact($"{month}-01", "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
     }
 
     private int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

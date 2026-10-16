@@ -1,8 +1,13 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using HomeBudgetAPI.Data;
 using HomeBudgetAPI.Models;
+using HomeBudgetAPI.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -11,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.IdentityModel.Tokens;
 using Xunit;
 
 namespace HomeBudgetAPI.Tests;
@@ -20,6 +26,7 @@ public sealed class ApiWorkflowTests
     private const string NetlifyOrigin = "https://wondrous-khapse-cc5b19.netlify.app";
     private const string GitHubPagesOrigin = "https://raju3009.github.io";
     private const string UnapprovedOrigin = "https://unapproved.example";
+    private const string TestJwtKey = "integration-tests-only-signing-key-with-more-than-32-bytes";
 
     [Fact]
     public async Task Cors_preflight_allows_only_configured_origins_methods_and_headers()
@@ -107,6 +114,12 @@ public sealed class ApiWorkflowTests
         Assert.Equal(NetlifyOrigin, created.Headers.GetValues("Access-Control-Allow-Origin").Single());
         var transaction = await created.Content.ReadFromJsonAsync<TransactionPayload>();
         Assert.NotNull(transaction);
+        Assert.Equal($"/api/Transactions/{transaction!.Id}", created.Headers.Location?.AbsolutePath);
+
+        using var ownRead = await client.GetAsync($"/api/Transactions/{transaction.Id}");
+        Assert.Equal(HttpStatusCode.OK, ownRead.StatusCode);
+        var readTransaction = await ownRead.Content.ReadFromJsonAsync<TransactionPayload>();
+        Assert.Equal(transaction.Id, readTransaction!.Id);
 
         var secondUser = await Register(client, "second@example.com");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", secondUser.Token);
@@ -116,6 +129,9 @@ public sealed class ApiWorkflowTests
         var list = await listResponse.Content.ReadFromJsonAsync<PagedTransactions>();
         Assert.NotNull(list);
         Assert.Empty(list.Items);
+
+        using var foreignRead = await client.GetAsync($"/api/Transactions/{transaction.Id}");
+        Assert.Equal(HttpStatusCode.NotFound, foreignRead.StatusCode);
 
         var update = await client.PutAsJsonAsync($"/api/Transactions/{transaction!.Id}", new
         {
@@ -177,8 +193,23 @@ public sealed class ApiWorkflowTests
         var priorMonth = currentMonth.AddMonths(-1);
         await AddExpense(client, "Groceries last month", 40m, priorMonth.AddDays(5));
         await AddExpense(client, "Groceries this month", 90m, currentMonth.AddDays(5));
-        await CreateBudget(client, "Last month", priorMonth, 300m);
-        await CreateBudget(client, "This month", currentMonth, 400m, "food");
+        var lastMonthBudget = await CreateBudget(client, "Last month", priorMonth, 300m);
+        var thisMonthBudget = await CreateBudget(client, "This month", currentMonth, 400m, "food");
+        Assert.Equal(40m, lastMonthBudget.SpentAmount);
+        Assert.Equal(90m, thisMonthBudget.SpentAmount);
+
+        using var update = await client.PutAsJsonAsync($"/api/Budgets/{thisMonthBudget.Id}", new
+        {
+            name = thisMonthBudget.Name,
+            category = thisMonthBudget.Category,
+            limitAmount = 450m,
+            month = currentMonth,
+            alertThreshold = 80,
+            isActive = true
+        });
+        Assert.Equal(HttpStatusCode.OK, update.StatusCode);
+        var updatedBudget = await update.Content.ReadFromJsonAsync<BudgetPayload>();
+        Assert.Equal(90m, updatedBudget!.SpentAmount);
 
         var budgets = await client.GetFromJsonAsync<List<BudgetPayload>>("/api/Budgets");
         Assert.NotNull(budgets);
@@ -195,6 +226,143 @@ public sealed class ApiWorkflowTests
             isActive = true
         });
         Assert.Equal(HttpStatusCode.Conflict, duplicate.StatusCode);
+    }
+
+    [Fact]
+    public void Password_hashes_use_salts_reject_malformed_values_and_identify_legacy_work_factors()
+    {
+        const string password = "ValidPassword1!";
+        var service = new PasswordService();
+        var currentHash = service.Hash(password);
+        var legacySalt = RandomNumberGenerator.GetBytes(16);
+        var legacyKey = Rfc2898DeriveBytes.Pbkdf2(password, legacySalt, 100_000, HashAlgorithmName.SHA256, 32);
+        var legacyHash = $"pbkdf2$100000${Convert.ToBase64String(legacySalt)}${Convert.ToBase64String(legacyKey)}";
+
+        Assert.True(service.Verify(password, currentHash));
+        Assert.False(service.Verify("wrong-password", currentHash));
+        Assert.False(service.Verify(password, "pbkdf2$999999999$bad$bad"));
+        Assert.False(service.Verify(password, "malformed"));
+        Assert.False(service.NeedsRehash(currentHash));
+        Assert.True(service.NeedsRehash(legacyHash));
+        Assert.True(service.Verify(password, legacyHash));
+    }
+
+    [Fact]
+    public async Task Successful_login_upgrades_legacy_password_hashes()
+    {
+        using var factory = new ApiFactory();
+        using var client = factory.CreateClient();
+        const string email = "legacy@example.com";
+        const string password = "ValidPassword1!";
+        var salt = RandomNumberGenerator.GetBytes(16);
+        var key = Rfc2898DeriveBytes.Pbkdf2(password, salt, 100_000, HashAlgorithmName.SHA256, 32);
+
+        using (var scope = factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Users.Add(new User
+            {
+                FullName = "Legacy User",
+                Email = email,
+                PasswordHash = $"pbkdf2$100000${Convert.ToBase64String(salt)}${Convert.ToBase64String(key)}"
+            });
+            await db.SaveChangesAsync();
+        }
+
+        using var login = await client.PostAsJsonAsync("/api/Auth/login", new { email, password });
+        Assert.Equal(HttpStatusCode.OK, login.StatusCode);
+
+        using var verifyScope = factory.Services.CreateScope();
+        var verifyDb = verifyScope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var savedHash = await verifyDb.Users.AsNoTracking().Where(x => x.Email == email).Select(x => x.PasswordHash).SingleAsync();
+        Assert.StartsWith("pbkdf2$600000$", savedHash, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Contact_endpoint_validates_input_and_ignores_client_controlled_entity_fields()
+    {
+        using var factory = new ApiFactory();
+        using var client = factory.CreateClient();
+
+        using var invalid = await client.PostAsJsonAsync("/api/Contact", new
+        {
+            name = "Contact",
+            email = "invalid-email",
+            message = "Hello"
+        });
+        Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
+
+        using var submitted = await client.PostAsJsonAsync("/api/Contact", new
+        {
+            id = 900,
+            createdAt = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            name = "  Contact Person  ",
+            email = "Contact@example.com",
+            message = "  Please contact me.  "
+        });
+        Assert.Equal(HttpStatusCode.OK, submitted.StatusCode);
+
+        using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var saved = await db.ContactMessages.SingleAsync();
+        Assert.Equal(1, saved.Id);
+        Assert.Equal("Contact Person", saved.Name);
+        Assert.Equal("contact@example.com", saved.Email);
+        Assert.Equal("Please contact me.", saved.Message);
+        Assert.True(saved.CreatedAt > new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public async Task Authentication_rejects_invalid_registration_credentials_and_tokens()
+    {
+        using var factory = new ApiFactory();
+        using var client = factory.CreateClient();
+
+        using var invalidRegistration = await client.PostAsJsonAsync("/api/Auth/register", new
+        {
+            fullName = "",
+            email = "invalid-email",
+            password = "short"
+        });
+        Assert.Equal(HttpStatusCode.BadRequest, invalidRegistration.StatusCode);
+
+        using var missingCredentials = await client.PostAsJsonAsync("/api/Auth/login", new { });
+        Assert.Equal(HttpStatusCode.BadRequest, missingCredentials.StatusCode);
+
+        var user = await Register(client, "auth@example.com");
+        using var duplicateRegistration = await client.PostAsJsonAsync("/api/Auth/register", new
+        {
+            fullName = "Duplicate User",
+            email = user.Email,
+            password = "ValidPassword1!"
+        });
+        Assert.Equal(HttpStatusCode.Conflict, duplicateRegistration.StatusCode);
+
+        using var wrongPassword = await client.PostAsJsonAsync("/api/Auth/login", new
+        {
+            email = user.Email,
+            password = "IncorrectPassword1!"
+        });
+        using var unknownAccount = await client.PostAsJsonAsync("/api/Auth/login", new
+        {
+            email = "unknown@example.com",
+            password = "IncorrectPassword1!"
+        });
+        Assert.Equal(HttpStatusCode.Unauthorized, wrongPassword.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, unknownAccount.StatusCode);
+        Assert.Equal(await wrongPassword.Content.ReadAsStringAsync(), await unknownAccount.Content.ReadAsStringAsync());
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            CreateTestToken("different-signing-key-with-more-than-32-bytes", DateTime.UtcNow.AddHours(1)));
+        using var invalidToken = await client.GetAsync("/api/Auth/me");
+        Assert.Equal(HttpStatusCode.Unauthorized, invalidToken.StatusCode);
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            CreateTestToken(TestJwtKey, DateTime.UtcNow.AddHours(-1)));
+        using var expiredToken = await client.GetAsync("/api/Auth/me");
+        Assert.Equal(HttpStatusCode.Unauthorized, expiredToken.StatusCode);
     }
 
     [Fact]
@@ -301,9 +469,15 @@ public sealed class ApiWorkflowTests
         var report = await client.GetFromJsonAsync<ReportPayload>($"/api/Reports/summary?period=monthly&month={DateTime.UtcNow:yyyy-MM}");
         Assert.NotNull(report);
         Assert.Equal(80m, report.Expenses);
+        using var invalidReportPeriod = await client.GetAsync("/api/Reports/summary?period=weekly");
+        Assert.Equal(HttpStatusCode.BadRequest, invalidReportPeriod.StatusCode);
+        using var invalidReportMonth = await client.GetAsync("/api/Reports/summary?period=monthly&month=2026-13");
+        Assert.Equal(HttpStatusCode.BadRequest, invalidReportMonth.StatusCode);
         using var reportExport = await client.GetAsync($"/api/Reports/export?period=monthly&month={DateTime.UtcNow:yyyy-MM}");
         Assert.Equal(HttpStatusCode.OK, reportExport.StatusCode);
         Assert.Contains("Expenses,80", await reportExport.Content.ReadAsStringAsync());
+        using var invalidReportExport = await client.GetAsync("/api/Reports/export?period=monthly&month=not-a-month");
+        Assert.Equal(HttpStatusCode.BadRequest, invalidReportExport.StatusCode);
 
         using var budgetResponse = await client.PostAsJsonAsync("/api/Budgets", new
         {
@@ -383,6 +557,20 @@ public sealed class ApiWorkflowTests
         return (await response.Content.ReadFromJsonAsync<AuthPayload>())!;
     }
 
+    private static string CreateTestToken(string key, DateTime expiresAt)
+    {
+        var token = new JwtSecurityToken(
+            issuer: "HomeBudgetAI.Tests",
+            audience: "HomeBudgetAI.Tests",
+            claims: [new Claim(ClaimTypes.NameIdentifier, "1")],
+            notBefore: DateTime.UtcNow.AddHours(-2),
+            expires: expiresAt,
+            signingCredentials: new SigningCredentials(
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                SecurityAlgorithms.HmacSha256));
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
     private static async Task AddExpense(HttpClient client, string title, decimal amount, DateTime date)
     {
         using var response = await client.PostAsJsonAsync("/api/Transactions", new
@@ -397,7 +585,7 @@ public sealed class ApiWorkflowTests
         response.EnsureSuccessStatusCode();
     }
 
-    private static async Task CreateBudget(HttpClient client, string name, DateTime month, decimal limitAmount, string category = "Food")
+    private static async Task<BudgetPayload> CreateBudget(HttpClient client, string name, DateTime month, decimal limitAmount, string category = "Food")
     {
         using var response = await client.PostAsJsonAsync("/api/Budgets", new
         {
@@ -409,6 +597,7 @@ public sealed class ApiWorkflowTests
             isActive = true
         });
         response.EnsureSuccessStatusCode();
+        return (await response.Content.ReadFromJsonAsync<BudgetPayload>())!;
     }
 
     private sealed record AuthPayload(string Token, string Email, string FullName, string Role, DateTime ExpiresAt, string? RefreshToken);
@@ -433,14 +622,14 @@ public sealed class ApiWorkflowTests
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("Production");
-            builder.UseSetting("Jwt:Key", "integration-tests-only-signing-key-with-more-than-32-bytes");
+            builder.UseSetting("Jwt:Key", TestJwtKey);
             builder.UseSetting("Jwt:Issuer", "HomeBudgetAI.Tests");
             builder.UseSetting("Jwt:Audience", "HomeBudgetAI.Tests");
             builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["DatabaseProvider"] = "Sqlite",
                 ["ConnectionStrings:DefaultConnection"] = "Data Source=:memory:",
-                ["Jwt:Key"] = "integration-tests-only-signing-key-with-more-than-32-bytes",
+                ["Jwt:Key"] = TestJwtKey,
                 ["Jwt:Issuer"] = "HomeBudgetAI.Tests",
                 ["Jwt:Audience"] = "HomeBudgetAI.Tests",
                 ["Cors:AllowedOrigins:0"] = NetlifyOrigin,

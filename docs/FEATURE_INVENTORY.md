@@ -34,5 +34,5 @@ This inventory describes the supported React frontend in frontend-react/. Implem
 - Two-factor authentication has no backend endpoint.
 - Budget period buttons do not filter data.
 - Report recommendation copy and profile activity are not API data.
-- Registration does not persist monthly goal, currency, or notification preferences through the registration endpoint.
+- Currency and notification preferences are saved through a follow-up settings request after registration; workspace name remains browser-local.
 - Savings goals have list/create/update API support and no delete endpoint.

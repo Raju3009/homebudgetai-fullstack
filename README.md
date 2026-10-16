@@ -41,7 +41,10 @@ From the repository root, configure a local signing key with .NET user secrets:
     dotnet restore
     dotnet run
 
-The API launch profile uses http://localhost:5033; Swagger is at /swagger. The default SQLite provider uses HomeBudgetAPI/homebudget-local.db. Development seeding is enabled by the development settings.
+The API launch profile uses http://localhost:5033; Swagger is at /swagger. The default SQLite provider uses HomeBudgetAPI/homebudget-local.db. Demo data is disabled by default. To opt in locally, configure `SeedDemoData` and a private `SeedDemoPassword` through .NET user secrets; the seeded demo account has the regular User role:
+
+    dotnet user-secrets set "SeedDemoData" "true"
+    dotnet user-secrets set "SeedDemoPassword" "<a-private-password-of-at-least-12-characters>"
 
 ### React frontend
 
@@ -67,14 +70,15 @@ The root .env.example and frontend-react/.env.example contain non-secret example
 | Jwt__Key | Private signing key; use user secrets locally and a secret environment setting in deployment |
 | Jwt__Issuer, Jwt__Audience | JWT validation values |
 | Cors__AllowedOrigins__0, Cors__AllowedOrigins__1 | Exact allowed frontend origins (HTTPS in production) |
-| SeedDemoData | Explicitly enable seed data outside development |
+| SeedDemoData | Explicitly enable optional demo data; disabled by default |
+| SeedDemoPassword | Private password required when demo seeding is enabled |
 
 ## Checks
 
     npm --prefix frontend-react ci
     npm run lint
     npm test
-    npm run build
+    $env:VITE_API_BASE_URL='https://homebudgetai-fullstack-2.onrender.com/api'; npm run build
     dotnet restore homebudgetai-fullstack.sln
     dotnet build homebudgetai-fullstack.sln -c Release
     dotnet test homebudgetai-fullstack.sln -c Release

@@ -1,4 +1,5 @@
 using HomeBudgetAPI.Data;
+using HomeBudgetAPI.DTOs;
 using HomeBudgetAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,19 +17,15 @@ namespace HomeBudgetAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Submit([FromBody] ContactMessage contact)
+        public async Task<IActionResult> Submit(ContactRequest request)
         {
-            if (string.IsNullOrWhiteSpace(contact.Name) ||
-                string.IsNullOrWhiteSpace(contact.Email) ||
-                string.IsNullOrWhiteSpace(contact.Message))
+            var contact = new ContactMessage
             {
-                return BadRequest(new { message = "Name, email, and message are required" });
-            }
-
-            contact.Name = contact.Name.Trim();
-            contact.Email = contact.Email.Trim();
-            contact.Message = contact.Message.Trim();
-            contact.CreatedAt = DateTime.UtcNow;
+                Name = request.Name.Trim(),
+                Email = request.Email.Trim().ToLowerInvariant(),
+                Message = request.Message.Trim(),
+                CreatedAt = DateTime.UtcNow
+            };
 
             _context.ContactMessages.Add(contact);
             await _context.SaveChangesAsync();

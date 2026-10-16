@@ -47,6 +47,10 @@ public class AuthController : ControllerBase
         var email = request.Email.Trim().ToLowerInvariant();
         var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == email);
         if (user is null || !_passwords.Verify(request.Password, user.PasswordHash)) return Unauthorized(new { message = "Invalid credentials." });
+        if (_passwords.NeedsRehash(user.PasswordHash))
+        {
+            user.PasswordHash = _passwords.Hash(request.Password);
+        }
         return Ok(await CreateAuthResponse(user));
     }
 

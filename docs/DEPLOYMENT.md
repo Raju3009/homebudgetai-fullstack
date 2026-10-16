@@ -18,10 +18,10 @@ Set `VITE_API_BASE_URL` to exactly `https://homebudgetai-fullstack-2.onrender.co
 
 Render's `Cors__AllowedOrigins__0` and `Cors__AllowedOrigins__1` are the exact Netlify and GitHub Pages origins listed above. CORS allows only GET, POST, PUT, and DELETE, with Accept, Authorization, and Content-Type headers. The app sends JWTs in the Authorization header and does not use cookie credentials. Vercel must only be added after its React deployment is verified; do not use wildcard origins.
 
-### Live deployment status checked on 2026-10-15
+### Live deployment status checked on 2026-10-16
 
-- Render `/api/health` responds with HTTP 200. An OPTIONS request from each configured frontend origin for `POST` with `Authorization, Content-Type` returned HTTP 204 but omitted `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods`, and `Access-Control-Allow-Headers`. The CORS repair in this branch has not been deployed to Render.
-- The live Netlify and GitHub Pages React bundles currently contain `http://localhost:5033/api`. They need new builds from this branch before browser API calls can use Render. The production build guard rejects a missing or incorrect API URL.
+- Render `/api/Health` returned HTTP 200 after an initial request timed out at 30 seconds. An OPTIONS request from each configured frontend origin for `POST` with `Authorization, Content-Type` returned HTTP 204 but omitted `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods`, and `Access-Control-Allow-Headers`. The CORS repair in this branch has not been deployed to Render.
+- The live Netlify and GitHub Pages React bundles both contain `http://localhost:5033/api`. They need new builds from this branch before browser API calls can use Render. The production build guard rejects a missing or incorrect API URL.
 - The Vercel alias serves React assets, but its API target has not been verified. It is not part of the React origin allowlist; add it only after configuring and verifying the deployment.
 - Recheck the actual deployed frontend bundles and API response headers after the host settings are applied and deployments complete. A successful health response alone does not verify browser CORS.
 

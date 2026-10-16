@@ -23,6 +23,13 @@ public class TransactionsController : ControllerBase
     public Task<PagedResponse<TransactionResponse>> Search([FromQuery] string? q, [FromQuery] string? category, [FromQuery] TransactionType? type, [FromQuery] DateTime? from, [FromQuery] DateTime? to, [FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
         _transactions.SearchAsync(UserId, q, category, type, from, to, page, pageSize);
 
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<TransactionResponse>> GetById(int id)
+    {
+        var item = await _transactions.GetAsync(UserId, id);
+        return item is null ? NotFound() : Ok(ToResponse(item));
+    }
+
     [HttpPost]
     public async Task<ActionResult<TransactionResponse>> Add(TransactionRequest request)
     {
@@ -40,7 +47,7 @@ public class TransactionsController : ControllerBase
             Notes = request.Notes,
             UserId = UserId
         });
-        return CreatedAtAction(nameof(Search), new { id = item.Id }, ToResponse(item));
+        return CreatedAtAction(nameof(GetById), new { id = item.Id }, ToResponse(item));
     }
 
     [HttpPut("{id:int}")]

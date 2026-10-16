@@ -7,13 +7,14 @@ Base path: `/api`. Controllers use ASP.NET Core routing and default camel-case J
 | Method | Route | Auth | Request / response |
 |---|---|---|---|
 | POST | `/Auth/register` | Anonymous | `{ fullName, email, password }` -> `AuthResponse` with token, refreshToken, user fields and expiry. Duplicate email returns 409; password must be at least 8 chars. |
-| POST | `/Auth/login` | Anonymous | `{ email, password }` -> `AuthResponse`; invalid credentials return 401. |
+| POST | `/Auth/login` | Anonymous | `{ email, password }` -> `AuthResponse`; invalid credentials return 401. Legacy lower-cost hashes are upgraded after successful login. |
 | POST | `/Auth/refresh` | Anonymous | `{ refreshToken }` -> new `AuthResponse`; old token is revoked. |
 | POST | `/Auth/forgot-password` | Anonymous | `{ email }` -> generic 503 message. Email delivery is not configured; no reset token or account-existence signal is returned. |
 | POST | `/Auth/reset-password` | Anonymous | `{ email, token, newPassword }` -> message if a valid, unexpired stored token exists. The application does not currently issue reset tokens because email delivery is unavailable. |
 | GET | `/Auth/me` | Bearer | Current `ProfileResponse`. |
 | GET | `/Dashboard` | Bearer | `DashboardSummary`: income, expenses, balance, savings rate, category totals, monthly totals, six recent transactions, suggestions. |
 | GET | `/Transactions` | Bearer | `q`, `category`, `type`, `from`, `to`, `page`, `pageSize` -> `PagedResponse<TransactionResponse>`. Page size is clamped to 5–100. |
+| GET | `/Transactions/{id}` | Bearer | Current user's transaction by ID; missing or foreign rows return 404. |
 | POST | `/Transactions` | Bearer | `{ title, category, amount, type, date, notes }` -> created transaction; title/category required and amount > 0. |
 | PUT | `/Transactions/{id}` | Bearer | Same transaction request -> updated row; only current user's row can be changed. |
 | DELETE | `/Transactions/{id}` | Bearer | Current user's row -> 204; missing/foreign row -> 404. |
@@ -25,15 +26,15 @@ Base path: `/api`. Controllers use ASP.NET Core routing and default camel-case J
 | GET | `/Goals` | Bearer | Current user's goals ordered by due date. |
 | POST | `/Goals` | Bearer | `{ name, targetAmount, currentAmount, dueDate, color }` -> created goal; target must be positive and current amount nonnegative. |
 | PUT | `/Goals/{id}` | Bearer | Same validation -> updated current user's goal. There is no delete route. |
-| GET | `/Reports/summary` | Bearer | Query `period` (`monthly` or `yearly`), `month` (`YYYY-MM`), `year` -> `ReportSummary`. Other period values follow the monthly branch. |
-| GET | `/Reports/export` | Bearer | Same query -> CSV attachment. |
+| GET | `/Reports/summary` | Bearer | Query `period` (`monthly` or `yearly`), `month` (`YYYY-MM`), `year` -> `ReportSummary`; unsupported periods and malformed dates return 400. |
+| GET | `/Reports/export` | Bearer | Same query -> CSV attachment; unsupported periods and malformed dates return 400. |
 | GET | `/Notifications` | Bearer | Current user's latest 40 `NotificationResponse` rows; no placeholder notifications are fabricated. |
 | POST | `/Notifications/{id}/read` | Bearer | Marks current user's notification read -> 204. |
 | GET | `/Settings` | Bearer | Current `UserSettingResponse`; creates defaults when missing. |
 | PUT | `/Settings` | Bearer | `{ currency, language, theme, emailNotifications, pushNotifications, monthlyDigest }` -> saved preferences. |
 | PUT | `/Profile` | Bearer | `{ fullName, avatarUrl }` -> updated `ProfileResponse`; email and role are not editable. |
 | POST | `/Profile/change-password` | Bearer | `{ currentPassword, newPassword }` -> message; current password must match and new password >= 8 chars. |
-| POST | `/Contact` | Anonymous | `{ name, email, message }` -> saved contact message. Current portfolio does not call it. |
+| POST | `/Contact` | Anonymous | `{ name, email, message }` -> saved contact message. Name, email, and message lengths are bounded; IDs and timestamps are assigned by the server. Current portfolio does not call it. |
 | GET | `/Expense` | Bearer | Compatibility endpoint returns an empty page; not a transaction source. |
 | GET | `/Health` | Anonymous | Health status and UTC timestamp; does not test database connectivity. |
 | GET | `/Test` | Anonymous | Static API-working text; does not test database connectivity. |
@@ -63,7 +64,7 @@ Base path: `/api`. Controllers use ASP.NET Core routing and default camel-case J
 
 ## Database and preservation
 
-- Provider default is SQLite with `Data Source=homebudget-local.db`; SQLite startup uses `EnsureCreatedAsync()` and development seeding.
+- Provider default is SQLite with `Data Source=homebudget-local.db`; SQLite startup uses `EnsureCreatedAsync()`. Demo seeding is disabled by default and requires explicit `SeedDemoData=true` plus a private `SeedDemoPassword` of at least 12 characters.
 - `DatabaseProvider` now explicitly accepts SQLite, PostgreSQL/Postgres, or SQL Server. PostgreSQL and SQLite use `EnsureCreatedAsync()`; SQL Server uses the existing SQL Server-shaped migration set.
 - `render.yaml` requests PostgreSQL. Provider selection is implemented, but a live Render database connection and schema/data compatibility still require deployment-side verification.
 - Existing ignored `HomeBudgetAPI/homebudget-local.db` is present locally. Keep it untouched during tests; use a separate temporary SQLite database.
@@ -76,4 +77,4 @@ Base path: `/api`. Controllers use ASP.NET Core routing and default camel-case J
 - `Jwt:Key` must be configured with at least 32 UTF-8 bytes, and `Jwt:Issuer` and `Jwt:Audience` must both be non-empty. Configure these through .NET user secrets or deployment environment settings; never copy the key into React variables or examples.
 - Exception middleware returns a generic 500 response with a trace ID while logging details server-side. Database initialization failures now stop startup.
 - JWT lifetimes: access token 12 hours, refresh token 14 days. The React client does not call the refresh endpoint; it handles access-token expiry by clearing the session and returning to login.
-- Password hashes use PBKDF2-SHA256 with 100,000 iterations. Refresh tokens are stored hashed in the database.
+- Password hashes use PBKDF2-SHA256 with 600,000 iterations; older valid hashes are upgraded on login. Refresh tokens are stored hashed in the database.

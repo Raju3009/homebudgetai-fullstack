@@ -402,17 +402,22 @@ try
     await db.Database.MigrateAsync();
   }
 
-  var shouldSeedDemoData =
-      app.Environment.IsDevelopment()
-      || builder.Configuration.GetValue<bool>("SeedDemoData");
+  var shouldSeedDemoData = builder.Configuration.GetValue<bool>("SeedDemoData");
 
   if (shouldSeedDemoData)
   {
+    var demoPassword = builder.Configuration["SeedDemoPassword"];
+    if (string.IsNullOrWhiteSpace(demoPassword) || demoPassword.Length < 12)
+    {
+      throw new InvalidOperationException(
+          "SeedDemoPassword must be configured with at least 12 characters when SeedDemoData is enabled.");
+    }
+
     var passwords =
         scope.ServiceProvider
             .GetRequiredService<IPasswordService>();
 
-    await SeedData.ApplyAsync(db, passwords);
+    await SeedData.ApplyAsync(db, passwords, demoPassword);
   }
 }
 catch (Exception ex)

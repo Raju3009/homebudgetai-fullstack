@@ -49,7 +49,7 @@ public class BudgetsController : ControllerBase
         var budget = new Budget { Name = request.Name.Trim(), Category = request.Category.Trim(), LimitAmount = request.LimitAmount, Month = FirstOfMonth(request.Month), AlertThreshold = request.AlertThreshold, IsActive = request.IsActive, UserId = UserId };
         _db.Budgets.Add(budget);
         await _db.SaveChangesAsync();
-        return Ok(ToResponse(budget, 0));
+        return Ok(ToResponse(budget, await SpentAmount(budget)));
     }
 
     [HttpPut("{id:int}")]
@@ -67,7 +67,7 @@ public class BudgetsController : ControllerBase
         budget.AlertThreshold = request.AlertThreshold;
         budget.IsActive = request.IsActive;
         await _db.SaveChangesAsync();
-        return Ok(ToResponse(budget, 0));
+        return Ok(ToResponse(budget, await SpentAmount(budget)));
     }
 
     [HttpDelete("{id:int}")]
@@ -95,5 +95,15 @@ public class BudgetsController : ControllerBase
     }
 
     private static DateTime FirstOfMonth(DateTime date) => new(date.Year, date.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+    private async Task<decimal> SpentAmount(Budget budget)
+    {
+        var month = FirstOfMonth(budget.Month);
+        var afterMonth = month.AddMonths(1);
+        return await _db.Transactions
+            .Where(x => x.UserId == budget.UserId && x.Type == TransactionType.Expense
+                && x.Category.ToUpper() == budget.Category.ToUpper()
+                && x.Date >= month && x.Date < afterMonth)
+            .SumAsync(x => (decimal?)x.Amount) ?? 0m;
+    }
     private static BudgetResponse ToResponse(Budget x, decimal spent) => new(x.Id, x.Name, x.Category, x.LimitAmount, spent, x.Month, x.AlertThreshold, x.IsActive);
 }

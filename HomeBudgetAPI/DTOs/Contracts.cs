@@ -61,6 +61,10 @@ public record UserSettingRequest(
     bool PushNotifications,
     bool MonthlyDigest);
 public record UserSettingResponse(string Currency, string Language, string Theme, bool EmailNotifications, bool PushNotifications, bool MonthlyDigest);
+public record ContactRequest(
+    [Required, StringLength(120)] string Name,
+    [Required, EmailAddress, StringLength(180)] string Email,
+    [Required, StringLength(5000)] string Message);
 public record ReportSummary(decimal Income, decimal Expenses, decimal Balance, decimal SavingsRate, IReadOnlyList<CategoryTotal> Categories, IReadOnlyList<MonthlyTotal> Months, IReadOnlyList<string> Insights, DateTime GeneratedAt);
 
 public record DashboardSummary(
